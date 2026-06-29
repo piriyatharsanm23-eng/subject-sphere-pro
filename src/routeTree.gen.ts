@@ -15,6 +15,14 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SuperSubjectsRouteImport } from './routes/super.subjects'
+import { Route as SuperSemestersRouteImport } from './routes/super.semesters'
+import { Route as SuperRequestsRouteImport } from './routes/super.requests'
+import { Route as SuperMaterialsRouteImport } from './routes/super.materials'
+import { Route as SuperFeedbackRouteImport } from './routes/super.feedback'
+import { Route as SuperDeadlinesRouteImport } from './routes/super.deadlines'
+import { Route as SuperAnalyticsRouteImport } from './routes/super.analytics'
+import { Route as SuperAdminsRouteImport } from './routes/super.admins'
 import { Route as SuperActivityRouteImport } from './routes/super.activity'
 import { Route as SubjectIdRouteImport } from './routes/subject.$id'
 
@@ -48,6 +56,46 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SuperSubjectsRoute = SuperSubjectsRouteImport.update({
+  id: '/subjects',
+  path: '/subjects',
+  getParentRoute: () => SuperRoute,
+} as any)
+const SuperSemestersRoute = SuperSemestersRouteImport.update({
+  id: '/semesters',
+  path: '/semesters',
+  getParentRoute: () => SuperRoute,
+} as any)
+const SuperRequestsRoute = SuperRequestsRouteImport.update({
+  id: '/requests',
+  path: '/requests',
+  getParentRoute: () => SuperRoute,
+} as any)
+const SuperMaterialsRoute = SuperMaterialsRouteImport.update({
+  id: '/materials',
+  path: '/materials',
+  getParentRoute: () => SuperRoute,
+} as any)
+const SuperFeedbackRoute = SuperFeedbackRouteImport.update({
+  id: '/feedback',
+  path: '/feedback',
+  getParentRoute: () => SuperRoute,
+} as any)
+const SuperDeadlinesRoute = SuperDeadlinesRouteImport.update({
+  id: '/deadlines',
+  path: '/deadlines',
+  getParentRoute: () => SuperRoute,
+} as any)
+const SuperAnalyticsRoute = SuperAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => SuperRoute,
+} as any)
+const SuperAdminsRoute = SuperAdminsRouteImport.update({
+  id: '/admins',
+  path: '/admins',
+  getParentRoute: () => SuperRoute,
+} as any)
 const SuperActivityRoute = SuperActivityRouteImport.update({
   id: '/activity',
   path: '/activity',
@@ -68,6 +116,14 @@ export interface FileRoutesByFullPath {
   '/super': typeof SuperRouteWithChildren
   '/subject/$id': typeof SubjectIdRoute
   '/super/activity': typeof SuperActivityRoute
+  '/super/admins': typeof SuperAdminsRoute
+  '/super/analytics': typeof SuperAnalyticsRoute
+  '/super/deadlines': typeof SuperDeadlinesRoute
+  '/super/feedback': typeof SuperFeedbackRoute
+  '/super/materials': typeof SuperMaterialsRoute
+  '/super/requests': typeof SuperRequestsRoute
+  '/super/semesters': typeof SuperSemestersRoute
+  '/super/subjects': typeof SuperSubjectsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -78,6 +134,14 @@ export interface FileRoutesByTo {
   '/super': typeof SuperRouteWithChildren
   '/subject/$id': typeof SubjectIdRoute
   '/super/activity': typeof SuperActivityRoute
+  '/super/admins': typeof SuperAdminsRoute
+  '/super/analytics': typeof SuperAnalyticsRoute
+  '/super/deadlines': typeof SuperDeadlinesRoute
+  '/super/feedback': typeof SuperFeedbackRoute
+  '/super/materials': typeof SuperMaterialsRoute
+  '/super/requests': typeof SuperRequestsRoute
+  '/super/semesters': typeof SuperSemestersRoute
+  '/super/subjects': typeof SuperSubjectsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -89,6 +153,14 @@ export interface FileRoutesById {
   '/super': typeof SuperRouteWithChildren
   '/subject/$id': typeof SubjectIdRoute
   '/super/activity': typeof SuperActivityRoute
+  '/super/admins': typeof SuperAdminsRoute
+  '/super/analytics': typeof SuperAnalyticsRoute
+  '/super/deadlines': typeof SuperDeadlinesRoute
+  '/super/feedback': typeof SuperFeedbackRoute
+  '/super/materials': typeof SuperMaterialsRoute
+  '/super/requests': typeof SuperRequestsRoute
+  '/super/semesters': typeof SuperSemestersRoute
+  '/super/subjects': typeof SuperSubjectsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -101,6 +173,14 @@ export interface FileRouteTypes {
     | '/super'
     | '/subject/$id'
     | '/super/activity'
+    | '/super/admins'
+    | '/super/analytics'
+    | '/super/deadlines'
+    | '/super/feedback'
+    | '/super/materials'
+    | '/super/requests'
+    | '/super/semesters'
+    | '/super/subjects'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -111,6 +191,14 @@ export interface FileRouteTypes {
     | '/super'
     | '/subject/$id'
     | '/super/activity'
+    | '/super/admins'
+    | '/super/analytics'
+    | '/super/deadlines'
+    | '/super/feedback'
+    | '/super/materials'
+    | '/super/requests'
+    | '/super/semesters'
+    | '/super/subjects'
   id:
     | '__root__'
     | '/'
@@ -121,6 +209,14 @@ export interface FileRouteTypes {
     | '/super'
     | '/subject/$id'
     | '/super/activity'
+    | '/super/admins'
+    | '/super/analytics'
+    | '/super/deadlines'
+    | '/super/feedback'
+    | '/super/materials'
+    | '/super/requests'
+    | '/super/semesters'
+    | '/super/subjects'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -177,6 +273,62 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/super/subjects': {
+      id: '/super/subjects'
+      path: '/subjects'
+      fullPath: '/super/subjects'
+      preLoaderRoute: typeof SuperSubjectsRouteImport
+      parentRoute: typeof SuperRoute
+    }
+    '/super/semesters': {
+      id: '/super/semesters'
+      path: '/semesters'
+      fullPath: '/super/semesters'
+      preLoaderRoute: typeof SuperSemestersRouteImport
+      parentRoute: typeof SuperRoute
+    }
+    '/super/requests': {
+      id: '/super/requests'
+      path: '/requests'
+      fullPath: '/super/requests'
+      preLoaderRoute: typeof SuperRequestsRouteImport
+      parentRoute: typeof SuperRoute
+    }
+    '/super/materials': {
+      id: '/super/materials'
+      path: '/materials'
+      fullPath: '/super/materials'
+      preLoaderRoute: typeof SuperMaterialsRouteImport
+      parentRoute: typeof SuperRoute
+    }
+    '/super/feedback': {
+      id: '/super/feedback'
+      path: '/feedback'
+      fullPath: '/super/feedback'
+      preLoaderRoute: typeof SuperFeedbackRouteImport
+      parentRoute: typeof SuperRoute
+    }
+    '/super/deadlines': {
+      id: '/super/deadlines'
+      path: '/deadlines'
+      fullPath: '/super/deadlines'
+      preLoaderRoute: typeof SuperDeadlinesRouteImport
+      parentRoute: typeof SuperRoute
+    }
+    '/super/analytics': {
+      id: '/super/analytics'
+      path: '/analytics'
+      fullPath: '/super/analytics'
+      preLoaderRoute: typeof SuperAnalyticsRouteImport
+      parentRoute: typeof SuperRoute
+    }
+    '/super/admins': {
+      id: '/super/admins'
+      path: '/admins'
+      fullPath: '/super/admins'
+      preLoaderRoute: typeof SuperAdminsRouteImport
+      parentRoute: typeof SuperRoute
+    }
     '/super/activity': {
       id: '/super/activity'
       path: '/activity'
@@ -196,10 +348,26 @@ declare module '@tanstack/react-router' {
 
 interface SuperRouteChildren {
   SuperActivityRoute: typeof SuperActivityRoute
+  SuperAdminsRoute: typeof SuperAdminsRoute
+  SuperAnalyticsRoute: typeof SuperAnalyticsRoute
+  SuperDeadlinesRoute: typeof SuperDeadlinesRoute
+  SuperFeedbackRoute: typeof SuperFeedbackRoute
+  SuperMaterialsRoute: typeof SuperMaterialsRoute
+  SuperRequestsRoute: typeof SuperRequestsRoute
+  SuperSemestersRoute: typeof SuperSemestersRoute
+  SuperSubjectsRoute: typeof SuperSubjectsRoute
 }
 
 const SuperRouteChildren: SuperRouteChildren = {
   SuperActivityRoute: SuperActivityRoute,
+  SuperAdminsRoute: SuperAdminsRoute,
+  SuperAnalyticsRoute: SuperAnalyticsRoute,
+  SuperDeadlinesRoute: SuperDeadlinesRoute,
+  SuperFeedbackRoute: SuperFeedbackRoute,
+  SuperMaterialsRoute: SuperMaterialsRoute,
+  SuperRequestsRoute: SuperRequestsRoute,
+  SuperSemestersRoute: SuperSemestersRoute,
+  SuperSubjectsRoute: SuperSubjectsRoute,
 }
 
 const SuperRouteWithChildren = SuperRoute._addFileChildren(SuperRouteChildren)
