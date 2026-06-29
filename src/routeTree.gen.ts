@@ -15,6 +15,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SuperSubjectsRouteImport } from './routes/super.subjects'
 import { Route as SuperSemestersRouteImport } from './routes/super.semesters'
 import { Route as SuperActivityRouteImport } from './routes/super.activity'
 import { Route as SubjectIdRouteImport } from './routes/subject.$id'
@@ -49,6 +50,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SuperSubjectsRoute = SuperSubjectsRouteImport.update({
+  id: '/subjects',
+  path: '/subjects',
+  getParentRoute: () => SuperRoute,
+} as any)
 const SuperSemestersRoute = SuperSemestersRouteImport.update({
   id: '/semesters',
   path: '/semesters',
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/subject/$id': typeof SubjectIdRoute
   '/super/activity': typeof SuperActivityRoute
   '/super/semesters': typeof SuperSemestersRoute
+  '/super/subjects': typeof SuperSubjectsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -86,6 +93,7 @@ export interface FileRoutesByTo {
   '/subject/$id': typeof SubjectIdRoute
   '/super/activity': typeof SuperActivityRoute
   '/super/semesters': typeof SuperSemestersRoute
+  '/super/subjects': typeof SuperSubjectsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -98,6 +106,7 @@ export interface FileRoutesById {
   '/subject/$id': typeof SubjectIdRoute
   '/super/activity': typeof SuperActivityRoute
   '/super/semesters': typeof SuperSemestersRoute
+  '/super/subjects': typeof SuperSubjectsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -111,6 +120,7 @@ export interface FileRouteTypes {
     | '/subject/$id'
     | '/super/activity'
     | '/super/semesters'
+    | '/super/subjects'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -122,6 +132,7 @@ export interface FileRouteTypes {
     | '/subject/$id'
     | '/super/activity'
     | '/super/semesters'
+    | '/super/subjects'
   id:
     | '__root__'
     | '/'
@@ -133,6 +144,7 @@ export interface FileRouteTypes {
     | '/subject/$id'
     | '/super/activity'
     | '/super/semesters'
+    | '/super/subjects'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -189,6 +201,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/super/subjects': {
+      id: '/super/subjects'
+      path: '/subjects'
+      fullPath: '/super/subjects'
+      preLoaderRoute: typeof SuperSubjectsRouteImport
+      parentRoute: typeof SuperRoute
+    }
     '/super/semesters': {
       id: '/super/semesters'
       path: '/semesters'
@@ -216,11 +235,13 @@ declare module '@tanstack/react-router' {
 interface SuperRouteChildren {
   SuperActivityRoute: typeof SuperActivityRoute
   SuperSemestersRoute: typeof SuperSemestersRoute
+  SuperSubjectsRoute: typeof SuperSubjectsRoute
 }
 
 const SuperRouteChildren: SuperRouteChildren = {
   SuperActivityRoute: SuperActivityRoute,
   SuperSemestersRoute: SuperSemestersRoute,
+  SuperSubjectsRoute: SuperSubjectsRoute,
 }
 
 const SuperRouteWithChildren = SuperRoute._addFileChildren(SuperRouteChildren)
