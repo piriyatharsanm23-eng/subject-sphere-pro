@@ -235,36 +235,18 @@ function DashboardContent({ sel }: { sel: Selection }) {
             </div>
           </div>
 
-          {/* Deadlines */}
+          {/* All deadlines list */}
           <aside>
-            <h2 className="text-lg font-semibold mb-3">Upcoming deadlines</h2>
-            <div className="space-y-3">
-              {deadlinesQ.isLoading ? (
-                [0,1].map((i) => <div key={i} className="h-20 rounded-2xl bg-muted animate-pulse" />)
-              ) : (deadlinesQ.data ?? []).length === 0 ? (
-                <EmptyState icon={Calendar} title="No upcoming deadlines" description="You're all caught up." />
-              ) : (
-                deadlinesQ.data!.map((d) => (
-                  <div key={d.id} className="rounded-2xl border border-border bg-card p-4 shadow-soft">
-                    <div className="flex items-start gap-3">
-                      <div className="grid place-items-center h-10 w-10 rounded-lg bg-badge-assignment/10 text-badge-assignment">
-                        <Calendar className="h-5 w-5" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="text-xs text-muted-foreground">{subjectsById[d.subject_id]?.name}</div>
-                        <div className="font-semibold truncate">{d.title}</div>
-                        <div className="mt-1 text-xs">
-                          <span className="text-badge-assignment font-medium">{format(new Date(d.deadline_at), "EEE, MMM d · h:mm a")}</span>
-                          <span className="text-muted-foreground"> · in {formatDistanceToNow(new Date(d.deadline_at))}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
+            {deadlinesQ.isLoading ? (
+              <div className="space-y-3">
+                {[0,1].map((i) => <div key={i} className="h-20 rounded-2xl bg-muted animate-pulse" />)}
+              </div>
+            ) : (
+              <AllDeadlinesList deadlines={deadlinesQ.data ?? []} subjectsById={subjectsById} />
+            )}
           </aside>
         </div>
+
       </main>
       <SiteFooter />
     </div>
