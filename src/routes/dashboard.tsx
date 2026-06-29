@@ -135,6 +135,17 @@ function DashboardContent({ sel }: { sel: Selection }) {
           </div>
         </div>
 
+        {/* Deadline reminder banner — urgent first */}
+        <div className="mb-10">
+          {deadlinesQ.isLoading ? (
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {[0,1,2].map((i) => <div key={i} className="h-40 rounded-2xl bg-muted animate-pulse" />)}
+            </div>
+          ) : (
+            <DeadlineBanner deadlines={deadlinesQ.data ?? []} subjectsById={subjectsById} />
+          )}
+        </div>
+
         {/* Subject cards */}
         <section>
           <h2 className="text-lg font-semibold mb-3">Your subjects</h2>
