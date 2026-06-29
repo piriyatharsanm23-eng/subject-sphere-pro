@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Search, Download, ArrowRight, Calendar, Settings2, Inbox, FileText, MessageSquarePlus, Star } from "lucide-react";
+import { Search, Download, ArrowRight, Settings2, Inbox, FileText, MessageSquarePlus, Star } from "lucide-react";
+import { DeadlineBanner, AllDeadlinesList } from "@/components/DeadlineBanner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SiteHeader } from "@/components/SiteHeader";
