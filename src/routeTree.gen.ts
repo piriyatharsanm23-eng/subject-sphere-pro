@@ -15,6 +15,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SuperActivityRouteImport } from './routes/super.activity'
 import { Route as SubjectIdRouteImport } from './routes/subject.$id'
 
 const SuperRoute = SuperRouteImport.update({
@@ -47,6 +48,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SuperActivityRoute = SuperActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => SuperRoute,
+} as any)
 const SubjectIdRoute = SubjectIdRouteImport.update({
   id: '/subject/$id',
   path: '/subject/$id',
@@ -59,8 +65,9 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/select': typeof SelectRoute
-  '/super': typeof SuperRoute
+  '/super': typeof SuperRouteWithChildren
   '/subject/$id': typeof SubjectIdRoute
+  '/super/activity': typeof SuperActivityRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -68,8 +75,9 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/select': typeof SelectRoute
-  '/super': typeof SuperRoute
+  '/super': typeof SuperRouteWithChildren
   '/subject/$id': typeof SubjectIdRoute
+  '/super/activity': typeof SuperActivityRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -78,8 +86,9 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/select': typeof SelectRoute
-  '/super': typeof SuperRoute
+  '/super': typeof SuperRouteWithChildren
   '/subject/$id': typeof SubjectIdRoute
+  '/super/activity': typeof SuperActivityRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +100,7 @@ export interface FileRouteTypes {
     | '/select'
     | '/super'
     | '/subject/$id'
+    | '/super/activity'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +110,7 @@ export interface FileRouteTypes {
     | '/select'
     | '/super'
     | '/subject/$id'
+    | '/super/activity'
   id:
     | '__root__'
     | '/'
@@ -109,6 +120,7 @@ export interface FileRouteTypes {
     | '/select'
     | '/super'
     | '/subject/$id'
+    | '/super/activity'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -117,7 +129,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   DashboardRoute: typeof DashboardRoute
   SelectRoute: typeof SelectRoute
-  SuperRoute: typeof SuperRoute
+  SuperRoute: typeof SuperRouteWithChildren
   SubjectIdRoute: typeof SubjectIdRoute
 }
 
@@ -165,6 +177,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/super/activity': {
+      id: '/super/activity'
+      path: '/activity'
+      fullPath: '/super/activity'
+      preLoaderRoute: typeof SuperActivityRouteImport
+      parentRoute: typeof SuperRoute
+    }
     '/subject/$id': {
       id: '/subject/$id'
       path: '/subject/$id'
@@ -175,13 +194,23 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface SuperRouteChildren {
+  SuperActivityRoute: typeof SuperActivityRoute
+}
+
+const SuperRouteChildren: SuperRouteChildren = {
+  SuperActivityRoute: SuperActivityRoute,
+}
+
+const SuperRouteWithChildren = SuperRoute._addFileChildren(SuperRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
   DashboardRoute: DashboardRoute,
   SelectRoute: SelectRoute,
-  SuperRoute: SuperRoute,
+  SuperRoute: SuperRouteWithChildren,
   SubjectIdRoute: SubjectIdRoute,
 }
 export const routeTree = rootRouteImport

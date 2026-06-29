@@ -14,6 +14,70 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_logs: {
+        Row: {
+          action_type: string
+          created_at: string
+          description: string
+          id: string
+          semester_id: string | null
+          subject_id: string | null
+          target_id: string | null
+          target_type: string | null
+          user_id: string | null
+          user_name: string | null
+          user_role: string | null
+        }
+        Insert: {
+          action_type: string
+          created_at?: string
+          description: string
+          id?: string
+          semester_id?: string | null
+          subject_id?: string | null
+          target_id?: string | null
+          target_type?: string | null
+          user_id?: string | null
+          user_name?: string | null
+          user_role?: string | null
+        }
+        Update: {
+          action_type?: string
+          created_at?: string
+          description?: string
+          id?: string
+          semester_id?: string | null
+          subject_id?: string | null
+          target_id?: string | null
+          target_type?: string | null
+          user_id?: string | null
+          user_name?: string | null
+          user_role?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_logs_semester_id_fkey"
+            columns: ["semester_id"]
+            isOneToOne: false
+            referencedRelation: "semesters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_logs_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       deadlines: {
         Row: {
           attachment_url: string | null
@@ -22,6 +86,7 @@ export type Database = {
           deadline_at: string
           description: string | null
           id: string
+          is_archived: boolean
           semester_id: string
           status: string
           subject_id: string
@@ -35,6 +100,7 @@ export type Database = {
           deadline_at: string
           description?: string | null
           id?: string
+          is_archived?: boolean
           semester_id: string
           status?: string
           subject_id: string
@@ -48,6 +114,7 @@ export type Database = {
           deadline_at?: string
           description?: string | null
           id?: string
+          is_archived?: boolean
           semester_id?: string
           status?: string
           subject_id?: string
@@ -161,6 +228,7 @@ export type Database = {
           file_type: string | null
           file_url: string
           id: string
+          is_archived: boolean
           material_type: string
           semester_id: string
           subject_id: string
@@ -178,6 +246,7 @@ export type Database = {
           file_type?: string | null
           file_url: string
           id?: string
+          is_archived?: boolean
           material_type: string
           semester_id: string
           subject_id: string
@@ -195,6 +264,7 @@ export type Database = {
           file_type?: string | null
           file_url?: string
           id?: string
+          is_archived?: boolean
           material_type?: string
           semester_id?: string
           subject_id?: string
@@ -415,6 +485,17 @@ export type Database = {
       }
       increment_download: { Args: { _material_id: string }; Returns: undefined }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
+      log_activity: {
+        Args: {
+          _action_type: string
+          _description: string
+          _semester_id?: string
+          _subject_id?: string
+          _target_id?: string
+          _target_type?: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       app_role: "admin" | "super_admin"
