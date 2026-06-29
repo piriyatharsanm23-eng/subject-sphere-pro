@@ -1,11 +1,11 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export const MATERIAL_TYPES = [
-  { value: "lecture_slide", label: "Lecture Slides", badge: "bg-[oklch(var(--badge-lecture))]/10 text-[oklch(var(--badge-lecture))] border border-[oklch(var(--badge-lecture))]/20" },
-  { value: "note", label: "Notes", badge: "bg-[oklch(var(--badge-note))]/10 text-[oklch(var(--badge-note))] border border-[oklch(var(--badge-note))]/20" },
-  { value: "past_paper", label: "Past Papers", badge: "bg-[oklch(var(--badge-paper))]/10 text-[oklch(var(--badge-paper))] border border-[oklch(var(--badge-paper))]/20" },
-  { value: "assignment", label: "Assignments", badge: "bg-[oklch(var(--badge-assignment))]/10 text-[oklch(var(--badge-assignment))] border border-[oklch(var(--badge-assignment))]/20" },
-  { value: "other", label: "Other", badge: "bg-[oklch(var(--badge-other))]/10 text-[oklch(var(--badge-other))] border border-[oklch(var(--badge-other))]/20" },
+  { value: "lecture_slide", label: "Lecture Slides", badge: "bg-badge-lecture/10 text-badge-lecture border border-badge-lecture/30" },
+  { value: "note", label: "Notes", badge: "bg-badge-note/10 text-badge-note border border-badge-note/30" },
+  { value: "past_paper", label: "Past Papers", badge: "bg-badge-paper/10 text-badge-paper border border-badge-paper/30" },
+  { value: "assignment", label: "Assignments", badge: "bg-badge-assignment/10 text-badge-assignment border border-badge-assignment/30" },
+  { value: "other", label: "Other", badge: "bg-badge-other/10 text-badge-other border border-badge-other/30" },
 ] as const;
 
 export type MaterialType = typeof MATERIAL_TYPES[number]["value"];
