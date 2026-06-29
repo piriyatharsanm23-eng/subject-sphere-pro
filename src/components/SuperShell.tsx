@@ -10,7 +10,8 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { supabase } from "@/integrations/supabase/client";
 
-const NAV = [
+type NavItem = { to: string; label: string; icon: typeof Activity; exact?: boolean };
+const NAV: NavItem[] = [
   { to: "/super", label: "Overview", icon: LayoutDashboard, exact: true },
   { to: "/super/semesters", label: "Semesters", icon: BookOpen },
   { to: "/super/subjects", label: "Subjects", icon: Library },
@@ -21,7 +22,7 @@ const NAV = [
   { to: "/super/feedback", label: "Feedback", icon: Star },
   { to: "/super/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/super/activity", label: "Activity Log", icon: Activity },
-] as const;
+];
 
 export function SuperShell({
   title, description, children,
