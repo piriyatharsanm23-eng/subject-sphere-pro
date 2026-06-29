@@ -21,6 +21,7 @@ import { Route as SuperRequestsRouteImport } from './routes/super.requests'
 import { Route as SuperMaterialsRouteImport } from './routes/super.materials'
 import { Route as SuperFeedbackRouteImport } from './routes/super.feedback'
 import { Route as SuperDeadlinesRouteImport } from './routes/super.deadlines'
+import { Route as SuperAnalyticsRouteImport } from './routes/super.analytics'
 import { Route as SuperAdminsRouteImport } from './routes/super.admins'
 import { Route as SuperActivityRouteImport } from './routes/super.activity'
 import { Route as SubjectIdRouteImport } from './routes/subject.$id'
@@ -85,6 +86,11 @@ const SuperDeadlinesRoute = SuperDeadlinesRouteImport.update({
   path: '/deadlines',
   getParentRoute: () => SuperRoute,
 } as any)
+const SuperAnalyticsRoute = SuperAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => SuperRoute,
+} as any)
 const SuperAdminsRoute = SuperAdminsRouteImport.update({
   id: '/admins',
   path: '/admins',
@@ -111,6 +117,7 @@ export interface FileRoutesByFullPath {
   '/subject/$id': typeof SubjectIdRoute
   '/super/activity': typeof SuperActivityRoute
   '/super/admins': typeof SuperAdminsRoute
+  '/super/analytics': typeof SuperAnalyticsRoute
   '/super/deadlines': typeof SuperDeadlinesRoute
   '/super/feedback': typeof SuperFeedbackRoute
   '/super/materials': typeof SuperMaterialsRoute
@@ -128,6 +135,7 @@ export interface FileRoutesByTo {
   '/subject/$id': typeof SubjectIdRoute
   '/super/activity': typeof SuperActivityRoute
   '/super/admins': typeof SuperAdminsRoute
+  '/super/analytics': typeof SuperAnalyticsRoute
   '/super/deadlines': typeof SuperDeadlinesRoute
   '/super/feedback': typeof SuperFeedbackRoute
   '/super/materials': typeof SuperMaterialsRoute
@@ -146,6 +154,7 @@ export interface FileRoutesById {
   '/subject/$id': typeof SubjectIdRoute
   '/super/activity': typeof SuperActivityRoute
   '/super/admins': typeof SuperAdminsRoute
+  '/super/analytics': typeof SuperAnalyticsRoute
   '/super/deadlines': typeof SuperDeadlinesRoute
   '/super/feedback': typeof SuperFeedbackRoute
   '/super/materials': typeof SuperMaterialsRoute
@@ -165,6 +174,7 @@ export interface FileRouteTypes {
     | '/subject/$id'
     | '/super/activity'
     | '/super/admins'
+    | '/super/analytics'
     | '/super/deadlines'
     | '/super/feedback'
     | '/super/materials'
@@ -182,6 +192,7 @@ export interface FileRouteTypes {
     | '/subject/$id'
     | '/super/activity'
     | '/super/admins'
+    | '/super/analytics'
     | '/super/deadlines'
     | '/super/feedback'
     | '/super/materials'
@@ -199,6 +210,7 @@ export interface FileRouteTypes {
     | '/subject/$id'
     | '/super/activity'
     | '/super/admins'
+    | '/super/analytics'
     | '/super/deadlines'
     | '/super/feedback'
     | '/super/materials'
@@ -303,6 +315,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SuperDeadlinesRouteImport
       parentRoute: typeof SuperRoute
     }
+    '/super/analytics': {
+      id: '/super/analytics'
+      path: '/analytics'
+      fullPath: '/super/analytics'
+      preLoaderRoute: typeof SuperAnalyticsRouteImport
+      parentRoute: typeof SuperRoute
+    }
     '/super/admins': {
       id: '/super/admins'
       path: '/admins'
@@ -330,6 +349,7 @@ declare module '@tanstack/react-router' {
 interface SuperRouteChildren {
   SuperActivityRoute: typeof SuperActivityRoute
   SuperAdminsRoute: typeof SuperAdminsRoute
+  SuperAnalyticsRoute: typeof SuperAnalyticsRoute
   SuperDeadlinesRoute: typeof SuperDeadlinesRoute
   SuperFeedbackRoute: typeof SuperFeedbackRoute
   SuperMaterialsRoute: typeof SuperMaterialsRoute
@@ -341,6 +361,7 @@ interface SuperRouteChildren {
 const SuperRouteChildren: SuperRouteChildren = {
   SuperActivityRoute: SuperActivityRoute,
   SuperAdminsRoute: SuperAdminsRoute,
+  SuperAnalyticsRoute: SuperAnalyticsRoute,
   SuperDeadlinesRoute: SuperDeadlinesRoute,
   SuperFeedbackRoute: SuperFeedbackRoute,
   SuperMaterialsRoute: SuperMaterialsRoute,
