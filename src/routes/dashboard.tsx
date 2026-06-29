@@ -122,13 +122,13 @@ function DashboardContent({ sel }: { sel: Selection }) {
       <SiteHeader />
       <main className="container mx-auto px-4 sm:px-6 py-8 flex-1 max-w-7xl w-full">
         {/* Header */}
-        <div className="flex flex-wrap items-end justify-between gap-4 mb-8">
-          <div>
+        <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-end sm:justify-between gap-4 mb-8">
+          <div className="min-w-0">
             <div className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Semester</div>
-            <h1 className="mt-1 text-3xl sm:text-4xl font-bold tracking-tight">{semesterQ.data?.name ?? "Your dashboard"}</h1>
+            <h1 className="mt-1 text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight break-words">{semesterQ.data?.name ?? "Your dashboard"}</h1>
             <p className="mt-1 text-sm text-muted-foreground">{sel.subjectIds.length} subject{sel.subjectIds.length === 1 ? "" : "s"} selected</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2 [&>*]:flex-1 sm:[&>*]:flex-none">
             <Button asChild variant="outline"><Link to="/select"><Settings2 className="mr-2 h-4 w-4" />Change preferences</Link></Button>
             <RequestDialog semesterId={sel.semesterId} subjects={subjectsQ.data ?? []} />
             <FeedbackDialog semesterId={sel.semesterId} subjects={subjectsQ.data ?? []} />
