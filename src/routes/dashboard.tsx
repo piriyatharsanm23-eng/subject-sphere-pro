@@ -78,9 +78,10 @@ function DashboardContent({ sel }: { sel: Selection }) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("deadlines")
-        .select("id,title,description,deadline_at,subject_id,status")
+        .select("id,title,description,deadline_at,subject_id,status,is_archived")
         .in("subject_id", sel.subjectIds)
         .eq("status", "active")
+        .eq("is_archived", false)
         .gte("deadline_at", new Date().toISOString())
         .order("deadline_at", { ascending: true });
       if (error) throw error;
