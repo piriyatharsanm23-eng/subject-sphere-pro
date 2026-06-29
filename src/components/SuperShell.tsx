@@ -72,23 +72,23 @@ export function SuperShell({
           {/* Sidebar */}
           <aside className="lg:sticky lg:top-20 lg:self-start">
             <div className="rounded-2xl border border-border bg-card p-2 shadow-soft">
-              <div className="px-3 py-2">
+              <div className="px-3 py-2 hidden lg:block">
                 <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Super Admin</div>
               </div>
-              <nav className="flex flex-col">
+              <nav className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible -mx-1 px-1 lg:mx-0 lg:px-0 scrollbar-thin">
                 {NAV.map((item) => {
                   const active = item.exact ? path === item.to : path.startsWith(item.to);
                   return (
                     <Link
                       key={item.to}
                       to={item.to}
-                      className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors ${
+                      className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm whitespace-nowrap transition-colors shrink-0 lg:shrink ${
                         active
                           ? "bg-primary/10 text-primary font-medium"
                           : "text-muted-foreground hover:bg-muted hover:text-foreground"
                       }`}
                     >
-                      <item.icon className="h-4 w-4" />
+                      <item.icon className="h-4 w-4 shrink-0" />
                       <span>{item.label}</span>
                     </Link>
                   );
