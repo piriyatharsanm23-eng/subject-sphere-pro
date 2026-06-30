@@ -1,7 +1,19 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, BookOpen, Calendar, Download, FileText, MessageSquare, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  BookOpen,
+  Calendar,
+  Download,
+  FileText,
+  MessageSquare,
+  Sparkles,
+  GraduationCap,
+  Clock,
+  Layers,
+  ShieldCheck,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -46,70 +58,172 @@ function Landing() {
       {/* HERO */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-hero" />
-        <div className="absolute inset-0 opacity-30 [background-image:radial-gradient(circle_at_20%_20%,white_0,transparent_40%),radial-gradient(circle_at_80%_60%,white_0,transparent_40%)]" />
-        <div className="relative container mx-auto px-4 sm:px-6 py-24 sm:py-32 lg:py-40">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white/90 backdrop-blur">
-              <Sparkles className="h-3.5 w-3.5" /> Built for students, organised by semester
+        {/* animated gradient orbs */}
+        <div className="pointer-events-none absolute -top-40 -left-40 h-[480px] w-[480px] rounded-full bg-emerald-400/30 blur-3xl animate-pulse" />
+        <div className="pointer-events-none absolute -bottom-40 -right-32 h-[520px] w-[520px] rounded-full bg-teal-400/25 blur-3xl animate-pulse [animation-delay:1.5s]" />
+        <div className="pointer-events-none absolute top-1/3 left-1/2 h-[320px] w-[320px] -translate-x-1/2 rounded-full bg-sky-400/15 blur-3xl" />
+        {/* grid texture */}
+        <div className="pointer-events-none absolute inset-0 opacity-[0.07] [background-image:linear-gradient(to_right,white_1px,transparent_1px),linear-gradient(to_bottom,white_1px,transparent_1px)] [background-size:48px_48px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_75%)]" />
+
+        <div className="relative container mx-auto px-4 sm:px-6 pt-14 pb-20 sm:pt-20 sm:pb-28 lg:pt-28 lg:pb-36">
+          <div className="grid items-center gap-12 lg:grid-cols-[1.15fr_1fr]">
+            {/* COPY */}
+            <div className="max-w-2xl">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-medium text-white/90 backdrop-blur">
+                <Sparkles className="h-3.5 w-3.5 text-emerald-300" />
+                <span>Built for students, organised by semester</span>
+              </div>
+
+              <h1 className="mt-5 text-[2.25rem] leading-[1.05] sm:text-5xl lg:text-[4rem] font-extrabold tracking-tight text-white">
+                Every lecture slide and past paper,{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-sky-200">
+                  one calm place
+                </span>
+                <span className="text-emerald-300">.</span>
+              </h1>
+
+              <p className="mt-5 text-base sm:text-lg text-white/75 max-w-xl leading-relaxed">
+                Instant, no-login access to lecture materials, notes, past papers and upcoming deadlines — sorted by your semester and subjects.
+              </p>
+
+              <div className="mt-8 flex flex-col sm:flex-row gap-3">
+                <Button
+                  size="lg"
+                  onClick={() => navigate({ to: hasSelection ? "/dashboard" : "/select" })}
+                  className="bg-white text-navy hover:bg-white/90 shadow-glow font-semibold w-full sm:w-auto"
+                >
+                  {hasSelection ? "Open dashboard" : "Start learning"}
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="bg-white/5 border-white/30 text-white hover:bg-white/15 hover:text-white backdrop-blur w-full sm:w-auto"
+                >
+                  <Link to="/select">Choose semester</Link>
+                </Button>
+              </div>
+
+              {/* trust row */}
+              <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 text-xs text-white/70">
+                <div className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-emerald-300" /> No sign-up required</div>
+                <div className="flex items-center gap-2"><Clock className="h-4 w-4 text-emerald-300" /> Live deadline alerts</div>
+                <div className="flex items-center gap-2"><Layers className="h-4 w-4 text-emerald-300" /> Organised by subject</div>
+              </div>
             </div>
-            <h1 className="mt-6 text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white">
-              Every lecture slide and past paper, <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-teal-200">one calm place</span>.
-            </h1>
-            <p className="mt-6 text-lg text-white/80 max-w-2xl leading-relaxed">
-              StudyHub gives you instant, no-login access to lecture materials, notes, past papers and upcoming deadlines — sorted by your semester and subjects.
-            </p>
-            <div className="mt-9 flex flex-wrap gap-3">
-              <Button
-                size="lg"
-                onClick={() => navigate({ to: hasSelection ? "/dashboard" : "/select" })}
-                className="bg-white text-navy hover:bg-white/90 shadow-glow font-semibold"
-              >
-                {hasSelection ? "Open dashboard" : "Start learning"} <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-              <Button asChild size="lg" variant="outline" className="bg-transparent border-white/40 text-white hover:bg-white/10 hover:text-white">
-                <Link to="/select">Choose semester</Link>
-              </Button>
+
+            {/* PREVIEW CARD */}
+            <div className="relative hidden lg:block">
+              <div className="absolute -inset-6 rounded-3xl bg-gradient-to-br from-emerald-400/30 via-teal-400/20 to-transparent blur-2xl" />
+              <div className="relative rounded-3xl border border-white/15 bg-white/10 backdrop-blur-xl p-5 shadow-2xl">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2 text-white/90">
+                    <div className="grid h-8 w-8 place-items-center rounded-lg bg-emerald-400/20 text-emerald-200">
+                      <GraduationCap className="h-4 w-4" />
+                    </div>
+                    <div className="text-sm font-semibold">Semester 4 · Today</div>
+                  </div>
+                  <span className="rounded-full bg-emerald-400/20 text-emerald-100 text-[10px] font-semibold uppercase tracking-wider px-2 py-1 border border-emerald-300/30">Live</span>
+                </div>
+
+                <div className="space-y-2.5">
+                  {[
+                    { t: "Algorithms · Lecture 12.pdf", b: "Slides", c: "bg-sky-400/20 text-sky-100" },
+                    { t: "Database Systems · Midterm 2024", b: "Paper", c: "bg-violet-400/20 text-violet-100" },
+                    { t: "OS · Assignment 3 due tomorrow", b: "Urgent", c: "bg-rose-400/20 text-rose-100" },
+                    { t: "Networks · Chapter notes", b: "Notes", c: "bg-emerald-400/20 text-emerald-100" },
+                  ].map((r, i) => (
+                    <div key={i} className="flex items-center gap-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-white/10 px-3 py-2.5">
+                      <div className="grid h-8 w-8 place-items-center rounded-md bg-white/10 text-white/80 shrink-0">
+                        <FileText className="h-4 w-4" />
+                      </div>
+                      <div className="min-w-0 flex-1 text-sm text-white/90 truncate">{r.t}</div>
+                      <span className={`shrink-0 rounded-full text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 ${r.c}`}>{r.b}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+                  {[
+                    { k: "Subjects", v: "6" },
+                    { k: "Materials", v: "120+" },
+                    { k: "Deadlines", v: "4" },
+                  ].map((s) => (
+                    <div key={s.k} className="rounded-xl bg-white/5 border border-white/10 py-2">
+                      <div className="text-base font-bold text-white">{s.v}</div>
+                      <div className="text-[10px] uppercase tracking-wider text-white/60">{s.k}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </div>
+
+        {/* fade to page */}
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-background" />
       </section>
 
       {/* FEATURES */}
-      <section className="container mx-auto px-4 sm:px-6 -mt-12 relative z-10">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="container mx-auto px-4 sm:px-6 -mt-10 sm:-mt-14 relative z-10">
+        <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
           {[
-            { icon: FileText, title: "Lecture slides & notes", desc: "Download up-to-date material from every subject." },
-            { icon: BookOpen, title: "Past papers archive", desc: "Browse past papers, organised by year." },
-            { icon: Calendar, title: "Live deadlines", desc: "See assignments and exam dates at a glance." },
-            { icon: MessageSquare, title: "Request & feedback", desc: "Ask for missing material or report issues." },
+            { icon: FileText, title: "Lecture slides & notes", desc: "Download up-to-date material from every subject.", tint: "from-sky-500/15 to-transparent", iconBg: "bg-sky-500/10 text-sky-600 dark:text-sky-300" },
+            { icon: BookOpen, title: "Past papers archive", desc: "Browse past papers, organised by year.", tint: "from-violet-500/15 to-transparent", iconBg: "bg-violet-500/10 text-violet-600 dark:text-violet-300" },
+            { icon: Calendar, title: "Live deadlines", desc: "See assignments and exam dates at a glance.", tint: "from-emerald-500/15 to-transparent", iconBg: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300" },
+            { icon: MessageSquare, title: "Request & feedback", desc: "Ask for missing material or report issues.", tint: "from-amber-500/15 to-transparent", iconBg: "bg-amber-500/10 text-amber-600 dark:text-amber-300" },
           ].map((f) => (
-            <div key={f.title} className="rounded-2xl border border-border bg-card p-5 shadow-soft hover:shadow-elevated transition-shadow">
-              <div className="grid h-10 w-10 place-items-center rounded-lg bg-primary/10 text-primary"><f.icon className="h-5 w-5" /></div>
-              <h3 className="mt-4 font-semibold">{f.title}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">{f.desc}</p>
+            <div
+              key={f.title}
+              className={`group relative overflow-hidden rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-soft hover:shadow-elevated hover:-translate-y-0.5 transition-all`}
+            >
+              <div className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${f.tint} opacity-60`} />
+              <div className="relative">
+                <div className={`grid h-10 w-10 place-items-center rounded-xl ${f.iconBg}`}>
+                  <f.icon className="h-5 w-5" />
+                </div>
+                <h3 className="mt-3 sm:mt-4 font-semibold text-sm sm:text-base leading-tight">{f.title}</h3>
+                <p className="mt-1 text-xs sm:text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
+              </div>
             </div>
           ))}
         </div>
       </section>
 
       {/* AVAILABLE SEMESTERS */}
-      <section className="container mx-auto px-4 sm:px-6 mt-24">
-        <div className="flex items-end justify-between gap-4 mb-6">
-          <div>
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Available semesters</h2>
+      <section className="container mx-auto px-4 sm:px-6 mt-16 sm:mt-24">
+        <div className="flex items-end justify-between gap-4 mb-6 flex-wrap">
+          <div className="min-w-0">
+            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 text-primary px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider">
+              <Layers className="h-3 w-3" /> Catalog
+            </div>
+            <h2 className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight">Available semesters</h2>
             <p className="mt-1 text-muted-foreground text-sm">Pick a semester to view its subjects and materials.</p>
           </div>
-          <Button asChild variant="ghost"><Link to="/select">View all <ArrowRight className="ml-1 h-4 w-4" /></Link></Button>
+          <Button asChild variant="ghost" className="shrink-0">
+            <Link to="/select">View all <ArrowRight className="ml-1 h-4 w-4" /></Link>
+          </Button>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {semesters && semesters.length > 0 ? (
             semesters.map((s) => (
-              <Link key={s.id} to="/select" className="group rounded-2xl border border-border bg-card-soft p-6 shadow-soft hover:shadow-elevated hover:-translate-y-0.5 transition-all">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold group-hover:text-primary transition-colors">{s.name}</h3>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+              <Link
+                key={s.id}
+                to="/select"
+                className="group relative overflow-hidden rounded-2xl border border-border bg-card-soft p-5 sm:p-6 shadow-soft hover:shadow-elevated hover:-translate-y-0.5 transition-all"
+              >
+                <div className="absolute -top-12 -right-12 h-32 w-32 rounded-full bg-primary/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="relative flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary-gradient text-primary-foreground shadow-glow">
+                      <GraduationCap className="h-5 w-5" />
+                    </div>
+                    <h3 className="text-base sm:text-lg font-semibold truncate group-hover:text-primary transition-colors">{s.name}</h3>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all shrink-0" />
                 </div>
-                {s.description && <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{s.description}</p>}
+                {s.description && <p className="relative mt-3 text-sm text-muted-foreground line-clamp-2">{s.description}</p>}
               </Link>
             ))
           ) : (
@@ -118,6 +232,28 @@ function Landing() {
               <p className="mt-3 text-muted-foreground">No semesters yet. An administrator will add them soon.</p>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="container mx-auto px-4 sm:px-6 mt-16 sm:mt-24 mb-16 sm:mb-24">
+        <div className="relative overflow-hidden rounded-3xl border border-border bg-hero p-8 sm:p-12 text-center">
+          <div className="pointer-events-none absolute -top-24 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-emerald-400/30 blur-3xl" />
+          <div className="relative">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight">
+              Ready to organise your study life?
+            </h2>
+            <p className="mt-3 text-sm sm:text-base text-white/75 max-w-xl mx-auto">
+              No login. No clutter. Just everything you need to ace this semester.
+            </p>
+            <Button
+              size="lg"
+              onClick={() => navigate({ to: hasSelection ? "/dashboard" : "/select" })}
+              className="mt-6 bg-white text-navy hover:bg-white/90 shadow-glow font-semibold"
+            >
+              {hasSelection ? "Open dashboard" : "Get started — it's free"} <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </section>
 
