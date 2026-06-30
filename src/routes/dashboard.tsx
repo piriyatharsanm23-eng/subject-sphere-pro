@@ -267,8 +267,6 @@ function RequestDialog({ semesterId, subjects }: { semesterId: string; subjects:
   const [open, setOpen] = useState(false);
   const [subjectId, setSubjectId] = useState<string>("");
   const [text, setText] = useState("");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
 
   const submit = async () => {
@@ -278,14 +276,13 @@ function RequestDialog({ semesterId, subjects }: { semesterId: string; subjects:
       semester_id: semesterId,
       subject_id: subjectId || null,
       request_text: text.trim(),
-      student_name: name.trim() || null,
-      student_email: email.trim() || null,
     });
     setBusy(false);
     if (error) { toast.error("Could not submit request"); return; }
     toast.success("Request submitted — thank you!");
-    setText(""); setName(""); setEmail(""); setSubjectId(""); setOpen(false);
+    setText(""); setSubjectId(""); setOpen(false);
   };
+
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -309,11 +306,8 @@ function RequestDialog({ semesterId, subjects }: { semesterId: string; subjects:
             <Label className="mb-1.5 block">What do you need?</Label>
             <Textarea rows={4} placeholder="e.g. Past paper for Calculus 2023" value={text} onChange={(e) => setText(e.target.value)} maxLength={1000} />
           </div>
-          <div className="grid grid-cols-2 gap-2">
-            <div><Label className="mb-1.5 block">Your name (optional)</Label><Input value={name} onChange={(e) => setName(e.target.value)} maxLength={100} /></div>
-            <div><Label className="mb-1.5 block">Email (optional)</Label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={255} /></div>
-          </div>
         </div>
+
         <DialogFooter>
           <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
           <Button onClick={submit} disabled={busy}>Submit request</Button>
@@ -328,8 +322,6 @@ function FeedbackDialog({ semesterId, subjects }: { semesterId: string; subjects
   const [subjectId, setSubjectId] = useState<string>("");
   const [text, setText] = useState("");
   const [rating, setRating] = useState<number>(0);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
 
   const submit = async () => {
@@ -339,15 +331,14 @@ function FeedbackDialog({ semesterId, subjects }: { semesterId: string; subjects
       semester_id: semesterId,
       subject_id: subjectId || null,
       feedback_text: text.trim(),
-      student_name: name.trim() || null,
-      student_email: email.trim() || null,
       rating: rating || null,
     });
     setBusy(false);
     if (error) { toast.error("Could not submit feedback"); return; }
     toast.success("Thanks for the feedback!");
-    setText(""); setName(""); setEmail(""); setSubjectId(""); setRating(0); setOpen(false);
+    setText(""); setSubjectId(""); setRating(0); setOpen(false);
   };
+
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -381,11 +372,8 @@ function FeedbackDialog({ semesterId, subjects }: { semesterId: string; subjects
             <Label className="mb-1.5 block">Your feedback</Label>
             <Textarea rows={4} value={text} onChange={(e) => setText(e.target.value)} maxLength={1000} />
           </div>
-          <div className="grid grid-cols-2 gap-2">
-            <div><Label className="mb-1.5 block">Name (optional)</Label><Input value={name} onChange={(e) => setName(e.target.value)} maxLength={100} /></div>
-            <div><Label className="mb-1.5 block">Email (optional)</Label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={255} /></div>
-          </div>
         </div>
+
         <DialogFooter>
           <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
           <Button onClick={submit} disabled={busy}>Send feedback</Button>

@@ -16,10 +16,10 @@ export const Route = createFileRoute("/super/feedback")({
 });
 
 type Fb = {
-  id: string; feedback_text: string; student_name: string | null;
-  student_email: string | null; rating: number | null;
+  id: string; feedback_text: string; rating: number | null;
   semester_id: string | null; subject_id: string | null; created_at: string;
 };
+
 
 function FeedbackPage() {
   const qc = useQueryClient();
@@ -41,7 +41,7 @@ function FeedbackPage() {
     queryFn: async () => {
       let qb = supabase
         .from("feedback")
-        .select("id,feedback_text,student_name,student_email,rating,semester_id,subject_id,created_at")
+        .select("id,feedback_text,rating,semester_id,subject_id,created_at")
         .order("created_at", { ascending: false })
         .limit(500);
       if (sem !== "all") qb = qb.eq("semester_id", sem);
@@ -59,12 +59,9 @@ function FeedbackPage() {
     const list = listQ.data ?? [];
     if (!q.trim()) return list;
     const n = q.toLowerCase();
-    return list.filter((f) =>
-      f.feedback_text.toLowerCase().includes(n) ||
-      (f.student_name ?? "").toLowerCase().includes(n) ||
-      (f.student_email ?? "").toLowerCase().includes(n),
-    );
+    return list.filter((f) => f.feedback_text.toLowerCase().includes(n));
   }, [listQ.data, q]);
+
 
   const avg = useMemo(() => {
     const ratings = (listQ.data ?? []).map((f) => f.rating).filter((r): r is number => typeof r === "number");
@@ -138,8 +135,8 @@ function FeedbackPage() {
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 text-sm">
-                    <span className="font-medium">{f.student_name || "Anonymous"}</span>
-                    {f.student_email && <span className="text-muted-foreground text-xs">{f.student_email}</span>}
+                    <span className="font-medium">Anonymous</span>
+
                     {typeof f.rating === "number" && (
                       <span className="inline-flex items-center gap-0.5 ml-1">
                         {Array.from({ length: 5 }).map((_, i) => (

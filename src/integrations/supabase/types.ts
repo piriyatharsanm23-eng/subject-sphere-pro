@@ -178,8 +178,6 @@ export type Database = {
           id: string
           rating: number | null
           semester_id: string | null
-          student_email: string | null
-          student_name: string | null
           subject_id: string | null
         }
         Insert: {
@@ -188,8 +186,6 @@ export type Database = {
           id?: string
           rating?: number | null
           semester_id?: string | null
-          student_email?: string | null
-          student_name?: string | null
           subject_id?: string | null
         }
         Update: {
@@ -198,8 +194,6 @@ export type Database = {
           id?: string
           rating?: number | null
           semester_id?: string | null
-          student_email?: string | null
-          student_name?: string | null
           subject_id?: string | null
         }
         Relationships: [
@@ -356,8 +350,6 @@ export type Database = {
           request_text: string
           semester_id: string | null
           status: string
-          student_email: string | null
-          student_name: string | null
           subject_id: string | null
           updated_at: string
         }
@@ -367,8 +359,6 @@ export type Database = {
           request_text: string
           semester_id?: string | null
           status?: string
-          student_email?: string | null
-          student_name?: string | null
           subject_id?: string | null
           updated_at?: string
         }
@@ -378,8 +368,6 @@ export type Database = {
           request_text?: string
           semester_id?: string | null
           status?: string
-          student_email?: string | null
-          student_name?: string | null
           subject_id?: string | null
           updated_at?: string
         }

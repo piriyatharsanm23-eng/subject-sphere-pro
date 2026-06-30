@@ -17,10 +17,10 @@ export const Route = createFileRoute("/super/requests")({
 });
 
 type Req = {
-  id: string; request_text: string; student_name: string | null;
-  student_email: string | null; status: string;
+  id: string; request_text: string; status: string;
   semester_id: string | null; subject_id: string | null; created_at: string;
 };
+
 
 const STATUSES = ["pending", "in_review", "resolved", "rejected"] as const;
 
@@ -51,7 +51,7 @@ function RequestsPage() {
     queryFn: async () => {
       let qb = supabase
         .from("student_requests")
-        .select("id,request_text,student_name,student_email,status,semester_id,subject_id,created_at")
+        .select("id,request_text,status,semester_id,subject_id,created_at")
         .order("created_at", { ascending: false })
         .limit(500);
       if (status !== "all") qb = qb.eq("status", status);
@@ -69,12 +69,9 @@ function RequestsPage() {
     const list = listQ.data ?? [];
     if (!q.trim()) return list;
     const n = q.toLowerCase();
-    return list.filter((r) =>
-      r.request_text.toLowerCase().includes(n) ||
-      (r.student_name ?? "").toLowerCase().includes(n) ||
-      (r.student_email ?? "").toLowerCase().includes(n),
-    );
+    return list.filter((r) => r.request_text.toLowerCase().includes(n));
   }, [listQ.data, q]);
+
 
   const refresh = () => qc.invalidateQueries({ queryKey: ["super-requests"] });
 
@@ -83,7 +80,7 @@ function RequestsPage() {
     if (error) return toast.error(error.message);
     await logActivity({
       action_type: "request_status_change",
-      description: `Request from ${r.student_name ?? r.student_email ?? "student"}: ${r.status} → ${next}`,
+      description: `Request status: ${r.status} → ${next}`,
       target_type: "student_request", target_id: r.id,
       semester_id: r.semester_id, subject_id: r.subject_id,
     });
@@ -136,8 +133,8 @@ function RequestsPage() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 text-sm">
                     <MessageSquare className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-medium">{r.student_name || "Anonymous"}</span>
-                    {r.student_email && <span className="text-muted-foreground text-xs">{r.student_email}</span>}
+                    <span className="font-medium">Anonymous</span>
+
                     <span className={`ml-auto inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium border ${STATUS_STYLE[r.status] ?? ""}`}>
                       {r.status.replace("_", " ")}
                     </span>
