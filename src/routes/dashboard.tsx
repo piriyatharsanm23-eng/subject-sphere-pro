@@ -322,8 +322,6 @@ function FeedbackDialog({ semesterId, subjects }: { semesterId: string; subjects
   const [subjectId, setSubjectId] = useState<string>("");
   const [text, setText] = useState("");
   const [rating, setRating] = useState<number>(0);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
 
   const submit = async () => {
@@ -333,15 +331,14 @@ function FeedbackDialog({ semesterId, subjects }: { semesterId: string; subjects
       semester_id: semesterId,
       subject_id: subjectId || null,
       feedback_text: text.trim(),
-      student_name: name.trim() || null,
-      student_email: email.trim() || null,
       rating: rating || null,
     });
     setBusy(false);
     if (error) { toast.error("Could not submit feedback"); return; }
     toast.success("Thanks for the feedback!");
-    setText(""); setName(""); setEmail(""); setSubjectId(""); setRating(0); setOpen(false);
+    setText(""); setSubjectId(""); setRating(0); setOpen(false);
   };
+
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
