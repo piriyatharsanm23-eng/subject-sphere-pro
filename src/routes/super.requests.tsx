@@ -17,10 +17,10 @@ export const Route = createFileRoute("/super/requests")({
 });
 
 type Req = {
-  id: string; request_text: string; student_name: string | null;
-  student_email: string | null; status: string;
+  id: string; request_text: string; status: string;
   semester_id: string | null; subject_id: string | null; created_at: string;
 };
+
 
 const STATUSES = ["pending", "in_review", "resolved", "rejected"] as const;
 
