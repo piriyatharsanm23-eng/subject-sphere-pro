@@ -35,5 +35,6 @@ export async function downloadMaterial(material: { id: string; file_url: string;
   a.remove();
 
   // Increment download count (fire & forget)
-  await supabase.rpc("increment_download", { _material_id: material.id });
+  // Record the download — a DB trigger increments materials.download_count.
+  await supabase.from("downloads").insert({ material_id: material.id });
 }
