@@ -306,11 +306,8 @@ function RequestDialog({ semesterId, subjects }: { semesterId: string; subjects:
             <Label className="mb-1.5 block">What do you need?</Label>
             <Textarea rows={4} placeholder="e.g. Past paper for Calculus 2023" value={text} onChange={(e) => setText(e.target.value)} maxLength={1000} />
           </div>
-          <div className="grid grid-cols-2 gap-2">
-            <div><Label className="mb-1.5 block">Your name (optional)</Label><Input value={name} onChange={(e) => setName(e.target.value)} maxLength={100} /></div>
-            <div><Label className="mb-1.5 block">Email (optional)</Label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={255} /></div>
-          </div>
         </div>
+
         <DialogFooter>
           <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
           <Button onClick={submit} disabled={busy}>Submit request</Button>
