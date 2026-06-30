@@ -136,46 +136,48 @@ function MaterialsPage() {
         ) : rows.length === 0 ? (
           <div className="p-10 text-center text-muted-foreground">No materials match these filters.</div>
         ) : (
-          <table className="w-full text-sm">
-            <thead className="bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
-              <tr>
-                <th className="text-left font-medium px-4 py-3">Title</th>
-                <th className="text-left font-medium px-4 py-3">Type</th>
-                <th className="text-left font-medium px-4 py-3">Semester / Subject</th>
-                <th className="text-left font-medium px-4 py-3"><Download className="inline h-3.5 w-3.5" /></th>
-                <th className="text-left font-medium px-4 py-3">Uploaded</th>
-                <th className="text-right font-medium px-4 py-3">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {rows.map((m) => (
-                <tr key={m.id} className={`hover:bg-muted/30 ${m.is_archived ? "opacity-60" : ""}`}>
-                  <td className="px-4 py-3">
-                    <div className="font-medium inline-flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-muted-foreground" />
-                      {m.title}
-                      {m.is_archived && <span className="ml-1 text-[10px] uppercase tracking-wider rounded bg-muted px-1.5 py-0.5">archived</span>}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 capitalize text-muted-foreground">{m.material_type}{m.year ? ` · ${m.year}` : ""}</td>
-                  <td className="px-4 py-3 text-muted-foreground text-xs">
-                    <div>{semById[m.semester_id]?.name ?? "—"}</div>
-                    <div className="text-foreground/80">{subById[m.subject_id]?.name ?? "—"}</div>
-                  </td>
-                  <td className="px-4 py-3 tabular-nums">{m.download_count}</td>
-                  <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">{format(new Date(m.created_at), "MMM d, yyyy")}</td>
-                  <td className="px-4 py-3 text-right whitespace-nowrap">
-                    <Button size="sm" variant="ghost" onClick={() => toggleArchive(m)}>
-                      {m.is_archived ? <ArchiveRestore className="h-4 w-4" /> : <Archive className="h-4 w-4" />}
-                    </Button>
-                    <Button size="sm" variant="ghost" className="text-rose-400 hover:text-rose-300" onClick={() => remove(m)}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[720px]">
+              <thead className="bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
+                <tr>
+                  <th className="text-left font-medium px-4 py-3">Title</th>
+                  <th className="text-left font-medium px-4 py-3">Type</th>
+                  <th className="text-left font-medium px-4 py-3">Semester / Subject</th>
+                  <th className="text-left font-medium px-4 py-3"><Download className="inline h-3.5 w-3.5" /></th>
+                  <th className="text-left font-medium px-4 py-3">Uploaded</th>
+                  <th className="text-right font-medium px-4 py-3">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {rows.map((m) => (
+                  <tr key={m.id} className={`hover:bg-muted/30 ${m.is_archived ? "opacity-60" : ""}`}>
+                    <td className="px-4 py-3">
+                      <div className="font-medium inline-flex items-center gap-2">
+                        <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <span className="break-words">{m.title}</span>
+                        {m.is_archived && <span className="ml-1 text-[10px] uppercase tracking-wider rounded bg-muted px-1.5 py-0.5">archived</span>}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 capitalize text-muted-foreground whitespace-nowrap">{m.material_type}{m.year ? ` · ${m.year}` : ""}</td>
+                    <td className="px-4 py-3 text-muted-foreground text-xs">
+                      <div>{semById[m.semester_id]?.name ?? "—"}</div>
+                      <div className="text-foreground/80">{subById[m.subject_id]?.name ?? "—"}</div>
+                    </td>
+                    <td className="px-4 py-3 tabular-nums">{m.download_count}</td>
+                    <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">{format(new Date(m.created_at), "MMM d, yyyy")}</td>
+                    <td className="px-4 py-3 text-right whitespace-nowrap">
+                      <Button size="sm" variant="ghost" onClick={() => toggleArchive(m)}>
+                        {m.is_archived ? <ArchiveRestore className="h-4 w-4" /> : <Archive className="h-4 w-4" />}
+                      </Button>
+                      <Button size="sm" variant="ghost" className="text-rose-400 hover:text-rose-300" onClick={() => remove(m)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </SuperShell>
