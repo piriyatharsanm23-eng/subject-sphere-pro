@@ -16,10 +16,10 @@ export const Route = createFileRoute("/super/feedback")({
 });
 
 type Fb = {
-  id: string; feedback_text: string; student_name: string | null;
-  student_email: string | null; rating: number | null;
+  id: string; feedback_text: string; rating: number | null;
   semester_id: string | null; subject_id: string | null; created_at: string;
 };
+
 
 function FeedbackPage() {
   const qc = useQueryClient();
