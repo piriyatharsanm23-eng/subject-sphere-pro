@@ -133,8 +133,8 @@ function RequestsPage() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 text-sm">
                     <MessageSquare className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-medium">{r.student_name || "Anonymous"}</span>
-                    {r.student_email && <span className="text-muted-foreground text-xs">{r.student_email}</span>}
+                    <span className="font-medium">Anonymous</span>
+
                     <span className={`ml-auto inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium border ${STATUS_STYLE[r.status] ?? ""}`}>
                       {r.status.replace("_", " ")}
                     </span>
