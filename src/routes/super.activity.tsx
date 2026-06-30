@@ -175,7 +175,7 @@ function LogsView() {
         {/* Table */}
         <div className="mt-4 rounded-2xl border border-border bg-card shadow-soft overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm min-w-[820px]">
               <thead className="bg-muted/50 text-xs uppercase tracking-wider text-muted-foreground">
                 <tr>
                   <th className="text-left font-medium px-4 py-3">When</th>
