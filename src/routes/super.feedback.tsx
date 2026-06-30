@@ -59,12 +59,9 @@ function FeedbackPage() {
     const list = listQ.data ?? [];
     if (!q.trim()) return list;
     const n = q.toLowerCase();
-    return list.filter((f) =>
-      f.feedback_text.toLowerCase().includes(n) ||
-      (f.student_name ?? "").toLowerCase().includes(n) ||
-      (f.student_email ?? "").toLowerCase().includes(n),
-    );
+    return list.filter((f) => f.feedback_text.toLowerCase().includes(n));
   }, [listQ.data, q]);
+
 
   const avg = useMemo(() => {
     const ratings = (listQ.data ?? []).map((f) => f.rating).filter((r): r is number => typeof r === "number");
