@@ -41,7 +41,7 @@ function FeedbackPage() {
     queryFn: async () => {
       let qb = supabase
         .from("feedback")
-        .select("id,feedback_text,student_name,student_email,rating,semester_id,subject_id,created_at")
+        .select("id,feedback_text,rating,semester_id,subject_id,created_at")
         .order("created_at", { ascending: false })
         .limit(500);
       if (sem !== "all") qb = qb.eq("semester_id", sem);
