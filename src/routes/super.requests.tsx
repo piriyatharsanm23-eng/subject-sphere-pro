@@ -51,7 +51,7 @@ function RequestsPage() {
     queryFn: async () => {
       let qb = supabase
         .from("student_requests")
-        .select("id,request_text,student_name,student_email,status,semester_id,subject_id,created_at")
+        .select("id,request_text,status,semester_id,subject_id,created_at")
         .order("created_at", { ascending: false })
         .limit(500);
       if (status !== "all") qb = qb.eq("status", status);
