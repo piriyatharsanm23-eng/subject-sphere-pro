@@ -267,8 +267,6 @@ function RequestDialog({ semesterId, subjects }: { semesterId: string; subjects:
   const [open, setOpen] = useState(false);
   const [subjectId, setSubjectId] = useState<string>("");
   const [text, setText] = useState("");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
 
   const submit = async () => {
@@ -278,14 +276,13 @@ function RequestDialog({ semesterId, subjects }: { semesterId: string; subjects:
       semester_id: semesterId,
       subject_id: subjectId || null,
       request_text: text.trim(),
-      student_name: name.trim() || null,
-      student_email: email.trim() || null,
     });
     setBusy(false);
     if (error) { toast.error("Could not submit request"); return; }
     toast.success("Request submitted — thank you!");
-    setText(""); setName(""); setEmail(""); setSubjectId(""); setOpen(false);
+    setText(""); setSubjectId(""); setOpen(false);
   };
+
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
