@@ -122,49 +122,52 @@ function DeadlinesPage() {
         ) : rows.length === 0 ? (
           <div className="p-10 text-center text-muted-foreground">No deadlines match these filters.</div>
         ) : (
-          <table className="w-full text-sm">
-            <thead className="bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
-              <tr>
-                <th className="text-left font-medium px-4 py-3">Deadline</th>
-                <th className="text-left font-medium px-4 py-3">When</th>
-                <th className="text-left font-medium px-4 py-3">Semester / Subject</th>
-                <th className="text-right font-medium px-4 py-3">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {rows.map((d) => {
-                const at = new Date(d.deadline_at);
-                const past = at.getTime() < Date.now();
-                return (
-                  <tr key={d.id} className={`hover:bg-muted/30 ${d.is_archived ? "opacity-60" : ""}`}>
-                    <td className="px-4 py-3">
-                      <div className="font-medium inline-flex items-center gap-2">
-                        <CalendarClock className="h-4 w-4 text-muted-foreground" />{d.title}
-                        {d.is_archived && <span className="ml-1 text-[10px] uppercase tracking-wider rounded bg-muted px-1.5 py-0.5">archived</span>}
-                        {past && !d.is_archived && <span className="ml-1 text-[10px] uppercase tracking-wider rounded bg-rose-500/15 text-rose-300 border border-rose-500/30 px-1.5 py-0.5">expired</span>}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
-                      <div>{format(at, "MMM d, yyyy · h:mm a")}</div>
-                      <div className="text-xs">{formatDistanceToNow(at, { addSuffix: true })}</div>
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground text-xs">
-                      <div>{semById[d.semester_id]?.name ?? "—"}</div>
-                      <div className="text-foreground/80">{subById[d.subject_id]?.name ?? "—"}</div>
-                    </td>
-                    <td className="px-4 py-3 text-right whitespace-nowrap">
-                      <Button size="sm" variant="ghost" onClick={() => toggleArchive(d)}>
-                        {d.is_archived ? <ArchiveRestore className="h-4 w-4" /> : <Archive className="h-4 w-4" />}
-                      </Button>
-                      <Button size="sm" variant="ghost" className="text-rose-400 hover:text-rose-300" onClick={() => remove(d)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[680px]">
+              <thead className="bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
+                <tr>
+                  <th className="text-left font-medium px-4 py-3">Deadline</th>
+                  <th className="text-left font-medium px-4 py-3">When</th>
+                  <th className="text-left font-medium px-4 py-3">Semester / Subject</th>
+                  <th className="text-right font-medium px-4 py-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {rows.map((d) => {
+                  const at = new Date(d.deadline_at);
+                  const past = at.getTime() < Date.now();
+                  return (
+                    <tr key={d.id} className={`hover:bg-muted/30 ${d.is_archived ? "opacity-60" : ""}`}>
+                      <td className="px-4 py-3">
+                        <div className="font-medium inline-flex items-center gap-2 flex-wrap">
+                          <CalendarClock className="h-4 w-4 text-muted-foreground shrink-0" />
+                          <span className="break-words">{d.title}</span>
+                          {d.is_archived && <span className="text-[10px] uppercase tracking-wider rounded bg-muted px-1.5 py-0.5">archived</span>}
+                          {past && !d.is_archived && <span className="text-[10px] uppercase tracking-wider rounded bg-rose-500/15 text-rose-300 border border-rose-500/30 px-1.5 py-0.5">expired</span>}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
+                        <div>{format(at, "MMM d, yyyy · h:mm a")}</div>
+                        <div className="text-xs">{formatDistanceToNow(at, { addSuffix: true })}</div>
+                      </td>
+                      <td className="px-4 py-3 text-muted-foreground text-xs">
+                        <div>{semById[d.semester_id]?.name ?? "—"}</div>
+                        <div className="text-foreground/80">{subById[d.subject_id]?.name ?? "—"}</div>
+                      </td>
+                      <td className="px-4 py-3 text-right whitespace-nowrap">
+                        <Button size="sm" variant="ghost" onClick={() => toggleArchive(d)}>
+                          {d.is_archived ? <ArchiveRestore className="h-4 w-4" /> : <Archive className="h-4 w-4" />}
+                        </Button>
+                        <Button size="sm" variant="ghost" className="text-rose-400 hover:text-rose-300" onClick={() => remove(d)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </SuperShell>
