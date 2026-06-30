@@ -135,8 +135,8 @@ function FeedbackPage() {
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 text-sm">
-                    <span className="font-medium">{f.student_name || "Anonymous"}</span>
-                    {f.student_email && <span className="text-muted-foreground text-xs">{f.student_email}</span>}
+                    <span className="font-medium">Anonymous</span>
+
                     {typeof f.rating === "number" && (
                       <span className="inline-flex items-center gap-0.5 ml-1">
                         {Array.from({ length: 5 }).map((_, i) => (
