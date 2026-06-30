@@ -74,33 +74,35 @@ function SemestersPage() {
         ) : (semsQ.data ?? []).length === 0 ? (
           <div className="p-10 text-center text-muted-foreground">No semesters yet.</div>
         ) : (
-          <table className="w-full text-sm">
-            <thead className="bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
-              <tr>
-                <th className="text-left font-medium px-4 py-3">Name</th>
-                <th className="text-left font-medium px-4 py-3">Description</th>
-                <th className="text-left font-medium px-4 py-3">Active</th>
-                <th className="text-right font-medium px-4 py-3">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {(semsQ.data ?? []).map((s) => (
-                <tr key={s.id} className="hover:bg-muted/30">
-                  <td className="px-4 py-3 font-medium">{s.name}</td>
-                  <td className="px-4 py-3 text-muted-foreground max-w-md">{s.description || "—"}</td>
-                  <td className="px-4 py-3"><Switch checked={s.is_active} onCheckedChange={() => toggleActive(s)} /></td>
-                  <td className="px-4 py-3 text-right">
-                    <Button size="sm" variant="ghost" onClick={() => { setEditing(s); setOpen(true); }}>
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button size="sm" variant="ghost" className="text-rose-400 hover:text-rose-300" onClick={() => remove(s)}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[560px]">
+              <thead className="bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
+                <tr>
+                  <th className="text-left font-medium px-4 py-3">Name</th>
+                  <th className="text-left font-medium px-4 py-3">Description</th>
+                  <th className="text-left font-medium px-4 py-3">Active</th>
+                  <th className="text-right font-medium px-4 py-3">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {(semsQ.data ?? []).map((s) => (
+                  <tr key={s.id} className="hover:bg-muted/30">
+                    <td className="px-4 py-3 font-medium whitespace-nowrap">{s.name}</td>
+                    <td className="px-4 py-3 text-muted-foreground max-w-md">{s.description || "—"}</td>
+                    <td className="px-4 py-3"><Switch checked={s.is_active} onCheckedChange={() => toggleActive(s)} /></td>
+                    <td className="px-4 py-3 text-right whitespace-nowrap">
+                      <Button size="sm" variant="ghost" onClick={() => { setEditing(s); setOpen(true); }}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button size="sm" variant="ghost" className="text-rose-400 hover:text-rose-300" onClick={() => remove(s)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </SuperShell>

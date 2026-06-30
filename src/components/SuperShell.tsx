@@ -67,15 +67,15 @@ export function SuperShell({
   return (
     <div className="min-h-screen flex flex-col bg-muted/30">
       <SiteHeader />
-      <main className="container mx-auto px-4 sm:px-6 py-6 flex-1 max-w-7xl w-full">
-        <div className="grid gap-6 lg:grid-cols-[220px_1fr]">
+      <main className="container mx-auto px-3 sm:px-6 py-4 sm:py-6 flex-1 max-w-7xl w-full">
+        <div className="grid gap-4 sm:gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
           {/* Sidebar */}
-          <aside className="lg:sticky lg:top-20 lg:self-start">
+          <aside className="lg:sticky lg:top-20 lg:self-start min-w-0">
             <div className="rounded-2xl border border-border bg-card p-2 shadow-soft">
               <div className="px-3 py-2 hidden lg:block">
                 <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Super Admin</div>
               </div>
-              <nav className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible -mx-1 px-1 lg:mx-0 lg:px-0 scrollbar-thin">
+              <nav className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible scrollbar-thin">
                 {NAV.map((item) => {
                   const active = item.exact ? path === item.to : path.startsWith(item.to);
                   return (
@@ -97,9 +97,9 @@ export function SuperShell({
             </div>
           </aside>
           {/* Content */}
-          <section>
-            <div className="mb-6">
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{title}</h1>
+          <section className="min-w-0">
+            <div className="mb-4 sm:mb-6">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">{title}</h1>
               {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
             </div>
             {children}

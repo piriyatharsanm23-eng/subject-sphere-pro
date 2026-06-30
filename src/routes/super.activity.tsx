@@ -120,15 +120,15 @@ function LogsView() {
     <div className="min-h-screen flex flex-col bg-muted/40">
       <SiteHeader />
       <main className="container mx-auto px-4 sm:px-6 py-8 flex-1 max-w-7xl w-full">
-        <div className="flex items-center justify-between gap-3 mb-6">
-          <div>
+        <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
+          <div className="min-w-0">
             <div className="text-xs uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-2">
               <Activity className="h-3.5 w-3.5" /> Super Admin
             </div>
-            <h1 className="mt-1 text-3xl font-bold tracking-tight">Activity Logs</h1>
+            <h1 className="mt-1 text-2xl sm:text-3xl font-bold tracking-tight">Activity Logs</h1>
             <p className="mt-1 text-sm text-muted-foreground">Every important action taken by admins and super admins.</p>
           </div>
-          <Button asChild variant="outline"><Link to="/super"><ArrowLeft className="mr-2 h-4 w-4" />Dashboard</Link></Button>
+          <Button asChild variant="outline" size="sm"><Link to="/super"><ArrowLeft className="mr-2 h-4 w-4" />Dashboard</Link></Button>
         </div>
 
         {/* Filters */}
@@ -175,7 +175,7 @@ function LogsView() {
         {/* Table */}
         <div className="mt-4 rounded-2xl border border-border bg-card shadow-soft overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm min-w-[820px]">
               <thead className="bg-muted/50 text-xs uppercase tracking-wider text-muted-foreground">
                 <tr>
                   <th className="text-left font-medium px-4 py-3">When</th>

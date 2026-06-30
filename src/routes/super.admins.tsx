@@ -138,59 +138,61 @@ function AdminsPage() {
         ) : rows.length === 0 ? (
           <div className="p-10 text-center text-muted-foreground">No admins yet.</div>
         ) : (
-          <table className="w-full text-sm">
-            <thead className="bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
-              <tr>
-                <th className="text-left font-medium px-4 py-3">User</th>
-                <th className="text-left font-medium px-4 py-3">Role</th>
-                <th className="text-left font-medium px-4 py-3">Semester</th>
-                <th className="text-right font-medium px-4 py-3">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {rows.map((r) => {
-                const p = profileById[r.user_id];
-                return (
-                  <tr key={r.id} className="hover:bg-muted/30">
-                    <td className="px-4 py-3">
-                      <div className="font-medium">{p?.full_name || "—"}</div>
-                      <div className="text-xs text-muted-foreground">{p?.email ?? r.user_id}</div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium border ${
-                        r.role === "super_admin"
-                          ? "bg-violet-500/15 text-violet-300 border-violet-500/30"
-                          : "bg-emerald-500/15 text-emerald-300 border-emerald-500/30"
-                      }`}>
-                        <ShieldCheck className="h-3 w-3" />
-                        {r.role === "super_admin" ? "Super Admin" : "Admin"}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      {r.role === "admin" ? (
-                        <Select
-                          value={r.assigned_semester_id ?? ""}
-                          onValueChange={(v) => changeSemester(r, v)}
-                        >
-                          <SelectTrigger className="w-56"><SelectValue placeholder="—" /></SelectTrigger>
-                          <SelectContent>
-                            {(semestersQ.data ?? []).map((s) => (
-                              <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      ) : <span className="text-muted-foreground">All semesters</span>}
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <Button size="sm" variant="ghost" className="text-rose-400 hover:text-rose-300" onClick={() => removeRole(r)}>
-                        <ShieldOff className="h-4 w-4 mr-1" />Remove
-                      </Button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[720px]">
+              <thead className="bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
+                <tr>
+                  <th className="text-left font-medium px-4 py-3">User</th>
+                  <th className="text-left font-medium px-4 py-3">Role</th>
+                  <th className="text-left font-medium px-4 py-3">Semester</th>
+                  <th className="text-right font-medium px-4 py-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {rows.map((r) => {
+                  const p = profileById[r.user_id];
+                  return (
+                    <tr key={r.id} className="hover:bg-muted/30">
+                      <td className="px-4 py-3">
+                        <div className="font-medium">{p?.full_name || "—"}</div>
+                        <div className="text-xs text-muted-foreground break-all">{p?.email ?? r.user_id}</div>
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium border ${
+                          r.role === "super_admin"
+                            ? "bg-violet-500/15 text-violet-300 border-violet-500/30"
+                            : "bg-emerald-500/15 text-emerald-300 border-emerald-500/30"
+                        }`}>
+                          <ShieldCheck className="h-3 w-3" />
+                          {r.role === "super_admin" ? "Super Admin" : "Admin"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        {r.role === "admin" ? (
+                          <Select
+                            value={r.assigned_semester_id ?? ""}
+                            onValueChange={(v) => changeSemester(r, v)}
+                          >
+                            <SelectTrigger className="w-full sm:w-56"><SelectValue placeholder="—" /></SelectTrigger>
+                            <SelectContent>
+                              {(semestersQ.data ?? []).map((s) => (
+                                <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        ) : <span className="text-muted-foreground whitespace-nowrap">All semesters</span>}
+                      </td>
+                      <td className="px-4 py-3 text-right whitespace-nowrap">
+                        <Button size="sm" variant="ghost" className="text-rose-400 hover:text-rose-300" onClick={() => removeRole(r)}>
+                          <ShieldOff className="h-4 w-4 mr-1" />Remove
+                        </Button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </SuperShell>

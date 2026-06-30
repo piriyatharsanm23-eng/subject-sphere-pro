@@ -94,36 +94,38 @@ function SubjectsPage() {
         ) : (subjectsQ.data ?? []).length === 0 ? (
           <div className="p-10 text-center text-muted-foreground">No subjects yet.</div>
         ) : (
-          <table className="w-full text-sm">
-            <thead className="bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
-              <tr>
-                <th className="text-left font-medium px-4 py-3">Subject</th>
-                <th className="text-left font-medium px-4 py-3">Code</th>
-                <th className="text-left font-medium px-4 py-3">Semester</th>
-                <th className="text-right font-medium px-4 py-3">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {(subjectsQ.data ?? []).map((s) => (
-                <tr key={s.id} className="hover:bg-muted/30">
-                  <td className="px-4 py-3">
-                    <div className="font-medium">{s.name}</div>
-                    {s.description && <div className="text-xs text-muted-foreground line-clamp-1">{s.description}</div>}
-                  </td>
-                  <td className="px-4 py-3 text-muted-foreground">{s.code || "—"}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{semNameById[s.semester_id] ?? "—"}</td>
-                  <td className="px-4 py-3 text-right">
-                    <Button size="sm" variant="ghost" onClick={() => { setEditing(s); setOpen(true); }}>
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button size="sm" variant="ghost" className="text-rose-400 hover:text-rose-300" onClick={() => remove(s)}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[640px]">
+              <thead className="bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
+                <tr>
+                  <th className="text-left font-medium px-4 py-3">Subject</th>
+                  <th className="text-left font-medium px-4 py-3">Code</th>
+                  <th className="text-left font-medium px-4 py-3">Semester</th>
+                  <th className="text-right font-medium px-4 py-3">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {(subjectsQ.data ?? []).map((s) => (
+                  <tr key={s.id} className="hover:bg-muted/30">
+                    <td className="px-4 py-3">
+                      <div className="font-medium">{s.name}</div>
+                      {s.description && <div className="text-xs text-muted-foreground line-clamp-1">{s.description}</div>}
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{s.code || "—"}</td>
+                    <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{semNameById[s.semester_id] ?? "—"}</td>
+                    <td className="px-4 py-3 text-right whitespace-nowrap">
+                      <Button size="sm" variant="ghost" onClick={() => { setEditing(s); setOpen(true); }}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button size="sm" variant="ghost" className="text-rose-400 hover:text-rose-300" onClick={() => remove(s)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </SuperShell>
