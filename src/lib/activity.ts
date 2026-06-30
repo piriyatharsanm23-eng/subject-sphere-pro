@@ -62,16 +62,20 @@ export async function logActivity(params: {
   semester_id?: string | null;
   subject_id?: string | null;
 }) {
-  const { error } = await supabase.rpc("log_activity", {
-    _action_type: params.action_type,
-    _description: params.description,
-    _target_type: params.target_type ?? undefined,
-    _target_id: params.target_id ?? undefined,
-    _semester_id: params.semester_id ?? undefined,
-    _subject_id: params.subject_id ?? undefined,
+  // user_id, user_name and user_role are populated server-side by a BEFORE INSERT
+  // trigger; clients cannot forge them. Placeholders satisfy NOT NULL columns.
+  const { error } = await supabase.from("activity_logs").insert({
+    user_id: "00000000-0000-0000-0000-000000000000",
+    user_name: "",
+    user_role: "",
+    action_type: params.action_type,
+    description: params.description,
+    target_type: params.target_type ?? null,
+    target_id: params.target_id ?? null,
+    semester_id: params.semester_id ?? null,
+    subject_id: params.subject_id ?? null,
   });
   if (error) {
-    // Non-fatal: surface in console but don't block the action.
     console.warn("logActivity failed", error);
   }
 }

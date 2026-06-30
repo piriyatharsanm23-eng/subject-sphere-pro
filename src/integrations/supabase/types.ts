@@ -471,19 +471,7 @@ export type Database = {
         }
         Returns: boolean
       }
-      increment_download: { Args: { _material_id: string }; Returns: undefined }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
-      log_activity: {
-        Args: {
-          _action_type: string
-          _description: string
-          _semester_id?: string
-          _subject_id?: string
-          _target_id?: string
-          _target_type?: string
-        }
-        Returns: string
-      }
     }
     Enums: {
       app_role: "admin" | "super_admin"
