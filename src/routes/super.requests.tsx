@@ -80,7 +80,7 @@ function RequestsPage() {
     if (error) return toast.error(error.message);
     await logActivity({
       action_type: "request_status_change",
-      description: `Request from ${r.student_name ?? r.student_email ?? "student"}: ${r.status} → ${next}`,
+      description: `Request status: ${r.status} → ${next}`,
       target_type: "student_request", target_id: r.id,
       semester_id: r.semester_id, subject_id: r.subject_id,
     });
