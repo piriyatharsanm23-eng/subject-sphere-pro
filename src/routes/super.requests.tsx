@@ -69,12 +69,9 @@ function RequestsPage() {
     const list = listQ.data ?? [];
     if (!q.trim()) return list;
     const n = q.toLowerCase();
-    return list.filter((r) =>
-      r.request_text.toLowerCase().includes(n) ||
-      (r.student_name ?? "").toLowerCase().includes(n) ||
-      (r.student_email ?? "").toLowerCase().includes(n),
-    );
+    return list.filter((r) => r.request_text.toLowerCase().includes(n));
   }, [listQ.data, q]);
+
 
   const refresh = () => qc.invalidateQueries({ queryKey: ["super-requests"] });
 
