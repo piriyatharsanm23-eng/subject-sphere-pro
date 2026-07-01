@@ -232,8 +232,12 @@ function DashboardContent({ sel }: { sel: Selection }) {
             <div className="mt-4 space-y-3">
               {materialsQ.isLoading ? (
                 [0,1,2].map((i) => <div key={i} className="h-24 rounded-2xl bg-muted animate-pulse" />)
+              ) : materialsQ.isError ? (
+                <ErrorState message="We couldn't load materials." onRetry={() => materialsQ.refetch()} />
               ) : filtered.length === 0 ? (
-                <EmptyState icon={Inbox} title="No materials yet" description="When admins upload material for your subjects, it will appear here." />
+                (materialsQ.data ?? []).length === 0
+                  ? <EmptyState icon={Inbox} title="No materials yet" description="When admins upload material for your subjects, it will appear here." />
+                  : <EmptyState icon={Inbox} title="No matches" description="Try clearing your search or filters." />
               ) : (
                 filtered.map((m) => (
                   <article key={m.id} className="rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-soft hover:shadow-elevated transition-shadow">
@@ -254,8 +258,13 @@ function DashboardContent({ sel }: { sel: Selection }) {
                         </div>
                       </div>
                       <Button size="sm" onClick={async () => {
-                        try { await downloadMaterial(m); toast.success("Download started"); }
-                        catch { toast.error("Could not download this file"); }
+                        const id = toast.loading("Preparing your download…");
+                        try {
+                          await downloadMaterial(m);
+                          toast.success("Download started", { id });
+                        } catch (err) {
+                          toast.error("Could not download this file", { id, description: (err as Error)?.message });
+                        }
                       }}>
                         <Download className="mr-2 h-4 w-4" /> Download
                       </Button>
