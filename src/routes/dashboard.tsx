@@ -16,6 +16,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { formatDistanceToNow } from "date-fns";
+import { useUploaders } from "@/lib/uploaders";
+import { UploaderBadge } from "@/components/UploaderBadge";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({ meta: [{ title: "Your dashboard — StudyHub" }] }),
