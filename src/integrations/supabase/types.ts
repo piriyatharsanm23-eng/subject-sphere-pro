@@ -453,6 +453,54 @@ export type Database = {
           },
         ]
       }
+      telegram_subscribers: {
+        Row: {
+          chat_id: number
+          created_at: string
+          first_name: string | null
+          is_subscribed: boolean
+          selected_semester_id: string | null
+          selected_subject_id: string | null
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          chat_id: number
+          created_at?: string
+          first_name?: string | null
+          is_subscribed?: boolean
+          selected_semester_id?: string | null
+          selected_subject_id?: string | null
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          chat_id?: number
+          created_at?: string
+          first_name?: string | null
+          is_subscribed?: boolean
+          selected_semester_id?: string | null
+          selected_subject_id?: string | null
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "telegram_subscribers_selected_semester_id_fkey"
+            columns: ["selected_semester_id"]
+            isOneToOne: false
+            referencedRelation: "semesters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "telegram_subscribers_selected_subject_id_fkey"
+            columns: ["selected_subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           assigned_semester_id: string | null
