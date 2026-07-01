@@ -101,7 +101,7 @@ function SubjectPage() {
 
           {(["lecture_slide","note","assignment"] as const).map((t) => (
             <TabsContent key={t} value={t} className="mt-4">
-              <MaterialList items={groups[t]} />
+              <MaterialList items={groups[t]} uploaders={uploadersQ.data ?? {}} />
             </TabsContent>
           ))}
 
@@ -109,7 +109,7 @@ function SubjectPage() {
             {papersByYear.length === 0 ? <Empty label="No past papers yet" /> : papersByYear.map(([year, items]) => (
               <div key={year}>
                 <h3 className="text-sm font-semibold text-muted-foreground mb-2">{year}</h3>
-                <MaterialList items={items} />
+                <MaterialList items={items} uploaders={uploadersQ.data ?? {}} />
               </div>
             ))}
           </TabsContent>
