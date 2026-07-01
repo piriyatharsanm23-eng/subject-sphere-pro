@@ -224,3 +224,11 @@ function Empty({ label }: { label: string }) {
     </div>
   );
 }
+
+function MaterialSkeleton() {
+  return (
+    <div className="grid gap-3 sm:grid-cols-2">
+      {[0,1,2,3].map((i) => <div key={i} className="h-32 rounded-2xl bg-muted animate-pulse" />)}
+    </div>
+  );
+}
