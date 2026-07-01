@@ -143,7 +143,11 @@ function SubjectPage() {
           </TabsContent>
 
           <TabsContent value="deadlines" className="mt-4">
-            {(deadlinesQ.data ?? []).length === 0 ? <Empty label="No active deadlines" /> : (
+            {deadlinesQ.isLoading ? (
+              <div className="space-y-3">
+                {[0,1].map((i) => <div key={i} className="h-24 rounded-2xl bg-muted animate-pulse" />)}
+              </div>
+            ) : (deadlinesQ.data ?? []).length === 0 ? <Empty label="No active deadlines" /> : (
               <div className="space-y-3">
                 {deadlinesQ.data!.map((d) => (
                   <div key={d.id} className="rounded-2xl border border-border bg-card p-5 shadow-soft">
