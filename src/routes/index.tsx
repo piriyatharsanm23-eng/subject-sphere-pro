@@ -51,6 +51,71 @@ function Landing() {
     },
   });
 
+  const featuredSemester = semesters?.[0];
+
+  const { data: preview } = useQuery({
+    queryKey: ["landing-preview", featuredSemester?.id],
+    enabled: !!featuredSemester?.id,
+    queryFn: async () => {
+      const semesterId = featuredSemester!.id;
+      const [subjectsRes, materialsRes, deadlinesRes] = await Promise.all([
+        supabase.from("subjects").select("id", { count: "exact", head: true }).eq("semester_id", semesterId),
+        supabase
+          .from("materials")
+          .select("id, title, material_type, subject:subjects(name)", { count: "exact" })
+          .eq("is_archived", false)
+          .eq("semester_id", semesterId)
+          .order("created_at", { ascending: false })
+          .limit(3),
+        supabase
+          .from("deadlines")
+          .select("id, title, deadline_at, subject:subjects(name)", { count: "exact" })
+          .eq("is_archived", false)
+          .eq("semester_id", semesterId)
+          .gte("deadline_at", new Date().toISOString())
+          .order("deadline_at", { ascending: true })
+          .limit(2),
+      ]);
+      return {
+        subjectCount: subjectsRes.count ?? 0,
+        materialCount: materialsRes.count ?? 0,
+        deadlineCount: deadlinesRes.count ?? 0,
+        materials: materialsRes.data ?? [],
+        deadlines: deadlinesRes.data ?? [],
+      };
+    },
+  });
+
+  const typeStyle: Record<string, string> = {
+    slides: "bg-sky-400/20 text-sky-100",
+    notes: "bg-emerald-400/20 text-emerald-100",
+    paper: "bg-violet-400/20 text-violet-100",
+    past_paper: "bg-violet-400/20 text-violet-100",
+    assignment: "bg-amber-400/20 text-amber-100",
+    other: "bg-white/15 text-white/90",
+  };
+
+  const previewRows: { t: string; b: string; c: string }[] = [];
+  if (preview) {
+    const now = Date.now();
+    for (const d of preview.deadlines) {
+      const hours = (new Date(d.deadline_at).getTime() - now) / 36e5;
+      const label = hours < 24 ? "Urgent" : hours < 72 ? "Due soon" : "Deadline";
+      const cls = hours < 24 ? "bg-rose-400/20 text-rose-100" : hours < 72 ? "bg-amber-400/20 text-amber-100" : "bg-teal-400/20 text-teal-100";
+      const subj = (d.subject as any)?.name ?? "";
+      previewRows.push({ t: `${subj} · ${d.title}`, b: label, c: cls });
+    }
+    for (const m of preview.materials) {
+      const subj = (m.subject as any)?.name ?? "";
+      const t = String(m.material_type ?? "other");
+      previewRows.push({
+        t: `${subj} · ${m.title}`,
+        b: t.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+        c: typeStyle[t] ?? typeStyle.other,
+      });
+    }
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
@@ -122,33 +187,38 @@ function Landing() {
                     <div className="grid h-8 w-8 place-items-center rounded-lg bg-emerald-400/20 text-emerald-200">
                       <GraduationCap className="h-4 w-4" />
                     </div>
-                    <div className="text-sm font-semibold">Semester 4 · Today</div>
+                    <div className="text-sm font-semibold">
+                      {featuredSemester ? `${featuredSemester.name} · Today` : "Today"}
+                    </div>
                   </div>
                   <span className="rounded-full bg-emerald-400/20 text-emerald-100 text-[10px] font-semibold uppercase tracking-wider px-2 py-1 border border-emerald-300/30">Live</span>
                 </div>
 
-                <div className="space-y-2.5">
-                  {[
-                    { t: "Algorithms · Lecture 12.pdf", b: "Slides", c: "bg-sky-400/20 text-sky-100" },
-                    { t: "Database Systems · Midterm 2024", b: "Paper", c: "bg-violet-400/20 text-violet-100" },
-                    { t: "OS · Assignment 3 due tomorrow", b: "Urgent", c: "bg-rose-400/20 text-rose-100" },
-                    { t: "Networks · Chapter notes", b: "Notes", c: "bg-emerald-400/20 text-emerald-100" },
-                  ].map((r, i) => (
-                    <div key={i} className="flex items-center gap-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-white/10 px-3 py-2.5">
-                      <div className="grid h-8 w-8 place-items-center rounded-md bg-white/10 text-white/80 shrink-0">
-                        <FileText className="h-4 w-4" />
+                <div className="space-y-2.5 min-h-[180px]">
+                  {previewRows.length > 0 ? (
+                    previewRows.slice(0, 4).map((r, i) => (
+                      <div key={i} className="flex items-center gap-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-white/10 px-3 py-2.5">
+                        <div className="grid h-8 w-8 place-items-center rounded-md bg-white/10 text-white/80 shrink-0">
+                          <FileText className="h-4 w-4" />
+                        </div>
+                        <div className="min-w-0 flex-1 text-sm text-white/90 truncate">{r.t}</div>
+                        <span className={`shrink-0 rounded-full text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 ${r.c}`}>{r.b}</span>
                       </div>
-                      <div className="min-w-0 flex-1 text-sm text-white/90 truncate">{r.t}</div>
-                      <span className={`shrink-0 rounded-full text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 ${r.c}`}>{r.b}</span>
+                    ))
+                  ) : (
+                    <div className="grid place-items-center h-[180px] text-sm text-white/60 text-center px-4">
+                      {featuredSemester
+                        ? "No materials or deadlines yet for this semester."
+                        : "No active semesters yet. Once an admin adds them, live content shows here."}
                     </div>
-                  ))}
+                  )}
                 </div>
 
                 <div className="mt-4 grid grid-cols-3 gap-2 text-center">
                   {[
-                    { k: "Subjects", v: "6" },
-                    { k: "Materials", v: "120+" },
-                    { k: "Deadlines", v: "4" },
+                    { k: "Subjects", v: preview?.subjectCount ?? 0 },
+                    { k: "Materials", v: preview?.materialCount ?? 0 },
+                    { k: "Deadlines", v: preview?.deadlineCount ?? 0 },
                   ].map((s) => (
                     <div key={s.k} className="rounded-xl bg-white/5 border border-white/10 py-2">
                       <div className="text-base font-bold text-white">{s.v}</div>
