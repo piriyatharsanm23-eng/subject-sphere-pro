@@ -2,7 +2,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   CalendarClock, FileText, LayoutDashboard, Loader2,
-  LogOut, MessageSquare, ShieldAlert, Star,
+  LogOut, MessageSquare, ShieldAlert, Star, UserCircle2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -24,6 +24,7 @@ const NAV: NavItem[] = [
   { to: "/admin/deadlines", label: "Deadlines", icon: CalendarClock },
   { to: "/admin/requests", label: "Requests", icon: MessageSquare },
   { to: "/admin/feedback", label: "Feedback", icon: Star },
+  { to: "/admin/profile", label: "Profile", icon: UserCircle2 },
 ];
 
 export function AdminShell({

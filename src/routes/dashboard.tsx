@@ -16,6 +16,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { formatDistanceToNow } from "date-fns";
+import { useUploaders } from "@/lib/uploaders";
+import { UploaderBadge } from "@/components/UploaderBadge";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({ meta: [{ title: "Your dashboard — StudyHub" }] }),
@@ -66,13 +68,15 @@ function DashboardContent({ sel }: { sel: Selection }) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("materials")
-        .select("id,title,description,material_type,file_url,file_name,file_type,year,week_or_module,created_at,subject_id,download_count")
+        .select("id,title,description,material_type,file_url,file_name,file_type,year,week_or_module,created_at,subject_id,download_count,uploaded_by")
         .in("subject_id", sel.subjectIds)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data ?? [];
     },
   });
+
+  const uploadersQ = useUploaders((materialsQ.data ?? []).map((m) => m.uploaded_by));
 
   const deadlinesQ = useQuery({
     queryKey: ["deadlines", sel.subjectIds.join(",")],
@@ -220,7 +224,11 @@ function DashboardContent({ sel }: { sel: Selection }) {
                         </div>
                         <h3 className="mt-1 font-semibold truncate">{m.title}</h3>
                         {m.description && <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{m.description}</p>}
-                        <div className="mt-2 text-xs text-muted-foreground">Uploaded {formatDistanceToNow(new Date(m.created_at), { addSuffix: true })} · {m.download_count} downloads</div>
+                        <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
+                          <UploaderBadge uploader={m.uploaded_by ? uploadersQ.data?.[m.uploaded_by] : null} />
+                          <span>· {formatDistanceToNow(new Date(m.created_at), { addSuffix: true })}</span>
+                          <span>· {m.download_count} downloads</span>
+                        </div>
                       </div>
                       <Button size="sm" onClick={async () => {
                         try { await downloadMaterial(m); toast.success("Download started"); }
