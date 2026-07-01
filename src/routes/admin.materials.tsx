@@ -268,9 +268,9 @@ function MaterialDialog({
 
     setSaving(true);
     try {
-      let file_url = editing?.file_url ?? "";
-      let file_name = editing?.file_name ?? null;
-      let file_type = editing?.file_url ? null : null;
+      let file_url: string = editing?.file_url ?? "";
+      let file_name: string | null = editing?.file_name ?? null;
+      let file_type: string | null = null;
 
       if (file) {
         setProgress("Uploading file…");
