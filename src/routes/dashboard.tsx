@@ -303,6 +303,15 @@ function EmptyState({ icon: Icon, title, description }: { icon: typeof Inbox; ti
   );
 }
 
+function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-center">
+      <p className="text-sm text-destructive-foreground/90">{message}</p>
+      <Button size="sm" variant="outline" className="mt-3" onClick={onRetry}>Try again</Button>
+    </div>
+  );
+}
+
 function RequestDialog({ semesterId, subjects }: { semesterId: string; subjects: { id: string; name: string }[] }) {
   const [open, setOpen] = useState(false);
   const [subjectId, setSubjectId] = useState<string>("");
