@@ -35,13 +35,15 @@ function SubjectPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("materials")
-        .select("id,title,description,material_type,file_url,file_name,file_type,year,week_or_module,created_at,download_count")
+        .select("id,title,description,material_type,file_url,file_name,file_type,year,week_or_module,created_at,download_count,uploaded_by")
         .eq("subject_id", id)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data ?? [];
     },
   });
+
+  const uploadersQ = useUploaders((materialsQ.data ?? []).map((m) => m.uploaded_by));
 
   const deadlinesQ = useQuery({
     queryKey: ["subject-deadlines", id],
