@@ -16,6 +16,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SuperIndexRouteImport } from './routes/super.index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as SuperSubjectsRouteImport } from './routes/super.subjects'
 import { Route as SuperSemestersRouteImport } from './routes/super.semesters'
 import { Route as SuperRequestsRouteImport } from './routes/super.requests'
@@ -26,6 +27,10 @@ import { Route as SuperAnalyticsRouteImport } from './routes/super.analytics'
 import { Route as SuperAdminsRouteImport } from './routes/super.admins'
 import { Route as SuperActivityRouteImport } from './routes/super.activity'
 import { Route as SubjectIdRouteImport } from './routes/subject.$id'
+import { Route as AdminRequestsRouteImport } from './routes/admin.requests'
+import { Route as AdminMaterialsRouteImport } from './routes/admin.materials'
+import { Route as AdminFeedbackRouteImport } from './routes/admin.feedback'
+import { Route as AdminDeadlinesRouteImport } from './routes/admin.deadlines'
 
 const SuperRoute = SuperRouteImport.update({
   id: '/super',
@@ -61,6 +66,11 @@ const SuperIndexRoute = SuperIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => SuperRoute,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
 } as any)
 const SuperSubjectsRoute = SuperSubjectsRouteImport.update({
   id: '/subjects',
@@ -112,14 +122,38 @@ const SubjectIdRoute = SubjectIdRouteImport.update({
   path: '/subject/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRequestsRoute = AdminRequestsRouteImport.update({
+  id: '/requests',
+  path: '/requests',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMaterialsRoute = AdminMaterialsRouteImport.update({
+  id: '/materials',
+  path: '/materials',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminFeedbackRoute = AdminFeedbackRouteImport.update({
+  id: '/feedback',
+  path: '/feedback',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminDeadlinesRoute = AdminDeadlinesRouteImport.update({
+  id: '/deadlines',
+  path: '/deadlines',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/select': typeof SelectRoute
   '/super': typeof SuperRouteWithChildren
+  '/admin/deadlines': typeof AdminDeadlinesRoute
+  '/admin/feedback': typeof AdminFeedbackRoute
+  '/admin/materials': typeof AdminMaterialsRoute
+  '/admin/requests': typeof AdminRequestsRoute
   '/subject/$id': typeof SubjectIdRoute
   '/super/activity': typeof SuperActivityRoute
   '/super/admins': typeof SuperAdminsRoute
@@ -130,14 +164,18 @@ export interface FileRoutesByFullPath {
   '/super/requests': typeof SuperRequestsRoute
   '/super/semesters': typeof SuperSemestersRoute
   '/super/subjects': typeof SuperSubjectsRoute
+  '/admin/': typeof AdminIndexRoute
   '/super/': typeof SuperIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/select': typeof SelectRoute
+  '/admin/deadlines': typeof AdminDeadlinesRoute
+  '/admin/feedback': typeof AdminFeedbackRoute
+  '/admin/materials': typeof AdminMaterialsRoute
+  '/admin/requests': typeof AdminRequestsRoute
   '/subject/$id': typeof SubjectIdRoute
   '/super/activity': typeof SuperActivityRoute
   '/super/admins': typeof SuperAdminsRoute
@@ -148,16 +186,21 @@ export interface FileRoutesByTo {
   '/super/requests': typeof SuperRequestsRoute
   '/super/semesters': typeof SuperSemestersRoute
   '/super/subjects': typeof SuperSubjectsRoute
+  '/admin': typeof AdminIndexRoute
   '/super': typeof SuperIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/select': typeof SelectRoute
   '/super': typeof SuperRouteWithChildren
+  '/admin/deadlines': typeof AdminDeadlinesRoute
+  '/admin/feedback': typeof AdminFeedbackRoute
+  '/admin/materials': typeof AdminMaterialsRoute
+  '/admin/requests': typeof AdminRequestsRoute
   '/subject/$id': typeof SubjectIdRoute
   '/super/activity': typeof SuperActivityRoute
   '/super/admins': typeof SuperAdminsRoute
@@ -168,6 +211,7 @@ export interface FileRoutesById {
   '/super/requests': typeof SuperRequestsRoute
   '/super/semesters': typeof SuperSemestersRoute
   '/super/subjects': typeof SuperSubjectsRoute
+  '/admin/': typeof AdminIndexRoute
   '/super/': typeof SuperIndexRoute
 }
 export interface FileRouteTypes {
@@ -179,6 +223,10 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/select'
     | '/super'
+    | '/admin/deadlines'
+    | '/admin/feedback'
+    | '/admin/materials'
+    | '/admin/requests'
     | '/subject/$id'
     | '/super/activity'
     | '/super/admins'
@@ -189,14 +237,18 @@ export interface FileRouteTypes {
     | '/super/requests'
     | '/super/semesters'
     | '/super/subjects'
+    | '/admin/'
     | '/super/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/admin'
     | '/auth'
     | '/dashboard'
     | '/select'
+    | '/admin/deadlines'
+    | '/admin/feedback'
+    | '/admin/materials'
+    | '/admin/requests'
     | '/subject/$id'
     | '/super/activity'
     | '/super/admins'
@@ -207,6 +259,7 @@ export interface FileRouteTypes {
     | '/super/requests'
     | '/super/semesters'
     | '/super/subjects'
+    | '/admin'
     | '/super'
   id:
     | '__root__'
@@ -216,6 +269,10 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/select'
     | '/super'
+    | '/admin/deadlines'
+    | '/admin/feedback'
+    | '/admin/materials'
+    | '/admin/requests'
     | '/subject/$id'
     | '/super/activity'
     | '/super/admins'
@@ -226,12 +283,13 @@ export interface FileRouteTypes {
     | '/super/requests'
     | '/super/semesters'
     | '/super/subjects'
+    | '/admin/'
     | '/super/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRoute
+  AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
   DashboardRoute: typeof DashboardRoute
   SelectRoute: typeof SelectRoute
@@ -289,6 +347,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/super/'
       preLoaderRoute: typeof SuperIndexRouteImport
       parentRoute: typeof SuperRoute
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/super/subjects': {
       id: '/super/subjects'
@@ -360,8 +425,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SubjectIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/requests': {
+      id: '/admin/requests'
+      path: '/requests'
+      fullPath: '/admin/requests'
+      preLoaderRoute: typeof AdminRequestsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/materials': {
+      id: '/admin/materials'
+      path: '/materials'
+      fullPath: '/admin/materials'
+      preLoaderRoute: typeof AdminMaterialsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/feedback': {
+      id: '/admin/feedback'
+      path: '/feedback'
+      fullPath: '/admin/feedback'
+      preLoaderRoute: typeof AdminFeedbackRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/deadlines': {
+      id: '/admin/deadlines'
+      path: '/deadlines'
+      fullPath: '/admin/deadlines'
+      preLoaderRoute: typeof AdminDeadlinesRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
+
+interface AdminRouteChildren {
+  AdminDeadlinesRoute: typeof AdminDeadlinesRoute
+  AdminFeedbackRoute: typeof AdminFeedbackRoute
+  AdminMaterialsRoute: typeof AdminMaterialsRoute
+  AdminRequestsRoute: typeof AdminRequestsRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminDeadlinesRoute: AdminDeadlinesRoute,
+  AdminFeedbackRoute: AdminFeedbackRoute,
+  AdminMaterialsRoute: AdminMaterialsRoute,
+  AdminRequestsRoute: AdminRequestsRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface SuperRouteChildren {
   SuperActivityRoute: typeof SuperActivityRoute
@@ -393,7 +504,7 @@ const SuperRouteWithChildren = SuperRoute._addFileChildren(SuperRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRoute: AdminRoute,
+  AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
   DashboardRoute: DashboardRoute,
   SelectRoute: SelectRoute,
