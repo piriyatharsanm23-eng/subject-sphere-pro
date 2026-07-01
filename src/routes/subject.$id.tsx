@@ -6,12 +6,13 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MATERIAL_TYPES, materialTypeBadge, materialTypeLabel, downloadMaterial } from "@/lib/materials";
+import { materialTypeBadge, materialTypeLabel, downloadMaterial } from "@/lib/materials";
 import { format, formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useUploaders } from "@/lib/uploaders";
 import { UploaderBadge, type UploaderInfo } from "@/components/UploaderBadge";
+import { useRealtimeInvalidate } from "@/hooks/useRealtimeInvalidate";
 
 export const Route = createFileRoute("/subject/$id")({
   head: () => ({ meta: [{ title: "Subject — StudyHub" }] }),
@@ -68,6 +69,17 @@ function SubjectPage() {
     };
   }, [materialsQ.data]);
 
+  // Realtime — invalidate when this subject's data changes.
+  useRealtimeInvalidate(`subject:${id}`, [
+    { table: "materials", filter: `subject_id=eq.${id}`, keys: [["subject-materials", id]] },
+    { table: "deadlines", filter: `subject_id=eq.${id}`, keys: [["subject-deadlines", id]] },
+    { table: "subjects", filter: `id=eq.${id}`, keys: [["subject", id]] },
+  ]);
+
+  useEffect(() => { if (subjectQ.error) toast.error("Couldn't load subject", { description: (subjectQ.error as Error).message }); }, [subjectQ.error]);
+  useEffect(() => { if (materialsQ.error) toast.error("Couldn't load materials", { description: (materialsQ.error as Error).message }); }, [materialsQ.error]);
+  useEffect(() => { if (deadlinesQ.error) toast.error("Couldn't load deadlines", { description: (deadlinesQ.error as Error).message }); }, [deadlinesQ.error]);
+
   // Past papers grouped by year
   const papersByYear = useMemo(() => {
     const grouped: Record<string, typeof groups.past_paper> = {};
@@ -85,9 +97,25 @@ function SubjectPage() {
         <Button asChild variant="ghost" size="sm" className="mb-4"><Link to="/dashboard"><ArrowLeft className="mr-2 h-4 w-4" /> Back to dashboard</Link></Button>
 
         <header className="rounded-2xl border border-border bg-card-soft p-6 shadow-soft">
-          <div className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{subjectQ.data?.code}</div>
-          <h1 className="mt-1 text-3xl sm:text-4xl font-bold tracking-tight">{subjectQ.data?.name ?? "Loading…"}</h1>
-          {subjectQ.data?.description && <p className="mt-2 text-muted-foreground max-w-2xl">{subjectQ.data.description}</p>}
+          {subjectQ.isLoading ? (
+            <div className="space-y-3">
+              <div className="h-3 w-24 rounded bg-muted animate-pulse" />
+              <div className="h-8 w-64 rounded bg-muted animate-pulse" />
+              <div className="h-4 w-full max-w-md rounded bg-muted animate-pulse" />
+            </div>
+          ) : !subjectQ.data ? (
+            <div className="text-center py-6">
+              <FileText className="mx-auto h-8 w-8 text-muted-foreground" />
+              <p className="mt-3 font-semibold">Subject not found</p>
+              <p className="mt-1 text-sm text-muted-foreground">It may have been removed. Go back to the dashboard to pick another.</p>
+            </div>
+          ) : (
+            <>
+              <div className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{subjectQ.data.code}</div>
+              <h1 className="mt-1 text-3xl sm:text-4xl font-bold tracking-tight">{subjectQ.data.name}</h1>
+              {subjectQ.data.description && <p className="mt-2 text-muted-foreground max-w-2xl">{subjectQ.data.description}</p>}
+            </>
+          )}
         </header>
 
         <Tabs defaultValue="lecture_slide" className="mt-6">
@@ -101,12 +129,12 @@ function SubjectPage() {
 
           {(["lecture_slide","note","assignment"] as const).map((t) => (
             <TabsContent key={t} value={t} className="mt-4">
-              <MaterialList items={groups[t]} uploaders={uploadersQ.data ?? {}} />
+              {materialsQ.isLoading ? <MaterialSkeleton /> : <MaterialList items={groups[t]} uploaders={uploadersQ.data ?? {}} />}
             </TabsContent>
           ))}
 
           <TabsContent value="past_paper" className="mt-4 space-y-6">
-            {papersByYear.length === 0 ? <Empty label="No past papers yet" /> : papersByYear.map(([year, items]) => (
+            {materialsQ.isLoading ? <MaterialSkeleton /> : papersByYear.length === 0 ? <Empty label="No past papers yet" /> : papersByYear.map(([year, items]) => (
               <div key={year}>
                 <h3 className="text-sm font-semibold text-muted-foreground mb-2">{year}</h3>
                 <MaterialList items={items} uploaders={uploadersQ.data ?? {}} />
@@ -115,7 +143,11 @@ function SubjectPage() {
           </TabsContent>
 
           <TabsContent value="deadlines" className="mt-4">
-            {(deadlinesQ.data ?? []).length === 0 ? <Empty label="No active deadlines" /> : (
+            {deadlinesQ.isLoading ? (
+              <div className="space-y-3">
+                {[0,1].map((i) => <div key={i} className="h-24 rounded-2xl bg-muted animate-pulse" />)}
+              </div>
+            ) : (deadlinesQ.data ?? []).length === 0 ? <Empty label="No active deadlines" /> : (
               <div className="space-y-3">
                 {deadlinesQ.data!.map((d) => (
                   <div key={d.id} className="rounded-2xl border border-border bg-card p-5 shadow-soft">
@@ -169,8 +201,13 @@ function MaterialList({
               <div className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(m.created_at), { addSuffix: true })} · {m.download_count} downloads</div>
             </div>
             <Button size="sm" onClick={async () => {
-              try { await downloadMaterial(m); toast.success("Download started"); }
-              catch { toast.error("Could not download"); }
+              const id = toast.loading("Preparing your download…");
+              try {
+                await downloadMaterial(m);
+                toast.success("Download started", { id });
+              } catch (err) {
+                toast.error("Could not download", { id, description: (err as Error)?.message });
+              }
             }}><Download className="mr-2 h-4 w-4" />Download</Button>
           </div>
         </div>
@@ -184,6 +221,14 @@ function Empty({ label }: { label: string }) {
     <div className="rounded-2xl border border-dashed border-border bg-card p-10 text-center">
       <FileText className="mx-auto h-8 w-8 text-muted-foreground" />
       <p className="mt-3 text-sm text-muted-foreground">{label}</p>
+    </div>
+  );
+}
+
+function MaterialSkeleton() {
+  return (
+    <div className="grid gap-3 sm:grid-cols-2">
+      {[0,1,2,3].map((i) => <div key={i} className="h-32 rounded-2xl bg-muted animate-pulse" />)}
     </div>
   );
 }

@@ -18,6 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { formatDistanceToNow } from "date-fns";
 import { useUploaders } from "@/lib/uploaders";
 import { UploaderBadge } from "@/components/UploaderBadge";
+import { useRealtimeInvalidate } from "@/hooks/useRealtimeInvalidate";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({ meta: [{ title: "Your dashboard — StudyHub" }] }),
@@ -121,6 +122,20 @@ function DashboardContent({ sel }: { sel: Selection }) {
     return counts;
   }, [materialsQ.data]);
 
+  // Realtime — invalidate materials & deadlines when they change in the DB.
+  const subjectFilter_ = sel.subjectIds.map((id) => `"${id}"`).join(",");
+  useRealtimeInvalidate(`dashboard:${sel.semesterId}`, [
+    { table: "materials", filter: `subject_id=in.(${subjectFilter_})`, keys: [["materials", sel.subjectIds.join(",")]] },
+    { table: "deadlines", filter: `subject_id=in.(${subjectFilter_})`, keys: [["deadlines", sel.subjectIds.join(",")]] },
+    { table: "semesters", filter: `id=eq.${sel.semesterId}`, keys: [["semester", sel.semesterId]] },
+  ]);
+
+  // Error toasts — one per query when it fails.
+  useEffect(() => { if (materialsQ.error) toast.error("Couldn't load materials", { description: (materialsQ.error as Error).message }); }, [materialsQ.error]);
+  useEffect(() => { if (deadlinesQ.error) toast.error("Couldn't load deadlines", { description: (deadlinesQ.error as Error).message }); }, [deadlinesQ.error]);
+  useEffect(() => { if (subjectsQ.error) toast.error("Couldn't load subjects", { description: (subjectsQ.error as Error).message }); }, [subjectsQ.error]);
+  useEffect(() => { if (semesterQ.error) toast.error("Couldn't load semester", { description: (semesterQ.error as Error).message }); }, [semesterQ.error]);
+
   return (
     <div className="min-h-screen flex flex-col bg-muted/40">
       <SiteHeader />
@@ -154,24 +169,32 @@ function DashboardContent({ sel }: { sel: Selection }) {
         <section>
           <h2 className="text-lg font-semibold mb-3">Your subjects</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {(subjectsQ.data ?? []).map((s) => {
-              const meta = subjectMaterialCounts[s.id];
-              return (
-                <Link key={s.id} to="/subject/$id" params={{ id: s.id }} className="group rounded-2xl border border-border bg-card-soft p-5 shadow-soft hover:shadow-elevated hover:-translate-y-0.5 transition-all">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <div className="font-semibold group-hover:text-primary transition-colors">{s.name}</div>
-                      {s.code && <div className="text-xs text-muted-foreground">{s.code}</div>}
+            {subjectsQ.isLoading ? (
+              [0,1,2].map((i) => <div key={i} className="h-28 rounded-2xl bg-muted animate-pulse" />)
+            ) : (subjectsQ.data ?? []).length === 0 ? (
+              <div className="sm:col-span-2 lg:col-span-3">
+                <EmptyState icon={Inbox} title="No subjects selected" description="Head back to preferences to pick your subjects for this semester." />
+              </div>
+            ) : (
+              (subjectsQ.data ?? []).map((s) => {
+                const meta = subjectMaterialCounts[s.id];
+                return (
+                  <Link key={s.id} to="/subject/$id" params={{ id: s.id }} className="group rounded-2xl border border-border bg-card-soft p-5 shadow-soft hover:shadow-elevated hover:-translate-y-0.5 transition-all">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <div className="font-semibold group-hover:text-primary transition-colors">{s.name}</div>
+                        {s.code && <div className="text-xs text-muted-foreground">{s.code}</div>}
+                      </div>
+                      <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
                     </div>
-                    <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
-                  </div>
-                  <div className="mt-4 flex items-center gap-4 text-xs text-muted-foreground">
-                    <span className="inline-flex items-center gap-1"><FileText className="h-3.5 w-3.5" /> {meta?.count ?? 0} materials</span>
-                    {meta?.latest && <span>Updated {formatDistanceToNow(new Date(meta.latest), { addSuffix: true })}</span>}
-                  </div>
-                </Link>
-              );
-            })}
+                    <div className="mt-4 flex items-center gap-4 text-xs text-muted-foreground">
+                      <span className="inline-flex items-center gap-1"><FileText className="h-3.5 w-3.5" /> {meta?.count ?? 0} materials</span>
+                      {meta?.latest && <span>Updated {formatDistanceToNow(new Date(meta.latest), { addSuffix: true })}</span>}
+                    </div>
+                  </Link>
+                );
+              })
+            )}
           </div>
         </section>
 
@@ -209,8 +232,12 @@ function DashboardContent({ sel }: { sel: Selection }) {
             <div className="mt-4 space-y-3">
               {materialsQ.isLoading ? (
                 [0,1,2].map((i) => <div key={i} className="h-24 rounded-2xl bg-muted animate-pulse" />)
+              ) : materialsQ.isError ? (
+                <ErrorState message="We couldn't load materials." onRetry={() => materialsQ.refetch()} />
               ) : filtered.length === 0 ? (
-                <EmptyState icon={Inbox} title="No materials yet" description="When admins upload material for your subjects, it will appear here." />
+                (materialsQ.data ?? []).length === 0
+                  ? <EmptyState icon={Inbox} title="No materials yet" description="When admins upload material for your subjects, it will appear here." />
+                  : <EmptyState icon={Inbox} title="No matches" description="Try clearing your search or filters." />
               ) : (
                 filtered.map((m) => (
                   <article key={m.id} className="rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-soft hover:shadow-elevated transition-shadow">
@@ -231,8 +258,13 @@ function DashboardContent({ sel }: { sel: Selection }) {
                         </div>
                       </div>
                       <Button size="sm" onClick={async () => {
-                        try { await downloadMaterial(m); toast.success("Download started"); }
-                        catch { toast.error("Could not download this file"); }
+                        const id = toast.loading("Preparing your download…");
+                        try {
+                          await downloadMaterial(m);
+                          toast.success("Download started", { id });
+                        } catch (err) {
+                          toast.error("Could not download this file", { id, description: (err as Error)?.message });
+                        }
                       }}>
                         <Download className="mr-2 h-4 w-4" /> Download
                       </Button>
@@ -267,6 +299,15 @@ function EmptyState({ icon: Icon, title, description }: { icon: typeof Inbox; ti
       <Icon className="mx-auto h-8 w-8 text-muted-foreground" />
       <h3 className="mt-3 font-semibold">{title}</h3>
       <p className="mt-1 text-sm text-muted-foreground">{description}</p>
+    </div>
+  );
+}
+
+function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-center">
+      <p className="text-sm text-destructive-foreground/90">{message}</p>
+      <Button size="sm" variant="outline" className="mt-3" onClick={onRetry}>Try again</Button>
     </div>
   );
 }
