@@ -27,14 +27,13 @@ export function useRealtimeInvalidate(channelName: string, subs: TableSub[]) {
 
     for (const s of subs) {
       channel.on(
-        // @ts-expect-error - supabase-js types are narrow but this is the documented shape
-        "postgres_changes",
+        "postgres_changes" as never,
         {
           event: s.event ?? "*",
           schema: "public",
           table: s.table,
           ...(s.filter ? { filter: s.filter } : {}),
-        },
+        } as never,
         () => {
           if (cancelled) return;
           for (const key of s.keys) qc.invalidateQueries({ queryKey: key });
