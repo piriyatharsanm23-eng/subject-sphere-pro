@@ -69,6 +69,17 @@ function SubjectPage() {
     };
   }, [materialsQ.data]);
 
+  // Realtime — invalidate when this subject's data changes.
+  useRealtimeInvalidate(`subject:${id}`, [
+    { table: "materials", filter: `subject_id=eq.${id}`, keys: [["subject-materials", id]] },
+    { table: "deadlines", filter: `subject_id=eq.${id}`, keys: [["subject-deadlines", id]] },
+    { table: "subjects", filter: `id=eq.${id}`, keys: [["subject", id]] },
+  ]);
+
+  useEffect(() => { if (subjectQ.error) toast.error("Couldn't load subject", { description: (subjectQ.error as Error).message }); }, [subjectQ.error]);
+  useEffect(() => { if (materialsQ.error) toast.error("Couldn't load materials", { description: (materialsQ.error as Error).message }); }, [materialsQ.error]);
+  useEffect(() => { if (deadlinesQ.error) toast.error("Couldn't load deadlines", { description: (deadlinesQ.error as Error).message }); }, [deadlinesQ.error]);
+
   // Past papers grouped by year
   const papersByYear = useMemo(() => {
     const grouped: Record<string, typeof groups.past_paper> = {};
