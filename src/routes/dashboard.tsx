@@ -68,13 +68,15 @@ function DashboardContent({ sel }: { sel: Selection }) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("materials")
-        .select("id,title,description,material_type,file_url,file_name,file_type,year,week_or_module,created_at,subject_id,download_count")
+        .select("id,title,description,material_type,file_url,file_name,file_type,year,week_or_module,created_at,subject_id,download_count,uploaded_by")
         .in("subject_id", sel.subjectIds)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data ?? [];
     },
   });
+
+  const uploadersQ = useUploaders((materialsQ.data ?? []).map((m) => m.uploaded_by));
 
   const deadlinesQ = useQuery({
     queryKey: ["deadlines", sel.subjectIds.join(",")],
