@@ -122,6 +122,20 @@ function DashboardContent({ sel }: { sel: Selection }) {
     return counts;
   }, [materialsQ.data]);
 
+  // Realtime — invalidate materials & deadlines when they change in the DB.
+  const subjectFilter_ = sel.subjectIds.map((id) => `"${id}"`).join(",");
+  useRealtimeInvalidate(`dashboard:${sel.semesterId}`, [
+    { table: "materials", filter: `subject_id=in.(${subjectFilter_})`, keys: [["materials", sel.subjectIds.join(",")]] },
+    { table: "deadlines", filter: `subject_id=in.(${subjectFilter_})`, keys: [["deadlines", sel.subjectIds.join(",")]] },
+    { table: "semesters", filter: `id=eq.${sel.semesterId}`, keys: [["semester", sel.semesterId]] },
+  ]);
+
+  // Error toasts — one per query when it fails.
+  useEffect(() => { if (materialsQ.error) toast.error("Couldn't load materials", { description: (materialsQ.error as Error).message }); }, [materialsQ.error]);
+  useEffect(() => { if (deadlinesQ.error) toast.error("Couldn't load deadlines", { description: (deadlinesQ.error as Error).message }); }, [deadlinesQ.error]);
+  useEffect(() => { if (subjectsQ.error) toast.error("Couldn't load subjects", { description: (subjectsQ.error as Error).message }); }, [subjectsQ.error]);
+  useEffect(() => { if (semesterQ.error) toast.error("Couldn't load semester", { description: (semesterQ.error as Error).message }); }, [semesterQ.error]);
+
   return (
     <div className="min-h-screen flex flex-col bg-muted/40">
       <SiteHeader />
