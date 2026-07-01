@@ -76,13 +76,6 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "activity_logs_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "uploader_profiles"
-            referencedColumns: ["id"]
-          },
         ]
       }
       deadlines: {
@@ -134,13 +127,6 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "deadlines_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "uploader_profiles"
             referencedColumns: ["id"]
           },
           {
@@ -304,13 +290,6 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "materials_uploaded_by_fkey"
-            columns: ["uploaded_by"]
-            isOneToOne: false
-            referencedRelation: "uploader_profiles"
-            referencedColumns: ["id"]
-          },
         ]
       }
       profiles: {
@@ -337,6 +316,27 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      public_profile_info: {
+        Row: {
+          avatar_url: string | null
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
           full_name?: string | null
           id?: string
           updated_at?: string
@@ -487,24 +487,7 @@ export type Database = {
       }
     }
     Views: {
-      uploader_profiles: {
-        Row: {
-          avatar_url: string | null
-          full_name: string | null
-          id: string | null
-        }
-        Insert: {
-          avatar_url?: string | null
-          full_name?: string | null
-          id?: string | null
-        }
-        Update: {
-          avatar_url?: string | null
-          full_name?: string | null
-          id?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       admin_semester: { Args: { _user_id: string }; Returns: string }
