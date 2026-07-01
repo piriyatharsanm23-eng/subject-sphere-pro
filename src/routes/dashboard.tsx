@@ -169,24 +169,32 @@ function DashboardContent({ sel }: { sel: Selection }) {
         <section>
           <h2 className="text-lg font-semibold mb-3">Your subjects</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {(subjectsQ.data ?? []).map((s) => {
-              const meta = subjectMaterialCounts[s.id];
-              return (
-                <Link key={s.id} to="/subject/$id" params={{ id: s.id }} className="group rounded-2xl border border-border bg-card-soft p-5 shadow-soft hover:shadow-elevated hover:-translate-y-0.5 transition-all">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <div className="font-semibold group-hover:text-primary transition-colors">{s.name}</div>
-                      {s.code && <div className="text-xs text-muted-foreground">{s.code}</div>}
+            {subjectsQ.isLoading ? (
+              [0,1,2].map((i) => <div key={i} className="h-28 rounded-2xl bg-muted animate-pulse" />)
+            ) : (subjectsQ.data ?? []).length === 0 ? (
+              <div className="sm:col-span-2 lg:col-span-3">
+                <EmptyState icon={Inbox} title="No subjects selected" description="Head back to preferences to pick your subjects for this semester." />
+              </div>
+            ) : (
+              (subjectsQ.data ?? []).map((s) => {
+                const meta = subjectMaterialCounts[s.id];
+                return (
+                  <Link key={s.id} to="/subject/$id" params={{ id: s.id }} className="group rounded-2xl border border-border bg-card-soft p-5 shadow-soft hover:shadow-elevated hover:-translate-y-0.5 transition-all">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <div className="font-semibold group-hover:text-primary transition-colors">{s.name}</div>
+                        {s.code && <div className="text-xs text-muted-foreground">{s.code}</div>}
+                      </div>
+                      <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
                     </div>
-                    <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
-                  </div>
-                  <div className="mt-4 flex items-center gap-4 text-xs text-muted-foreground">
-                    <span className="inline-flex items-center gap-1"><FileText className="h-3.5 w-3.5" /> {meta?.count ?? 0} materials</span>
-                    {meta?.latest && <span>Updated {formatDistanceToNow(new Date(meta.latest), { addSuffix: true })}</span>}
-                  </div>
-                </Link>
-              );
-            })}
+                    <div className="mt-4 flex items-center gap-4 text-xs text-muted-foreground">
+                      <span className="inline-flex items-center gap-1"><FileText className="h-3.5 w-3.5" /> {meta?.count ?? 0} materials</span>
+                      {meta?.latest && <span>Updated {formatDistanceToNow(new Date(meta.latest), { addSuffix: true })}</span>}
+                    </div>
+                  </Link>
+                );
+              })
+            )}
           </div>
         </section>
 
