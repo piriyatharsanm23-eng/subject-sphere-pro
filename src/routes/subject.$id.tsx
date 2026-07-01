@@ -10,6 +10,8 @@ import { MATERIAL_TYPES, materialTypeBadge, materialTypeLabel, downloadMaterial 
 import { format, formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 import { useMemo } from "react";
+import { useUploaders } from "@/lib/uploaders";
+import { UploaderBadge, type UploaderInfo } from "@/components/UploaderBadge";
 
 export const Route = createFileRoute("/subject/$id")({
   head: () => ({ meta: [{ title: "Subject — StudyHub" }] }),
