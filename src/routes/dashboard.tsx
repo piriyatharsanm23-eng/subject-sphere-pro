@@ -224,7 +224,11 @@ function DashboardContent({ sel }: { sel: Selection }) {
                         </div>
                         <h3 className="mt-1 font-semibold truncate">{m.title}</h3>
                         {m.description && <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{m.description}</p>}
-                        <div className="mt-2 text-xs text-muted-foreground">Uploaded {formatDistanceToNow(new Date(m.created_at), { addSuffix: true })} · {m.download_count} downloads</div>
+                        <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
+                          <UploaderBadge uploader={m.uploaded_by ? uploadersQ.data?.[m.uploaded_by] : null} />
+                          <span>· {formatDistanceToNow(new Date(m.created_at), { addSuffix: true })}</span>
+                          <span>· {m.download_count} downloads</span>
+                        </div>
                       </div>
                       <Button size="sm" onClick={async () => {
                         try { await downloadMaterial(m); toast.success("Download started"); }
