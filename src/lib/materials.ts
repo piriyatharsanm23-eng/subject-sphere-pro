@@ -34,7 +34,10 @@ export async function downloadMaterial(material: { id: string; file_url: string;
   a.click();
   a.remove();
 
-  // Increment download count (fire & forget)
   // Record the download — a DB trigger increments materials.download_count.
-  await supabase.from("downloads").insert({ material_id: material.id });
+  const { error: insertError } = await supabase.from("downloads").insert({ material_id: material.id });
+  if (insertError) {
+    // The file already downloaded; log but don't break the UX.
+    console.warn("[downloads] failed to record download", insertError);
+  }
 }
