@@ -144,7 +144,13 @@ function SubjectPage() {
   );
 }
 
-function MaterialList({ items }: { items: { id: string; title: string; description: string | null; material_type: string; file_url: string; file_name: string | null; year: string | null; week_or_module: string | null; created_at: string; download_count: number }[] }) {
+function MaterialList({
+  items,
+  uploaders,
+}: {
+  items: { id: string; title: string; description: string | null; material_type: string; file_url: string; file_name: string | null; year: string | null; week_or_module: string | null; created_at: string; download_count: number; uploaded_by: string | null }[];
+  uploaders: Record<string, UploaderInfo>;
+}) {
   if (items.length === 0) return <Empty label="Nothing here yet" />;
   return (
     <div className="grid gap-3 sm:grid-cols-2">
@@ -157,8 +163,11 @@ function MaterialList({ items }: { items: { id: string; title: string; descripti
           </div>
           <h4 className="mt-2 font-semibold">{m.title}</h4>
           {m.description && <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{m.description}</p>}
-          <div className="mt-3 flex items-center justify-between">
-            <div className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(m.created_at), { addSuffix: true })} · {m.download_count} downloads</div>
+          <div className="mt-3 flex items-center justify-between gap-2 flex-wrap">
+            <div className="flex flex-col gap-1 min-w-0">
+              <UploaderBadge uploader={m.uploaded_by ? uploaders[m.uploaded_by] : null} />
+              <div className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(m.created_at), { addSuffix: true })} · {m.download_count} downloads</div>
+            </div>
             <Button size="sm" onClick={async () => {
               try { await downloadMaterial(m); toast.success("Download started"); }
               catch { toast.error("Could not download"); }
