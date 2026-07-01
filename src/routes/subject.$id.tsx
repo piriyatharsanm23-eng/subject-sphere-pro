@@ -201,8 +201,13 @@ function MaterialList({
               <div className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(m.created_at), { addSuffix: true })} · {m.download_count} downloads</div>
             </div>
             <Button size="sm" onClick={async () => {
-              try { await downloadMaterial(m); toast.success("Download started"); }
-              catch { toast.error("Could not download"); }
+              const id = toast.loading("Preparing your download…");
+              try {
+                await downloadMaterial(m);
+                toast.success("Download started", { id });
+              } catch (err) {
+                toast.error("Could not download", { id, description: (err as Error)?.message });
+              }
             }}><Download className="mr-2 h-4 w-4" />Download</Button>
           </div>
         </div>
