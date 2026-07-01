@@ -62,18 +62,18 @@ function Landing() {
         supabase.from("subjects").select("id", { count: "exact", head: true }).eq("semester_id", semesterId),
         supabase
           .from("materials")
-          .select("id, title, type, subject:subjects!inner(name, semester_id)", { count: "exact" })
+          .select("id, title, material_type, subject:subjects(name)", { count: "exact" })
           .eq("is_archived", false)
-          .eq("subjects.semester_id", semesterId)
+          .eq("semester_id", semesterId)
           .order("created_at", { ascending: false })
           .limit(3),
         supabase
           .from("deadlines")
-          .select("id, title, due_date, subject:subjects!inner(name, semester_id)", { count: "exact" })
+          .select("id, title, deadline_at, subject:subjects(name)", { count: "exact" })
           .eq("is_archived", false)
-          .eq("subjects.semester_id", semesterId)
-          .gte("due_date", new Date().toISOString())
-          .order("due_date", { ascending: true })
+          .eq("semester_id", semesterId)
+          .gte("deadline_at", new Date().toISOString())
+          .order("deadline_at", { ascending: true })
           .limit(2),
       ]);
       return {
@@ -90,6 +90,7 @@ function Landing() {
     slides: "bg-sky-400/20 text-sky-100",
     notes: "bg-emerald-400/20 text-emerald-100",
     paper: "bg-violet-400/20 text-violet-100",
+    past_paper: "bg-violet-400/20 text-violet-100",
     assignment: "bg-amber-400/20 text-amber-100",
     other: "bg-white/15 text-white/90",
   };
@@ -98,7 +99,7 @@ function Landing() {
   if (preview) {
     const now = Date.now();
     for (const d of preview.deadlines) {
-      const hours = (new Date(d.due_date).getTime() - now) / 36e5;
+      const hours = (new Date(d.deadline_at).getTime() - now) / 36e5;
       const label = hours < 24 ? "Urgent" : hours < 72 ? "Due soon" : "Deadline";
       const cls = hours < 24 ? "bg-rose-400/20 text-rose-100" : hours < 72 ? "bg-amber-400/20 text-amber-100" : "bg-teal-400/20 text-teal-100";
       const subj = (d.subject as any)?.name ?? "";
@@ -106,10 +107,11 @@ function Landing() {
     }
     for (const m of preview.materials) {
       const subj = (m.subject as any)?.name ?? "";
+      const t = String(m.material_type ?? "other");
       previewRows.push({
         t: `${subj} · ${m.title}`,
-        b: m.type.charAt(0).toUpperCase() + m.type.slice(1),
-        c: typeStyle[m.type] ?? typeStyle.other,
+        b: t.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+        c: typeStyle[t] ?? typeStyle.other,
       });
     }
   }
