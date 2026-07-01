@@ -6,12 +6,13 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MATERIAL_TYPES, materialTypeBadge, materialTypeLabel, downloadMaterial } from "@/lib/materials";
+import { materialTypeBadge, materialTypeLabel, downloadMaterial } from "@/lib/materials";
 import { format, formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useUploaders } from "@/lib/uploaders";
 import { UploaderBadge, type UploaderInfo } from "@/components/UploaderBadge";
+import { useRealtimeInvalidate } from "@/hooks/useRealtimeInvalidate";
 
 export const Route = createFileRoute("/subject/$id")({
   head: () => ({ meta: [{ title: "Subject — StudyHub" }] }),
