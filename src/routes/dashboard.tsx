@@ -123,11 +123,13 @@ function DashboardContent({ sel }: { sel: Selection }) {
   }, [materialsQ.data]);
 
   // Realtime — invalidate materials & deadlines when they change in the DB.
-  const subjectFilter_ = sel.subjectIds.map((id) => `"${id}"`).join(",");
+  // Filter by semester_id so a single subscription covers every selected subject
+  // (Postgres changes `in.()` filter with UUIDs is unreliable — semester scope is simpler & sufficient).
   useRealtimeInvalidate(`dashboard:${sel.semesterId}`, [
-    { table: "materials", filter: `subject_id=in.(${subjectFilter_})`, keys: [["materials", sel.subjectIds.join(",")]] },
-    { table: "deadlines", filter: `subject_id=in.(${subjectFilter_})`, keys: [["deadlines", sel.subjectIds.join(",")]] },
+    { table: "materials", filter: `semester_id=eq.${sel.semesterId}`, keys: [["materials", sel.subjectIds.join(",")]] },
+    { table: "deadlines", filter: `semester_id=eq.${sel.semesterId}`, keys: [["deadlines", sel.subjectIds.join(",")]] },
     { table: "semesters", filter: `id=eq.${sel.semesterId}`, keys: [["semester", sel.semesterId]] },
+    { table: "subjects", filter: `semester_id=eq.${sel.semesterId}`, keys: [["subjects", sel.subjectIds.join(",")]] },
   ]);
 
   // Error toasts — one per query when it fails.
