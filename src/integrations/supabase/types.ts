@@ -226,6 +226,7 @@ export type Database = {
           material_type: string
           semester_id: string
           subject_id: string
+          telegram_notified_at: string | null
           title: string
           updated_at: string
           uploaded_by: string | null
@@ -244,6 +245,7 @@ export type Database = {
           material_type: string
           semester_id: string
           subject_id: string
+          telegram_notified_at?: string | null
           title: string
           updated_at?: string
           uploaded_by?: string | null
@@ -262,6 +264,7 @@ export type Database = {
           material_type?: string
           semester_id?: string
           subject_id?: string
+          telegram_notified_at?: string | null
           title?: string
           updated_at?: string
           uploaded_by?: string | null
@@ -453,6 +456,39 @@ export type Database = {
           },
         ]
       }
+      telegram_health_logs: {
+        Row: {
+          checked_at: string
+          id: string
+          last_error_at: string | null
+          last_error_message: string | null
+          pending_update_count: number | null
+          raw: Json | null
+          status: string
+          webhook_url: string | null
+        }
+        Insert: {
+          checked_at?: string
+          id?: string
+          last_error_at?: string | null
+          last_error_message?: string | null
+          pending_update_count?: number | null
+          raw?: Json | null
+          status: string
+          webhook_url?: string | null
+        }
+        Update: {
+          checked_at?: string
+          id?: string
+          last_error_at?: string | null
+          last_error_message?: string | null
+          pending_update_count?: number | null
+          raw?: Json | null
+          status?: string
+          webhook_url?: string | null
+        }
+        Relationships: []
+      }
       telegram_subject_enrollments: {
         Row: {
           chat_id: number
@@ -495,6 +531,7 @@ export type Database = {
           created_at: string
           first_name: string | null
           is_subscribed: boolean
+          receive_admin_alerts: boolean
           selected_semester_id: string | null
           selected_subject_id: string | null
           updated_at: string
@@ -505,6 +542,7 @@ export type Database = {
           created_at?: string
           first_name?: string | null
           is_subscribed?: boolean
+          receive_admin_alerts?: boolean
           selected_semester_id?: string | null
           selected_subject_id?: string | null
           updated_at?: string
@@ -515,6 +553,7 @@ export type Database = {
           created_at?: string
           first_name?: string | null
           is_subscribed?: boolean
+          receive_admin_alerts?: boolean
           selected_semester_id?: string | null
           selected_subject_id?: string | null
           updated_at?: string

@@ -77,8 +77,10 @@ const HELP = [
   "/get &lt;n&gt; – download material #n from the last list",
   "/getall – download every available material (up to 20)",
   "/deadlines – upcoming deadlines",
+  "/adminalerts on|off – receive bot health alerts (admins)",
   "/help – show this menu",
 ].join("\n");
+
 
 async function ensureSubscriber(msg: any) {
   const chat = msg.chat;
@@ -393,10 +395,26 @@ async function handleUpdate(update: any) {
       return cmdGetAll(chatId);
     case "/deadlines":
       return cmdDeadlines(chatId);
+    case "/adminalerts": {
+      const on = /^on$/i.test(arg.trim());
+      const off = /^off$/i.test(arg.trim());
+      if (!on && !off) {
+        return sendMessage(chatId, "Usage: <code>/adminalerts on</code> or <code>/adminalerts off</code>.");
+      }
+      await sb()
+        .from("telegram_subscribers")
+        .update({ receive_admin_alerts: on })
+        .eq("chat_id", chatId);
+      return sendMessage(
+        chatId,
+        on ? "🔔 You'll now receive bot health alerts." : "🔕 Health alerts disabled.",
+      );
+    }
     default:
       return sendMessage(chatId, `Unknown command. Try /help.`);
   }
 }
+
 
 // ---------- Route ----------
 export const Route = createFileRoute("/api/public/telegram/webhook")({
