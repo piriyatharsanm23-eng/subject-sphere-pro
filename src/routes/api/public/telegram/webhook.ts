@@ -377,6 +377,11 @@ async function handleUpdate(update: any) {
       return cmdMySubjects(chatId);
     case "/materials":
       return cmdMaterials(chatId);
+    case "/get":
+      return cmdGet(chatId, arg);
+    case "/getall":
+    case "/downloadall":
+      return cmdGetAll(chatId);
     case "/deadlines":
       return cmdDeadlines(chatId);
     default:
