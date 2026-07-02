@@ -64,10 +64,12 @@ const HELP = [
   "/semesters – list semesters",
   "/semester &lt;n&gt; – pick a semester by number",
   "/subjects – list subjects in your chosen semester",
-  "/enroll &lt;n&gt; – toggle enrollment for subject #n",
+"/enroll &lt;n&gt; – toggle enrollment for subject #n",
   "/enrollall – enroll every subject in the semester",
   "/mysubjects – show your enrolled subjects",
-  "/materials – recent materials for your subjects",
+  "/materials – list available materials for your subjects",
+  "/get &lt;n&gt; – download material #n from the last list",
+  "/getall – download every available material (up to 20)",
   "/deadlines – upcoming deadlines",
   "/help – show this menu",
 ].join("\n");
@@ -234,19 +236,84 @@ async function cmdMySubjects(chatId: number) {
   await sendMessage(chatId, `🎓 <b>Your subjects</b>\n\n${lines.join("\n")}`);
 }
 
-async function cmdMaterials(chatId: number) {
+async function fetchMaterialsForChat(chatId: number, limit = 20) {
   const enrolled = await getEnrolledIds(chatId);
-  if (enrolled.size === 0) return sendMessage(chatId, "Enroll in subjects first — /subjects.");
+  if (enrolled.size === 0) return [];
   const { data } = await sb()
     .from("materials")
-    .select("title,material_type,created_at,subject_id,subjects(name)")
+    .select("id,title,material_type,file_url,file_name,subject_id,subjects(name,code)")
     .in("subject_id", Array.from(enrolled))
     .eq("is_archived", false)
     .order("created_at", { ascending: false })
-    .limit(15);
-  if (!data || data.length === 0) return sendMessage(chatId, "No materials yet for your subjects.");
-  const lines = data.map((m: any) => `• <b>${escape(m.title)}</b> (${m.material_type}) — ${escape(m.subjects?.name ?? "")}`);
-  await sendMessage(chatId, `📎 <b>Recent materials</b>\n\n${lines.join("\n")}`);
+    .limit(limit);
+  return data ?? [];
+}
+
+async function cmdMaterials(chatId: number) {
+  const enrolled = await getEnrolledIds(chatId);
+  if (enrolled.size === 0) return sendMessage(chatId, "Enroll in subjects first — /subjects.");
+  const data = await fetchMaterialsForChat(chatId, 20);
+  if (data.length === 0) return sendMessage(chatId, "No materials yet for your subjects.");
+  const lines = data.map(
+    (m: any, i: number) =>
+      `<b>${i + 1}.</b> ${escape(m.title)} <i>(${m.material_type})</i> — ${escape(m.subjects?.code ?? m.subjects?.name ?? "")}`,
+  );
+  await sendMessage(
+    chatId,
+    `📎 <b>Available materials</b>\n\n${lines.join("\n")}\n\nDownload one with <code>/get &lt;n&gt;</code> or all with /getall.`,
+  );
+}
+
+async function signedUrlFor(path: string) {
+  const { data, error } = await sb().storage
+    .from("learning-materials")
+    .createSignedUrl(path, 60 * 30);
+  if (error || !data) throw error ?? new Error("signed url failed");
+  return data.signedUrl;
+}
+
+async function sendMaterial(chatId: number, m: any) {
+  try {
+    const url = await signedUrlFor(m.file_url);
+    const caption = `📄 <b>${escape(m.title)}</b>\n${escape(m.subjects?.name ?? "")}`;
+    const res = await tg("sendDocument", {
+      chat_id: chatId,
+      document: url,
+      caption,
+      parse_mode: "HTML",
+    });
+    if (res?.ok) {
+      await sb().from("downloads").insert({ material_id: m.id }).then(() => {}, () => {});
+      return true;
+    }
+    // Fallback: send the link if Telegram couldn't fetch the file directly.
+    await sendMessage(chatId, `⬇️ <b>${escape(m.title)}</b>\n<a href="${url}">Download link</a> (valid 30 min)`);
+    return false;
+  } catch (e) {
+    console.error("sendMaterial failed", e);
+    await sendMessage(chatId, `❌ Could not send <b>${escape(m.title)}</b>.`);
+    return false;
+  }
+}
+
+async function cmdGet(chatId: number, arg: string) {
+  const data = await fetchMaterialsForChat(chatId, 20);
+  if (data.length === 0) return sendMessage(chatId, "No materials available. Try /materials.");
+  const n = Number(arg);
+  if (!Number.isInteger(n) || n < 1 || n > data.length) {
+    return sendMessage(chatId, `Usage: /get <number> (1–${data.length}). See /materials.`);
+  }
+  await sendMaterial(chatId, data[n - 1]);
+}
+
+async function cmdGetAll(chatId: number) {
+  const data = await fetchMaterialsForChat(chatId, 20);
+  if (data.length === 0) return sendMessage(chatId, "No materials available. Try /materials.");
+  await sendMessage(chatId, `📦 Sending <b>${data.length}</b> materials…`);
+  for (const m of data) {
+    await sendMaterial(chatId, m);
+  }
+  await sendMessage(chatId, "✅ Done.");
 }
 
 async function cmdDeadlines(chatId: number) {
@@ -310,6 +377,11 @@ async function handleUpdate(update: any) {
       return cmdMySubjects(chatId);
     case "/materials":
       return cmdMaterials(chatId);
+    case "/get":
+      return cmdGet(chatId, arg);
+    case "/getall":
+    case "/downloadall":
+      return cmdGetAll(chatId);
     case "/deadlines":
       return cmdDeadlines(chatId);
     default:
