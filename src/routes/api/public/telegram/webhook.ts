@@ -361,7 +361,10 @@ async function handleUpdate(update: any) {
   const arg = rest.join(" ");
 
   if (cmd === "/start") return cmdStart(chatId, msg);
-  if (!isSubscribed && cmd !== "/help") return; // silent — user unsubscribed
+  if (!sub && cmd !== "/help") {
+    return sendMessage(chatId, "Please send /start first to subscribe to StudyHub.");
+  }
+  if (!isSubscribed && cmd !== "/help") return; // silent only after explicit unsubscribe
 
   switch (cmd) {
     case "/help":
