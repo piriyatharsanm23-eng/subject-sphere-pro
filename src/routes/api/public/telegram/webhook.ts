@@ -7,17 +7,23 @@ import type { Database } from "@/integrations/supabase/types";
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/telegram";
 
 async function tg(method: string, payload: unknown) {
+  const lovableApiKey = process.env.LOVABLE_API_KEY;
+  const telegramApiKey = process.env.TELEGRAM_API_KEY;
+  if (!lovableApiKey || !telegramApiKey) {
+    throw new Error("Telegram gateway is not configured");
+  }
+
   const res = await fetch(`${GATEWAY_URL}/${method}`, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${process.env.LOVABLE_API_KEY!}`,
-      "X-Connection-Api-Key": process.env.TELEGRAM_API_KEY!,
+      Authorization: `Bearer ${lovableApiKey}`,
+      "X-Connection-Api-Key": telegramApiKey,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(payload),
   });
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) console.error("telegram error", method, res.status, data);
+  if (!res.ok || data?.ok === false) console.error("telegram error", method, res.status, data);
   return data;
 }
 
@@ -355,7 +361,10 @@ async function handleUpdate(update: any) {
   const arg = rest.join(" ");
 
   if (cmd === "/start") return cmdStart(chatId, msg);
-  if (!isSubscribed && cmd !== "/help") return; // silent — user unsubscribed
+  if (!sub && cmd !== "/help") {
+    return sendMessage(chatId, "Please send /start first to subscribe to StudyHub.");
+  }
+  if (!isSubscribed && cmd !== "/help") return; // silent only after explicit unsubscribe
 
   switch (cmd) {
     case "/help":
@@ -404,8 +413,13 @@ export const Route = createFileRoute("/api/public/telegram/webhook")({
         const update = await request.json().catch(() => null);
         if (!update) return new Response("Bad Request", { status: 400 });
 
-        // Always ack quickly — errors are logged, not returned, so Telegram doesn't retry.
-        handleUpdate(update).catch((e) => console.error("telegram handleUpdate error", e));
+        try {
+          // Wait for the reply/send work to finish before acknowledging the webhook.
+          // Serverless requests can stop background promises after the response is returned.
+          await handleUpdate(update);
+        } catch (e) {
+          console.error("telegram handleUpdate error", e);
+        }
         return Response.json({ ok: true });
       },
       GET: async () => Response.json({ ok: true, service: "telegram-webhook" }),
