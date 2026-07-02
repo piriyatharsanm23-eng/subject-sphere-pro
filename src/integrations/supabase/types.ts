@@ -453,6 +453,42 @@ export type Database = {
           },
         ]
       }
+      telegram_subject_enrollments: {
+        Row: {
+          chat_id: number
+          created_at: string
+          semester_id: string
+          subject_id: string
+        }
+        Insert: {
+          chat_id: number
+          created_at?: string
+          semester_id: string
+          subject_id: string
+        }
+        Update: {
+          chat_id?: number
+          created_at?: string
+          semester_id?: string
+          subject_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "telegram_subject_enrollments_semester_id_fkey"
+            columns: ["semester_id"]
+            isOneToOne: false
+            referencedRelation: "semesters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "telegram_subject_enrollments_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       telegram_subscribers: {
         Row: {
           chat_id: number
