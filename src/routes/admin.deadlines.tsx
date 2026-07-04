@@ -249,7 +249,7 @@ function DeadlineDialog({
       if (file) {
         const subject = subjects.find((s) => s.id === subjectId);
         const path = buildMaterialStoragePath({
-          semesterSlug: ctx.semesterName,
+          semesterSlug: ctx.semesterId,
           subjectSlug: subject?.name ?? "subject",
           materialType: "deadline",
           fileName: file.name,
