@@ -51,7 +51,6 @@ function ContributorsPage() {
     staleTime: 60_000,
   });
 
-  const supers = (data ?? []).filter((c) => c.role === "super_admin");
   const admins = (data ?? []).filter((c) => c.role === "admin");
 
   return (
@@ -76,13 +75,10 @@ function ContributorsPage() {
           </div>
         ) : (
           <>
-            {supers.length > 0 && (
-              <Section title="Super admins" icon={<ShieldCheck className="h-4 w-4" />} items={supers} />
-            )}
             {admins.length > 0 && (
               <Section title="Semester admins" icon={<GraduationCap className="h-4 w-4" />} items={admins} />
             )}
-            {supers.length === 0 && admins.length === 0 && (
+            {admins.length === 0 && (
               <div className="mt-10 rounded-2xl border border-dashed border-border p-10 text-center text-muted-foreground">
                 No contributors yet.
               </div>
