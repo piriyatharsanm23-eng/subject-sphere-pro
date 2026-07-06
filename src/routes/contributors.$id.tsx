@@ -69,9 +69,7 @@ function ContributorProfile() {
         .eq("id", id);
       if (error) throw error;
       const rows = (data ?? []) as Contributor[];
-      if (rows.length === 0) return null;
-      // Prefer super_admin row if the user has multiple roles.
-      return rows.find((r) => r.role === "super_admin") ?? rows[0];
+      return rows[0] ?? null;
     },
     staleTime: 60_000,
   });
