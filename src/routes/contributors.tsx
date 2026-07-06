@@ -119,13 +119,9 @@ function Section({ title, icon, items }: { title: string; icon: React.ReactNode;
                   {c.full_name || "Unnamed admin"}
                 </div>
                 <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                  {c.role === "super_admin" ? (
-                    <Badge variant="secondary" className="text-[10px]">Super admin</Badge>
-                  ) : (
-                    <Badge variant="outline" className="text-[10px]">
-                      {c.semester_name ? c.semester_name : "Unassigned"}
-                    </Badge>
-                  )}
+                  <Badge variant="outline" className="text-[10px]">
+                    {c.semester_name ? c.semester_name : "Unassigned"}
+                  </Badge>
                 </div>
               </div>
             </div>
