@@ -610,7 +610,25 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_contributors: {
+        Row: {
+          assigned_semester_id: string | null
+          avatar_url: string | null
+          full_name: string | null
+          id: string | null
+          role: string | null
+          semester_name: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_semester_fk"
+            columns: ["assigned_semester_id"]
+            isOneToOne: false
+            referencedRelation: "semesters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       admin_semester: { Args: { _user_id: string }; Returns: string }

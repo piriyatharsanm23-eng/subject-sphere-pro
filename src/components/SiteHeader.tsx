@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { GraduationCap, Settings, LogIn } from "lucide-react";
+import { GraduationCap, Settings, LogIn, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function SiteHeader() {
@@ -16,6 +16,13 @@ export function SiteHeader() {
           <Button asChild variant="ghost" size="sm" className="px-2 sm:px-3">
             <Link to="/dashboard">Dashboard</Link>
           </Button>
+          <Button asChild variant="ghost" size="sm" className="px-2 sm:px-3">
+            <Link to="/contributors">
+              <Users className="h-4 w-4 sm:mr-1.5" />
+              <span className="hidden sm:inline">Contributors</span>
+            </Link>
+          </Button>
+
           <Button asChild variant="ghost" size="sm" className="px-2 sm:px-3">
             <Link to="/select">
               <Settings className="h-4 w-4 sm:mr-1.5" />
