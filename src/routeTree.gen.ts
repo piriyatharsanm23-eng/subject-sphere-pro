@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SuperRouteImport } from './routes/super'
 import { Route as SelectRouteImport } from './routes/select'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as ContributorsRouteImport } from './routes/contributors'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
@@ -49,6 +50,11 @@ const SelectRoute = SelectRouteImport.update({
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContributorsRoute = ContributorsRouteImport.update({
+  id: '/contributors',
+  path: '/contributors',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -173,6 +179,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
+  '/contributors': typeof ContributorsRoute
   '/dashboard': typeof DashboardRoute
   '/select': typeof SelectRoute
   '/super': typeof SuperRouteWithChildren
@@ -200,6 +207,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/contributors': typeof ContributorsRoute
   '/dashboard': typeof DashboardRoute
   '/select': typeof SelectRoute
   '/admin/deadlines': typeof AdminDeadlinesRoute
@@ -228,6 +236,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
+  '/contributors': typeof ContributorsRoute
   '/dashboard': typeof DashboardRoute
   '/select': typeof SelectRoute
   '/super': typeof SuperRouteWithChildren
@@ -258,6 +267,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/contributors'
     | '/dashboard'
     | '/select'
     | '/super'
@@ -285,6 +295,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/contributors'
     | '/dashboard'
     | '/select'
     | '/admin/deadlines'
@@ -312,6 +323,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/contributors'
     | '/dashboard'
     | '/select'
     | '/super'
@@ -341,6 +353,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ContributorsRoute: typeof ContributorsRoute
   DashboardRoute: typeof DashboardRoute
   SelectRoute: typeof SelectRoute
   SuperRoute: typeof SuperRouteWithChildren
@@ -371,6 +384,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contributors': {
+      id: '/contributors'
+      path: '/contributors'
+      fullPath: '/contributors'
+      preLoaderRoute: typeof ContributorsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -589,6 +609,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
+  ContributorsRoute: ContributorsRoute,
   DashboardRoute: DashboardRoute,
   SelectRoute: SelectRoute,
   SuperRoute: SuperRouteWithChildren,
