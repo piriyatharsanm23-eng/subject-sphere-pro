@@ -36,7 +36,7 @@ type DeadlineRow = {
   subject: { id: string; name: string; code: string | null } | null;
 };
 
-export const Route = createFileRoute("/contributors/$id")({
+export const Route = createFileRoute("/contributors_/$id")({
   head: () => ({
     meta: [
       { title: "Contributor — StudyHub" },

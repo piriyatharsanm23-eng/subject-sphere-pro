@@ -28,7 +28,7 @@ import { Route as SuperAnalyticsRouteImport } from './routes/super.analytics'
 import { Route as SuperAdminsRouteImport } from './routes/super.admins'
 import { Route as SuperActivityRouteImport } from './routes/super.activity'
 import { Route as SubjectIdRouteImport } from './routes/subject.$id'
-import { Route as ContributorsIdRouteImport } from './routes/contributors.$id'
+import { Route as ContributorsIdRouteImport } from './routes/contributors_.$id'
 import { Route as AdminRequestsRouteImport } from './routes/admin.requests'
 import { Route as AdminProfileRouteImport } from './routes/admin.profile'
 import { Route as AdminMaterialsRouteImport } from './routes/admin.materials'
@@ -134,9 +134,9 @@ const SubjectIdRoute = SubjectIdRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContributorsIdRoute = ContributorsIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => ContributorsRoute,
+  id: '/contributors_/$id',
+  path: '/contributors/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRequestsRoute = AdminRequestsRouteImport.update({
   id: '/requests',
@@ -185,7 +185,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
-  '/contributors': typeof ContributorsRouteWithChildren
+  '/contributors': typeof ContributorsRoute
   '/dashboard': typeof DashboardRoute
   '/select': typeof SelectRoute
   '/super': typeof SuperRouteWithChildren
@@ -214,7 +214,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/contributors': typeof ContributorsRouteWithChildren
+  '/contributors': typeof ContributorsRoute
   '/dashboard': typeof DashboardRoute
   '/select': typeof SelectRoute
   '/admin/deadlines': typeof AdminDeadlinesRoute
@@ -244,7 +244,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
-  '/contributors': typeof ContributorsRouteWithChildren
+  '/contributors': typeof ContributorsRoute
   '/dashboard': typeof DashboardRoute
   '/select': typeof SelectRoute
   '/super': typeof SuperRouteWithChildren
@@ -253,7 +253,7 @@ export interface FileRoutesById {
   '/admin/materials': typeof AdminMaterialsRoute
   '/admin/profile': typeof AdminProfileRoute
   '/admin/requests': typeof AdminRequestsRoute
-  '/contributors/$id': typeof ContributorsIdRoute
+  '/contributors_/$id': typeof ContributorsIdRoute
   '/subject/$id': typeof SubjectIdRoute
   '/super/activity': typeof SuperActivityRoute
   '/super/admins': typeof SuperAdminsRoute
@@ -343,7 +343,7 @@ export interface FileRouteTypes {
     | '/admin/materials'
     | '/admin/profile'
     | '/admin/requests'
-    | '/contributors/$id'
+    | '/contributors_/$id'
     | '/subject/$id'
     | '/super/activity'
     | '/super/admins'
@@ -365,10 +365,11 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
-  ContributorsRoute: typeof ContributorsRouteWithChildren
+  ContributorsRoute: typeof ContributorsRoute
   DashboardRoute: typeof DashboardRoute
   SelectRoute: typeof SelectRoute
   SuperRoute: typeof SuperRouteWithChildren
+  ContributorsIdRoute: typeof ContributorsIdRoute
   SubjectIdRoute: typeof SubjectIdRoute
   ApiPublicTelegramHealthRoute: typeof ApiPublicTelegramHealthRoute
   ApiPublicTelegramNotifyMaterialsRoute: typeof ApiPublicTelegramNotifyMaterialsRoute
@@ -510,12 +511,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SubjectIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/contributors/$id': {
-      id: '/contributors/$id'
-      path: '/$id'
+    '/contributors_/$id': {
+      id: '/contributors_/$id'
+      path: '/contributors/$id'
       fullPath: '/contributors/$id'
       preLoaderRoute: typeof ContributorsIdRouteImport
-      parentRoute: typeof ContributorsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/requests': {
       id: '/admin/requests'
@@ -596,18 +597,6 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
-interface ContributorsRouteChildren {
-  ContributorsIdRoute: typeof ContributorsIdRoute
-}
-
-const ContributorsRouteChildren: ContributorsRouteChildren = {
-  ContributorsIdRoute: ContributorsIdRoute,
-}
-
-const ContributorsRouteWithChildren = ContributorsRoute._addFileChildren(
-  ContributorsRouteChildren,
-)
-
 interface SuperRouteChildren {
   SuperActivityRoute: typeof SuperActivityRoute
   SuperAdminsRoute: typeof SuperAdminsRoute
@@ -640,10 +629,11 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
-  ContributorsRoute: ContributorsRouteWithChildren,
+  ContributorsRoute: ContributorsRoute,
   DashboardRoute: DashboardRoute,
   SelectRoute: SelectRoute,
   SuperRoute: SuperRouteWithChildren,
+  ContributorsIdRoute: ContributorsIdRoute,
   SubjectIdRoute: SubjectIdRoute,
   ApiPublicTelegramHealthRoute: ApiPublicTelegramHealthRoute,
   ApiPublicTelegramNotifyMaterialsRoute: ApiPublicTelegramNotifyMaterialsRoute,
@@ -652,13 +642,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
