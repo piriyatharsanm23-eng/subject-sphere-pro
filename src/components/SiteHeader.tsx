@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { GraduationCap, Settings, LogIn } from "lucide-react";
+import { GraduationCap, Settings, LogIn, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function SiteHeader() {
