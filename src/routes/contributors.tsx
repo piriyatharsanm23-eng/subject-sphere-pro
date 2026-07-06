@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Users, ShieldCheck, GraduationCap } from "lucide-react";
+import { Users, GraduationCap } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -51,7 +51,6 @@ function ContributorsPage() {
     staleTime: 60_000,
   });
 
-  const supers = (data ?? []).filter((c) => c.role === "super_admin");
   const admins = (data ?? []).filter((c) => c.role === "admin");
 
   return (
@@ -76,13 +75,10 @@ function ContributorsPage() {
           </div>
         ) : (
           <>
-            {supers.length > 0 && (
-              <Section title="Super admins" icon={<ShieldCheck className="h-4 w-4" />} items={supers} />
-            )}
             {admins.length > 0 && (
               <Section title="Semester admins" icon={<GraduationCap className="h-4 w-4" />} items={admins} />
             )}
-            {supers.length === 0 && admins.length === 0 && (
+            {admins.length === 0 && (
               <div className="mt-10 rounded-2xl border border-dashed border-border p-10 text-center text-muted-foreground">
                 No contributors yet.
               </div>
@@ -123,13 +119,9 @@ function Section({ title, icon, items }: { title: string; icon: React.ReactNode;
                   {c.full_name || "Unnamed admin"}
                 </div>
                 <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                  {c.role === "super_admin" ? (
-                    <Badge variant="secondary" className="text-[10px]">Super admin</Badge>
-                  ) : (
-                    <Badge variant="outline" className="text-[10px]">
-                      {c.semester_name ? c.semester_name : "Unassigned"}
-                    </Badge>
-                  )}
+                  <Badge variant="outline" className="text-[10px]">
+                    {c.semester_name ? c.semester_name : "Unassigned"}
+                  </Badge>
                 </div>
               </div>
             </div>

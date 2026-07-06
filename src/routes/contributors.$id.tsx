@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, FileText, CalendarClock, ShieldCheck, GraduationCap, Download } from "lucide-react";
+import { ArrowLeft, FileText, CalendarClock, GraduationCap, Download } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -69,9 +69,7 @@ function ContributorProfile() {
         .eq("id", id);
       if (error) throw error;
       const rows = (data ?? []) as Contributor[];
-      if (rows.length === 0) return null;
-      // Prefer super_admin row if the user has multiple roles.
-      return rows.find((r) => r.role === "super_admin") ?? rows[0];
+      return rows[0] ?? null;
     },
     staleTime: 60_000,
   });
@@ -138,14 +136,10 @@ function ContributorProfile() {
                 <div className="min-w-0 flex-1">
                   <h1 className="text-2xl sm:text-3xl font-bold truncate">{c.full_name || "Unnamed admin"}</h1>
                   <div className="mt-2 flex flex-wrap items-center gap-2">
-                    {c.role === "super_admin" ? (
-                      <Badge className="gap-1"><ShieldCheck className="h-3 w-3" /> Super admin</Badge>
-                    ) : (
-                      <Badge variant="secondary" className="gap-1">
-                        <GraduationCap className="h-3 w-3" />
-                        {c.semester_name ? `Handles ${c.semester_name}` : "Semester unassigned"}
-                      </Badge>
-                    )}
+                    <Badge variant="secondary" className="gap-1">
+                      <GraduationCap className="h-3 w-3" />
+                      {c.semester_name ? `Handles ${c.semester_name}` : "Semester unassigned"}
+                    </Badge>
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-4 sm:gap-6 text-center sm:text-right">
