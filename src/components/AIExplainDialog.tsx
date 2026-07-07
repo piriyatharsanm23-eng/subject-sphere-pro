@@ -1,6 +1,11 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css";
 import { Bot, Copy, Download, Loader2, RefreshCcw, Sparkles, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,76 +30,71 @@ const providerMeta: Record<AIProvider, { label: string; accent: string }> = {
   gemini: { label: "Gemini", accent: "text-sky-400" },
 };
 
-/**
- * Minimal Markdown → HTML renderer for the AI explanation.
- * Keeps the bundle tiny and avoids injecting a heavy MD library for one dialog.
- */
-function renderMd(md: string): string {
-  const esc = (s: string) =>
-    s
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
-
-  // Fenced code blocks first
-  const parts: string[] = [];
-  const codeRe = /```([\s\S]*?)```/g;
-  let last = 0;
-  let m: RegExpExecArray | null;
-  while ((m = codeRe.exec(md)) !== null) {
-    parts.push(processInline(md.slice(last, m.index)));
-    parts.push(
-      `<pre class="bg-muted/60 border border-border rounded-lg p-3 my-3 overflow-x-auto text-xs"><code>${esc(m[1].trim())}</code></pre>`,
-    );
-    last = m.index + m[0].length;
-  }
-  parts.push(processInline(md.slice(last)));
-  return parts.join("");
-
-  function processInline(chunk: string): string {
-    const lines = chunk.split("\n");
-    let html = "";
-    let inList = false;
-    for (let raw of lines) {
-      const line = raw.trimEnd();
-      const bulletMatch = /^\s*[-*]\s+(.*)/.exec(line);
-      if (bulletMatch) {
-        if (!inList) {
-          html += '<ul class="list-disc pl-5 my-2 space-y-1">';
-          inList = true;
-        }
-        html += `<li>${inlineFmt(bulletMatch[1])}</li>`;
-        continue;
-      }
-      if (inList) {
-        html += "</ul>";
-        inList = false;
-      }
-      if (!line.trim()) {
-        html += "";
-        continue;
-      }
-      if (line.startsWith("### ")) {
-        html += `<h4 class="mt-4 mb-2 font-semibold text-primary">${inlineFmt(line.slice(4))}</h4>`;
-      } else if (line.startsWith("## ")) {
-        html += `<h3 class="mt-5 mb-2 text-lg font-bold">${inlineFmt(line.slice(3))}</h3>`;
-      } else if (line.startsWith("# ")) {
-        html += `<h2 class="mt-6 mb-3 text-xl font-bold">${inlineFmt(line.slice(2))}</h2>`;
-      } else {
-        html += `<p class="my-2 leading-relaxed">${inlineFmt(line)}</p>`;
-      }
-    }
-    if (inList) html += "</ul>";
-    return html;
-  }
-
-  function inlineFmt(s: string): string {
-    let out = esc(s);
-    out = out.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
-    out = out.replace(/`([^`]+)`/g, '<code class="rounded bg-muted/70 px-1 py-0.5 text-[0.85em]">$1</code>');
-    return out;
-  }
+function MdView({ children }: { children: string }) {
+  return (
+    <div className="ai-md text-sm leading-relaxed space-y-3">
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm, remarkMath]}
+        rehypePlugins={[rehypeKatex]}
+        components={{
+          h1: (p) => <h2 className="mt-6 mb-3 text-xl font-bold" {...p} />,
+          h2: (p) => <h3 className="mt-5 mb-2 text-lg font-bold" {...p} />,
+          h3: (p) => <h4 className="mt-4 mb-2 font-semibold text-primary" {...p} />,
+          h4: (p) => <h5 className="mt-3 mb-1 font-semibold" {...p} />,
+          p: (p) => <p className="my-2 leading-relaxed" {...p} />,
+          ul: (p) => <ul className="list-disc pl-5 my-2 space-y-1" {...p} />,
+          ol: (p) => <ol className="list-decimal pl-5 my-2 space-y-1" {...p} />,
+          li: (p) => <li className="pl-1" {...p} />,
+          strong: (p) => <strong className="font-semibold text-foreground" {...p} />,
+          em: (p) => <em className="italic" {...p} />,
+          code: ({ className, children, ...rest }) => {
+            const isBlock = /language-/.test(className ?? "");
+            if (isBlock) {
+              return (
+                <code className={className} {...rest}>
+                  {children}
+                </code>
+              );
+            }
+            return (
+              <code
+                className="rounded bg-muted/70 px-1 py-0.5 text-[0.85em]"
+                {...rest}
+              >
+                {children}
+              </code>
+            );
+          },
+          pre: (p) => (
+            <pre
+              className="bg-muted/60 border border-border rounded-lg p-3 my-3 overflow-x-auto text-xs"
+              {...p}
+            />
+          ),
+          blockquote: (p) => (
+            <blockquote
+              className="border-l-2 border-primary/60 pl-3 my-3 text-muted-foreground italic"
+              {...p}
+            />
+          ),
+          table: (p) => (
+            <div className="overflow-x-auto my-3">
+              <table className="w-full text-xs border border-border rounded" {...p} />
+            </div>
+          ),
+          th: (p) => (
+            <th className="border border-border bg-muted/40 px-2 py-1 text-left" {...p} />
+          ),
+          td: (p) => <td className="border border-border px-2 py-1 align-top" {...p} />,
+          hr: () => <hr className="my-4 border-border" />,
+        }}
+      >
+        {children}
+      </ReactMarkdown>
+    </div>
+  );
 }
+
 
 export function AIExplainDialog({
   open,
@@ -127,7 +127,7 @@ export function AIExplainDialog({
 
   // Auto-fire when opened with a fresh target
   const targetId = target?.id ?? "";
-  useMemo(() => {
+  useEffect(() => {
     if (open && targetId && !mut.isPending && !result) {
       mut.mutate(provider);
     }
@@ -236,12 +236,7 @@ export function AIExplainDialog({
               </div>
             </div>
           )}
-          {!mut.isPending && result && (
-            <article
-              className="prose prose-invert max-w-none text-sm"
-              dangerouslySetInnerHTML={{ __html: renderMd(result.explanation) }}
-            />
-          )}
+          {!mut.isPending && result && <MdView>{result.explanation}</MdView>}
         </div>
 
         <div className="flex flex-wrap items-center gap-2 px-4 sm:px-5 py-3 border-t border-border">
