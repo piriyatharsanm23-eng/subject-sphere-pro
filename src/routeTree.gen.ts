@@ -37,6 +37,7 @@ import { Route as AdminRequestsRouteImport } from './routes/admin.requests'
 import { Route as AdminProfileRouteImport } from './routes/admin.profile'
 import { Route as AdminModulesRouteImport } from './routes/admin.modules'
 import { Route as AdminMaterialsRouteImport } from './routes/admin.materials'
+import { Route as AdminKuppiRouteImport } from './routes/admin.kuppi'
 import { Route as AdminGuideRouteImport } from './routes/admin.guide'
 import { Route as AdminFeedbackRouteImport } from './routes/admin.feedback'
 import { Route as AdminDeadlinesRouteImport } from './routes/admin.deadlines'
@@ -184,6 +185,11 @@ const AdminMaterialsRoute = AdminMaterialsRouteImport.update({
   path: '/materials',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminKuppiRoute = AdminKuppiRouteImport.update({
+  id: '/kuppi',
+  path: '/kuppi',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminGuideRoute = AdminGuideRouteImport.update({
   id: '/guide',
   path: '/guide',
@@ -229,6 +235,7 @@ export interface FileRoutesByFullPath {
   '/admin/deadlines': typeof AdminDeadlinesRoute
   '/admin/feedback': typeof AdminFeedbackRoute
   '/admin/guide': typeof AdminGuideRoute
+  '/admin/kuppi': typeof AdminKuppiRoute
   '/admin/materials': typeof AdminMaterialsRoute
   '/admin/modules': typeof AdminModulesRoute
   '/admin/profile': typeof AdminProfileRoute
@@ -263,6 +270,7 @@ export interface FileRoutesByTo {
   '/admin/deadlines': typeof AdminDeadlinesRoute
   '/admin/feedback': typeof AdminFeedbackRoute
   '/admin/guide': typeof AdminGuideRoute
+  '/admin/kuppi': typeof AdminKuppiRoute
   '/admin/materials': typeof AdminMaterialsRoute
   '/admin/modules': typeof AdminModulesRoute
   '/admin/profile': typeof AdminProfileRoute
@@ -300,6 +308,7 @@ export interface FileRoutesById {
   '/admin/deadlines': typeof AdminDeadlinesRoute
   '/admin/feedback': typeof AdminFeedbackRoute
   '/admin/guide': typeof AdminGuideRoute
+  '/admin/kuppi': typeof AdminKuppiRoute
   '/admin/materials': typeof AdminMaterialsRoute
   '/admin/modules': typeof AdminModulesRoute
   '/admin/profile': typeof AdminProfileRoute
@@ -338,6 +347,7 @@ export interface FileRouteTypes {
     | '/admin/deadlines'
     | '/admin/feedback'
     | '/admin/guide'
+    | '/admin/kuppi'
     | '/admin/materials'
     | '/admin/modules'
     | '/admin/profile'
@@ -372,6 +382,7 @@ export interface FileRouteTypes {
     | '/admin/deadlines'
     | '/admin/feedback'
     | '/admin/guide'
+    | '/admin/kuppi'
     | '/admin/materials'
     | '/admin/modules'
     | '/admin/profile'
@@ -408,6 +419,7 @@ export interface FileRouteTypes {
     | '/admin/deadlines'
     | '/admin/feedback'
     | '/admin/guide'
+    | '/admin/kuppi'
     | '/admin/materials'
     | '/admin/modules'
     | '/admin/profile'
@@ -649,6 +661,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminMaterialsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/kuppi': {
+      id: '/admin/kuppi'
+      path: '/kuppi'
+      fullPath: '/admin/kuppi'
+      preLoaderRoute: typeof AdminKuppiRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/guide': {
       id: '/admin/guide'
       path: '/guide'
@@ -698,6 +717,7 @@ interface AdminRouteChildren {
   AdminDeadlinesRoute: typeof AdminDeadlinesRoute
   AdminFeedbackRoute: typeof AdminFeedbackRoute
   AdminGuideRoute: typeof AdminGuideRoute
+  AdminKuppiRoute: typeof AdminKuppiRoute
   AdminMaterialsRoute: typeof AdminMaterialsRoute
   AdminModulesRoute: typeof AdminModulesRoute
   AdminProfileRoute: typeof AdminProfileRoute
@@ -709,6 +729,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminDeadlinesRoute: AdminDeadlinesRoute,
   AdminFeedbackRoute: AdminFeedbackRoute,
   AdminGuideRoute: AdminGuideRoute,
+  AdminKuppiRoute: AdminKuppiRoute,
   AdminMaterialsRoute: AdminMaterialsRoute,
   AdminModulesRoute: AdminModulesRoute,
   AdminProfileRoute: AdminProfileRoute,
