@@ -50,7 +50,7 @@ function RequestsPage({ ctx }: { ctx: AdminContext }) {
     queryFn: async () => {
       let qb = supabase
         .from("student_requests")
-        .select("id,request_text,status,semester_id,subject_id,created_at")
+        .select("id,request_text,status,semester_id,subject_id,created_at,material_id,issue_type")
         .eq("semester_id", ctx.semesterId)
         .order("created_at", { ascending: false })
         .limit(500);
