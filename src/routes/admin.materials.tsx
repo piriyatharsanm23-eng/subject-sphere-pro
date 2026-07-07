@@ -252,7 +252,7 @@ function MaterialDialog({
   const [title, setTitle] = useState(editing?.title ?? "");
   const [description, setDescription] = useState(editing?.description ?? "");
   const [subjectId, setSubjectId] = useState(editing?.subject_id ?? subjects[0]?.id ?? "");
-  const [materialType, setMaterialType] = useState<string>(editing?.material_type ?? "lecture_slide");
+  const [materialType, setMaterialType] = useState<string>(editing?.material_type ?? "note");
   const [year, setYear] = useState(editing?.year ?? "");
   const [weekOrModule, setWeekOrModule] = useState(editing?.week_or_module ?? "");
   const [file, setFile] = useState<File | null>(null);
