@@ -61,6 +61,19 @@ function SubjectPage() {
     },
   });
 
+  const kuppiQ = useQuery({
+    queryKey: ["subject-kuppi", id],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("kuppi_videos")
+        .select("id,title,description,sections_covered,medium,video_url,presenter_name,presenter_photo_url,created_at")
+        .eq("subject_id", id)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as KuppiRow[];
+    },
+  });
+
   const groups = useMemo(() => {
     const m = materialsQ.data ?? [];
     // Treat legacy "lecture_slide" rows as notes.
@@ -128,6 +141,7 @@ function SubjectPage() {
             <TabsTrigger value="past_paper">Past Papers ({groups.past_paper.length})</TabsTrigger>
             <TabsTrigger value="assignment">Assignments ({groups.assignment.length})</TabsTrigger>
             <TabsTrigger value="other">Tutorials ({groups.other.length})</TabsTrigger>
+            <TabsTrigger value="kuppi">Kuppi ({(kuppiQ.data ?? []).length})</TabsTrigger>
             <TabsTrigger value="deadlines">Deadlines ({(deadlinesQ.data ?? []).length})</TabsTrigger>
           </TabsList>
 
@@ -136,6 +150,11 @@ function SubjectPage() {
               {materialsQ.isLoading ? <MaterialSkeleton /> : <MaterialList items={groups[t]} uploaders={uploadersQ.data ?? {}} />}
             </TabsContent>
           ))}
+
+          <TabsContent value="kuppi" className="mt-4">
+            {kuppiQ.isLoading ? <MaterialSkeleton /> : <KuppiSection items={kuppiQ.data ?? []} />}
+          </TabsContent>
+
 
 
           <TabsContent value="past_paper" className="mt-4 space-y-6">
