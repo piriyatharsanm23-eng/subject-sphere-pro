@@ -206,33 +206,51 @@ function AssignDialog({
 }) {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<Role>("admin");
-  const [semesterId, setSemesterId] = useState("");
+  const [semesterIds, setSemesterIds] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
+
+  const toggle = (id: string) =>
+    setSemesterIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
 
   const save = async () => {
     const target = profiles.find((p) => (p.email ?? "").toLowerCase() === email.trim().toLowerCase());
     if (!target) return toast.error("No user with that email. Ask them to sign up at /auth first.");
-    if (role === "admin" && !semesterId) return toast.error("Choose a semester for the admin");
-
-    // remove any existing role of same kind to avoid unique constraint issues
-    const dupes = existing.filter((r) => r.user_id === target.id && r.role === role);
-    for (const d of dupes) {
-      await supabase.from("user_roles").delete().eq("id", d.id);
-    }
+    if (role === "admin" && semesterIds.length === 0) return toast.error("Choose at least one semester for the admin");
 
     setSaving(true);
-    const { error } = await supabase.from("user_roles").insert({
-      user_id: target.id, role,
-      assigned_semester_id: role === "admin" ? semesterId : null,
-    });
+    if (role === "super_admin") {
+      // ensure only a single super_admin row exists for the user
+      const dupes = existing.filter((r) => r.user_id === target.id && r.role === "super_admin");
+      for (const d of dupes) await supabase.from("user_roles").delete().eq("id", d.id);
+      const { error } = await supabase.from("user_roles").insert({
+        user_id: target.id, role: "super_admin", assigned_semester_id: null,
+      });
+      if (error) { setSaving(false); return toast.error(error.message); }
+    } else {
+      // only insert semesters that aren't already assigned
+      const alreadyAssigned = new Set(
+        existing.filter((r) => r.user_id === target.id && r.role === "admin").map((r) => r.assigned_semester_id),
+      );
+      const toInsert = semesterIds
+        .filter((id) => !alreadyAssigned.has(id))
+        .map((id) => ({ user_id: target.id, role: "admin" as const, assigned_semester_id: id }));
+      if (toInsert.length === 0) {
+        setSaving(false);
+        return toast.error("This user is already admin of the selected semesters");
+      }
+      const { error } = await supabase.from("user_roles").insert(toInsert);
+      if (error) { setSaving(false); return toast.error(error.message); }
+    }
     setSaving(false);
-    if (error) return toast.error(error.message);
 
     await logActivity({
       action_type: "admin_assign",
-      description: `Assigned ${role} to ${target.email}` + (role === "admin" ? ` for ${semesters.find((s) => s.id === semesterId)?.name}` : ""),
+      description:
+        role === "super_admin"
+          ? `Assigned super_admin to ${target.email}`
+          : `Assigned admin to ${target.email} for ${semesterIds.map((id) => semesters.find((s) => s.id === id)?.name).filter(Boolean).join(", ")}`,
       target_type: "user_role", target_id: target.id,
-      semester_id: role === "admin" ? semesterId : null,
+      semester_id: role === "admin" ? semesterIds[0] : null,
     });
     toast.success("Role assigned");
     onSaved();
@@ -252,20 +270,32 @@ function AssignDialog({
           <Select value={role} onValueChange={(v) => setRole(v as Role)}>
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="admin">Admin (one semester)</SelectItem>
+              <SelectItem value="admin">Admin (choose one or more semesters)</SelectItem>
               <SelectItem value="super_admin">Super Admin (full access)</SelectItem>
             </SelectContent>
           </Select>
         </div>
         {role === "admin" && (
           <div>
-            <label className="text-sm font-medium">Semester</label>
-            <Select value={semesterId} onValueChange={setSemesterId}>
-              <SelectTrigger><SelectValue placeholder="Select semester" /></SelectTrigger>
-              <SelectContent>
-                {semesters.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
-              </SelectContent>
-            </Select>
+            <label className="text-sm font-medium">Semesters</label>
+            <div className="mt-1 max-h-56 overflow-auto rounded-lg border border-border divide-y divide-border">
+              {semesters.length === 0 ? (
+                <div className="p-3 text-sm text-muted-foreground">No semesters available.</div>
+              ) : semesters.map((s) => (
+                <label key={s.id} className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted/40 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 accent-primary"
+                    checked={semesterIds.includes(s.id)}
+                    onChange={() => toggle(s.id)}
+                  />
+                  <span>{s.name}</span>
+                </label>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              This admin will be able to manage every selected semester.
+            </p>
           </div>
         )}
       </div>
@@ -277,3 +307,4 @@ function AssignDialog({
     </DialogContent>
   );
 }
+
