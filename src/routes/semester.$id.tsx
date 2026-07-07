@@ -113,7 +113,7 @@ function SemesterPage() {
           )}
           <div className="mt-5 grid grid-cols-2 sm:grid-cols-5 gap-3">
             <Stat icon={BookOpen} label="Subjects" value={totals.subjects} tone="text-sky-500" />
-            <Stat icon={ScrollText} label="Slides" value={totals.slides} tone="text-violet-500" />
+            <Stat icon={ScrollText} label="Tutorials" value={totals.tutorials} tone="text-violet-500" />
             <Stat icon={NotebookPen} label="Notes" value={totals.notes} tone="text-emerald-500" />
             <Stat icon={Layers} label="Past papers" value={totals.papers} tone="text-amber-500" />
             <Stat icon={CalendarClock} label="Deadlines" value={totals.deadlines} tone="text-rose-500" />
@@ -151,7 +151,7 @@ function SemesterPage() {
                     <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
                   </div>
                   <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
-                    <MiniStat icon={ScrollText} label="Slides" value={s.slides} tone="text-violet-500" />
+                    <MiniStat icon={ScrollText} label="Tutorials" value={s.tutorials} tone="text-violet-500" />
                     <MiniStat icon={NotebookPen} label="Notes" value={s.notes} tone="text-emerald-500" />
                     <MiniStat icon={Layers} label="Papers" value={s.papers} tone="text-amber-500" />
                     <MiniStat icon={CalendarClock} label="Deadlines" value={s.deadlines} tone="text-rose-500" />
