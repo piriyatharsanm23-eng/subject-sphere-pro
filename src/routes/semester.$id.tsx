@@ -78,8 +78,8 @@ function SemesterPage() {
     const latest = mine.reduce<string | null>((acc, m) => (!acc || m.created_at > acc ? m.created_at : acc), null);
     return {
       ...s,
-      tutorials: mine.filter((m) => m.material_type === "other" || m.material_type === "lecture_slide").length,
-      notes: mine.filter((m) => m.material_type === "note").length,
+      tutorials: mine.filter((m) => m.material_type === "other").length,
+      notes: mine.filter((m) => m.material_type === "note" || m.material_type === "lecture_slide").length,
       papers: mine.filter((m) => m.material_type === "past_paper").length,
       deadlines: deadlines.filter((d) => d.subject_id === s.id).length,
       latest,
@@ -88,8 +88,8 @@ function SemesterPage() {
 
   const totals = {
     subjects: subjects.length,
-    tutorials: materials.filter((m) => m.material_type === "other" || m.material_type === "lecture_slide").length,
-    notes: materials.filter((m) => m.material_type === "note").length,
+    tutorials: materials.filter((m) => m.material_type === "other").length,
+    notes: materials.filter((m) => m.material_type === "note" || m.material_type === "lecture_slide").length,
     papers: materials.filter((m) => m.material_type === "past_paper").length,
     deadlines: deadlines.length,
   };

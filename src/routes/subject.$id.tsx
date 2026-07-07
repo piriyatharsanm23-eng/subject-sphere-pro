@@ -60,12 +60,12 @@ function SubjectPage() {
 
   const groups = useMemo(() => {
     const m = materialsQ.data ?? [];
-    // Treat legacy "lecture_slide" rows as tutorials in the merged Tutorials tab.
+    // Treat legacy "lecture_slide" rows as notes.
     return {
-      note: m.filter((x) => x.material_type === "note"),
+      note: m.filter((x) => x.material_type === "note" || x.material_type === "lecture_slide"),
       past_paper: m.filter((x) => x.material_type === "past_paper"),
       assignment: m.filter((x) => x.material_type === "assignment"),
-      other: m.filter((x) => x.material_type === "other" || x.material_type === "lecture_slide"),
+      other: m.filter((x) => x.material_type === "other"),
     };
   }, [materialsQ.data]);
 
