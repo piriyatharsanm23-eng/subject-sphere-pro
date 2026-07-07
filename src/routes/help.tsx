@@ -18,7 +18,8 @@ import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 
-const TELEGRAM_BOT_URL = "https://t.me/StudyHub_Materials_Bot";
+const TELEGRAM_BOT_URL = "https://t.me/StudyGeniusX_bot";
+const TELEGRAM_BOT_HANDLE = "@StudyGeniusX_bot";
 const SUPPORT_EMAIL = "piriyatharsan2611@gmail.com";
 
 export const Route = createFileRoute("/help")({
