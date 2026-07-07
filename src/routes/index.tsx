@@ -326,8 +326,8 @@ function SemesterCards({ semesters }: { semesters: { id: string; name: string; d
       for (const s of subs.data ?? []) by[s.semester_id].subjects += 1;
       for (const m of mat.data ?? []) {
         const b = by[m.semester_id]; if (!b) continue;
-        if (m.material_type === "other" || m.material_type === "lecture_slide") b.tutorials += 1;
-        else if (m.material_type === "note") b.notes += 1;
+        if (m.material_type === "other") b.tutorials += 1;
+        else if (m.material_type === "note" || m.material_type === "lecture_slide") b.notes += 1;
         else if (m.material_type === "past_paper") b.papers += 1;
       }
       for (const d of dead.data ?? []) if (by[d.semester_id]) by[d.semester_id].deadlines += 1;
