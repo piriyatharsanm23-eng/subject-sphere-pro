@@ -139,6 +139,41 @@ function SemesterPage() {
           </div>
         </header>
 
+        {(contributorsQ.data ?? []).length > 0 && (
+          <section className="mt-6 rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-soft">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-semibold text-muted-foreground">
+                <Users className="h-3.5 w-3.5" /> Contributors
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                {(contributorsQ.data ?? []).map((c) => (
+                  <Link
+                    key={c.id}
+                    to="/contributors/$id"
+                    params={{ id: c.id }}
+                    className="group inline-flex items-center gap-2 rounded-full border border-border bg-muted/40 hover:border-primary/40 hover:bg-primary/5 pl-1 pr-3 py-1 transition-all"
+                  >
+                    <Avatar className="h-6 w-6">
+                      {c.avatar_url ? <AvatarImage src={c.avatar_url} alt={c.full_name ?? "Admin"} /> : null}
+                      <AvatarFallback className="bg-primary/10 text-primary text-[10px] font-semibold">
+                        {(c.full_name ?? "?").trim().split(/\s+/).slice(0, 2).map((p) => p[0]?.toUpperCase() ?? "").join("") || "?"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-xs font-medium group-hover:text-primary transition-colors">
+                      {c.full_name ?? "Admin"}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+              <Link to="/contributors" className="ml-auto text-xs text-primary hover:underline">
+                View all
+              </Link>
+            </div>
+          </section>
+        )}
+
+
+
         <section className="mt-8">
           <h2 className="text-lg font-semibold mb-3">Subjects</h2>
           {subjectsQ.isLoading ? (
