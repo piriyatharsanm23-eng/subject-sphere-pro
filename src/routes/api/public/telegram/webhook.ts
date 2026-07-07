@@ -457,7 +457,7 @@ async function showSubjectDeadlines(chatId: number, messageId: number, subjectId
     const days = Math.floor(diff / DAY);
     const hours = Math.floor((diff % DAY) / (60 * 60 * 1000));
     const remaining = diff < DAY ? `${Math.max(1, Math.floor(diff / (60 * 60 * 1000)))}h left` : `${days}d ${hours}h left`;
-    const when = new Date(d.deadline_at as string).toUTCString();
+    const when = formatDeadline(d.deadline_at as string);
     const line = `• <b>${escape(d.title)}</b>\n  ${when} — ${remaining}${d.description ? `\n  ${escape(d.description)}` : ""}`;
     if (diff < DAY) buckets.today.push(line);
     else if (diff < 2 * DAY) buckets.tomorrow.push(line);
