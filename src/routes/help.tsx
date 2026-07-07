@@ -158,7 +158,7 @@ function HelpPage() {
             eyebrow="Pro tips"
             title="Use the website more efficiently"
           >
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <Tip
                 icon={<Search className="h-4 w-4" />}
                 title="Global search"
@@ -202,7 +202,7 @@ function HelpPage() {
               Missing a material, spotted a broken link, or want to become a contributor? Reach
               out — we usually reply within a day.
             </p>
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
               <a
                 href={`mailto:${SUPPORT_EMAIL}`}
                 className="group flex items-center gap-3 rounded-xl border border-border bg-card p-4 hover:border-primary/40 hover:shadow-soft transition-all"

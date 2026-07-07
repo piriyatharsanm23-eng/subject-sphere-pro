@@ -177,7 +177,7 @@ function SemesterPage() {
         <section className="mt-8">
           <h2 className="text-lg font-semibold mb-3">Subjects</h2>
           {subjectsQ.isLoading ? (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {[0, 1, 2, 3].map((i) => <div key={i} className="h-44 rounded-2xl bg-muted animate-pulse" />)}
             </div>
           ) : perSubject.length === 0 ? (
@@ -189,7 +189,7 @@ function SemesterPage() {
               </p>
             </div>
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {perSubject.map((s) => (
                 <Link
                   key={s.id}
