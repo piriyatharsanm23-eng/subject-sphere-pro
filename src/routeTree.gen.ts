@@ -28,6 +28,7 @@ import { Route as SuperMaterialsRouteImport } from './routes/super.materials'
 import { Route as SuperFeedbackRouteImport } from './routes/super.feedback'
 import { Route as SuperDeadlinesRouteImport } from './routes/super.deadlines'
 import { Route as SuperAnalyticsRouteImport } from './routes/super.analytics'
+import { Route as SuperAiSettingsRouteImport } from './routes/super.ai-settings'
 import { Route as SuperAdminsRouteImport } from './routes/super.admins'
 import { Route as SuperActivityRouteImport } from './routes/super.activity'
 import { Route as SubjectIdRouteImport } from './routes/subject.$id'
@@ -140,6 +141,11 @@ const SuperDeadlinesRoute = SuperDeadlinesRouteImport.update({
 const SuperAnalyticsRoute = SuperAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
+  getParentRoute: () => SuperRoute,
+} as any)
+const SuperAiSettingsRoute = SuperAiSettingsRouteImport.update({
+  id: '/ai-settings',
+  path: '/ai-settings',
   getParentRoute: () => SuperRoute,
 } as any)
 const SuperAdminsRoute = SuperAdminsRouteImport.update({
@@ -260,6 +266,7 @@ export interface FileRoutesByFullPath {
   '/subject/$id': typeof SubjectIdRoute
   '/super/activity': typeof SuperActivityRoute
   '/super/admins': typeof SuperAdminsRoute
+  '/super/ai-settings': typeof SuperAiSettingsRoute
   '/super/analytics': typeof SuperAnalyticsRoute
   '/super/deadlines': typeof SuperDeadlinesRoute
   '/super/feedback': typeof SuperFeedbackRoute
@@ -297,6 +304,7 @@ export interface FileRoutesByTo {
   '/subject/$id': typeof SubjectIdRoute
   '/super/activity': typeof SuperActivityRoute
   '/super/admins': typeof SuperAdminsRoute
+  '/super/ai-settings': typeof SuperAiSettingsRoute
   '/super/analytics': typeof SuperAnalyticsRoute
   '/super/deadlines': typeof SuperDeadlinesRoute
   '/super/feedback': typeof SuperFeedbackRoute
@@ -337,6 +345,7 @@ export interface FileRoutesById {
   '/subject/$id': typeof SubjectIdRoute
   '/super/activity': typeof SuperActivityRoute
   '/super/admins': typeof SuperAdminsRoute
+  '/super/ai-settings': typeof SuperAiSettingsRoute
   '/super/analytics': typeof SuperAnalyticsRoute
   '/super/deadlines': typeof SuperDeadlinesRoute
   '/super/feedback': typeof SuperFeedbackRoute
@@ -378,6 +387,7 @@ export interface FileRouteTypes {
     | '/subject/$id'
     | '/super/activity'
     | '/super/admins'
+    | '/super/ai-settings'
     | '/super/analytics'
     | '/super/deadlines'
     | '/super/feedback'
@@ -415,6 +425,7 @@ export interface FileRouteTypes {
     | '/subject/$id'
     | '/super/activity'
     | '/super/admins'
+    | '/super/ai-settings'
     | '/super/analytics'
     | '/super/deadlines'
     | '/super/feedback'
@@ -454,6 +465,7 @@ export interface FileRouteTypes {
     | '/subject/$id'
     | '/super/activity'
     | '/super/admins'
+    | '/super/ai-settings'
     | '/super/analytics'
     | '/super/deadlines'
     | '/super/feedback'
@@ -624,6 +636,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SuperAnalyticsRouteImport
       parentRoute: typeof SuperRoute
     }
+    '/super/ai-settings': {
+      id: '/super/ai-settings'
+      path: '/ai-settings'
+      fullPath: '/super/ai-settings'
+      preLoaderRoute: typeof SuperAiSettingsRouteImport
+      parentRoute: typeof SuperRoute
+    }
     '/super/admins': {
       id: '/super/admins'
       path: '/admins'
@@ -782,6 +801,7 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 interface SuperRouteChildren {
   SuperActivityRoute: typeof SuperActivityRoute
   SuperAdminsRoute: typeof SuperAdminsRoute
+  SuperAiSettingsRoute: typeof SuperAiSettingsRoute
   SuperAnalyticsRoute: typeof SuperAnalyticsRoute
   SuperDeadlinesRoute: typeof SuperDeadlinesRoute
   SuperFeedbackRoute: typeof SuperFeedbackRoute
@@ -796,6 +816,7 @@ interface SuperRouteChildren {
 const SuperRouteChildren: SuperRouteChildren = {
   SuperActivityRoute: SuperActivityRoute,
   SuperAdminsRoute: SuperAdminsRoute,
+  SuperAiSettingsRoute: SuperAiSettingsRoute,
   SuperAnalyticsRoute: SuperAnalyticsRoute,
   SuperDeadlinesRoute: SuperDeadlinesRoute,
   SuperFeedbackRoute: SuperFeedbackRoute,

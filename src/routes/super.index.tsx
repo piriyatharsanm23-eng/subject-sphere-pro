@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
   Activity, ArrowRight, BarChart3, BookOpen, CalendarClock, FileText,
-  Library, MessageSquare, Star, Users,
+  Library, MessageSquare, Sparkles, Star, Users,
 } from "lucide-react";
 import { SuperShell } from "@/components/SuperShell";
 import { supabase } from "@/integrations/supabase/client";
@@ -48,6 +48,7 @@ const CARDS = [
   { to: "/super/feedback", icon: Star, title: "Feedback", desc: "Read student feedback and ratings." },
   { to: "/super/analytics", icon: BarChart3, title: "Analytics", desc: "Downloads, popular materials, engagement." },
   { to: "/super/activity", icon: Activity, title: "Activity Log", desc: "Audit every important admin action." },
+  { to: "/super/ai-settings", icon: Sparkles, title: "AI Study Helper", desc: "Turn ChatGPT / Gemini explanations on or off." },
 ];
 
 function Stats() {

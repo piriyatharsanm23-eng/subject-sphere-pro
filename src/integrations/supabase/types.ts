@@ -85,6 +85,33 @@ export type Database = {
           },
         ]
       }
+      ai_settings: {
+        Row: {
+          chatgpt_enabled: boolean
+          enabled: boolean
+          gemini_enabled: boolean
+          id: boolean
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          chatgpt_enabled?: boolean
+          enabled?: boolean
+          gemini_enabled?: boolean
+          id?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          chatgpt_enabled?: boolean
+          enabled?: boolean
+          gemini_enabled?: boolean
+          id?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       deadlines: {
         Row: {
           attachment_url: string | null
