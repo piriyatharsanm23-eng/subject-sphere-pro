@@ -60,7 +60,7 @@ function Stats() {
         supabase.from("materials").select("id", { head: true, count: "exact" }).eq("is_archived", false),
         supabase.from("deadlines").select("id", { head: true, count: "exact" }).eq("is_archived", false),
         supabase.from("student_requests").select("id", { head: true, count: "exact" }).eq("status", "pending"),
-        supabase.from("downloads").select("id", { head: true, count: "exact" }),
+        (supabase as any).from("kuppi_videos").select("id", { head: true, count: "exact" }),
       ]);
       return {
         semesters: counts[0].count ?? 0,
@@ -68,7 +68,7 @@ function Stats() {
         materials: counts[2].count ?? 0,
         deadlines: counts[3].count ?? 0,
         pendingRequests: counts[4].count ?? 0,
-        downloads: counts[5].count ?? 0,
+        kuppi: counts[5].count ?? 0,
       };
     },
   });
@@ -79,7 +79,7 @@ function Stats() {
     { label: "Active Materials", value: s?.materials, icon: FileText, color: "text-teal-400" },
     { label: "Active Deadlines", value: s?.deadlines, icon: CalendarClock, color: "text-orange-400" },
     { label: "Pending Requests", value: s?.pendingRequests, icon: MessageSquare, color: "text-rose-400" },
-    { label: "Total Downloads", value: s?.downloads, icon: BarChart3, color: "text-violet-400" },
+    { label: "Kuppi videos", value: s?.kuppi, icon: BarChart3, color: "text-violet-400" },
   ];
   return (
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
