@@ -68,7 +68,7 @@ function ContributorsPage() {
         </div>
 
         {isLoading ? (
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="h-32 rounded-2xl border border-border bg-card animate-pulse" />
             ))}
@@ -148,7 +148,7 @@ function KuppiPresenters() {
         <h2 className="font-semibold">Kuppi presenters</h2>
         <span className="text-xs text-muted-foreground">({grouped.length})</span>
       </div>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {grouped.map((g) => (
           <Link
             key={g.name}
@@ -198,7 +198,7 @@ function Section({ title, icon, items }: { title: string; icon: React.ReactNode;
         <h2 className="font-semibold">{title}</h2>
         <span className="text-xs text-muted-foreground">({items.length})</span>
       </div>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((c) => (
           <Link
             key={`${c.id}-${c.role}-${c.assigned_semester_id ?? "unassigned"}`}

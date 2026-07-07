@@ -72,11 +72,11 @@ function SelectPage() {
             <h2 className="font-semibold text-lg">Select your semester</h2>
           </div>
           {semestersQ.isLoading ? (
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {[0,1,2].map((i) => <div key={i} className="h-24 rounded-xl bg-muted animate-pulse" />)}
             </div>
           ) : semestersQ.data && semestersQ.data.length > 0 ? (
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {semestersQ.data.map((s) => {
                 const active = semesterId === s.id;
                 return (
@@ -112,11 +112,11 @@ function SelectPage() {
           {!semesterId ? (
             <p className="text-sm text-muted-foreground">Select a semester first.</p>
           ) : subjectsQ.isLoading ? (
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {[0,1,2,3].map((i) => <div key={i} className="h-20 rounded-xl bg-muted animate-pulse" />)}
             </div>
           ) : subjectsQ.data && subjectsQ.data.length > 0 ? (
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {subjectsQ.data.map((sub) => {
                 const active = subjectIds.includes(sub.id);
                 return (
