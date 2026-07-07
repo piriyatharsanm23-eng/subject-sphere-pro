@@ -297,21 +297,6 @@ function DashboardContent({ sel }: { sel: Selection }) {
         </div>
 
         <MaterialPreviewDialog material={previewing} onClose={() => setPreviewing(null)} />
-              )}
-            </div>
-          </div>
-
-          {/* All deadlines list */}
-          <aside>
-            {deadlinesQ.isLoading ? (
-              <div className="space-y-3">
-                {[0,1].map((i) => <div key={i} className="h-20 rounded-2xl bg-muted animate-pulse" />)}
-              </div>
-            ) : (
-              <AllDeadlinesList deadlines={deadlinesQ.data ?? []} subjectsById={subjectsById} />
-            )}
-          </aside>
-        </div>
 
       </main>
       <SiteFooter />
