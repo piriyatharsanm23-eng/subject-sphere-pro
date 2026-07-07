@@ -153,7 +153,14 @@ function SubjectPage() {
 
           {(["note","assignment","other"] as const).map((t) => (
             <TabsContent key={t} value={t} className="mt-4">
-              {materialsQ.isLoading ? <MaterialSkeleton /> : <MaterialList items={groups[t]} uploaders={uploadersQ.data ?? {}} />}
+              {materialsQ.isLoading ? <MaterialSkeleton /> : (
+                <MaterialList
+                  items={groups[t]}
+                  uploaders={uploadersQ.data ?? {}}
+                  subjectName={(subjectQ.data as any)?.name ?? null}
+                  semesterName={(subjectQ.data as any)?.semester?.name ?? null}
+                />
+              )}
             </TabsContent>
           ))}
 
@@ -167,7 +174,12 @@ function SubjectPage() {
             {materialsQ.isLoading ? <MaterialSkeleton /> : papersByYear.length === 0 ? <Empty label="No past papers yet" /> : papersByYear.map(([year, items]) => (
               <div key={year}>
                 <h3 className="text-sm font-semibold text-muted-foreground mb-2">{year}</h3>
-                <MaterialList items={items} uploaders={uploadersQ.data ?? {}} />
+                <MaterialList
+                  items={items}
+                  uploaders={uploadersQ.data ?? {}}
+                  subjectName={(subjectQ.data as any)?.name ?? null}
+                  semesterName={(subjectQ.data as any)?.semester?.name ?? null}
+                />
               </div>
             ))}
           </TabsContent>
