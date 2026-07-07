@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, FileText, CalendarClock, GraduationCap, Download } from "lucide-react";
+import { ArrowLeft, FileText, CalendarClock, GraduationCap } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -22,7 +22,6 @@ type MaterialRow = {
   title: string;
   material_type: string | null;
   week_or_module: string | null;
-  download_count: number | null;
   created_at: string;
   subject: { id: string; name: string; code: string | null } | null;
 };
@@ -79,7 +78,7 @@ function ContributorProfile() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("materials")
-        .select("id,title,material_type,week_or_module,download_count,created_at,subject:subjects(id,name,code)")
+        .select("id,title,material_type,week_or_module,created_at,subject:subjects(id,name,code)")
         .eq("uploaded_by", id)
         .eq("is_archived", false)
         .order("created_at", { ascending: false })
@@ -107,7 +106,6 @@ function ContributorProfile() {
   });
 
   const c = contributor.data;
-  const totalDownloads = (materials.data ?? []).reduce((s, m) => s + (m.download_count ?? 0), 0);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -142,10 +140,9 @@ function ContributorProfile() {
                     </Badge>
                   </div>
                 </div>
-                <div className="grid grid-cols-3 gap-4 sm:gap-6 text-center sm:text-right">
+                <div className="grid grid-cols-2 gap-4 sm:gap-6 text-center sm:text-right">
                   <Stat label="Materials" value={materials.data?.length ?? 0} />
                   <Stat label="Deadlines" value={deadlines.data?.length ?? 0} />
-                  <Stat label="Downloads" value={totalDownloads} />
                 </div>
               </div>
             </header>
@@ -179,10 +176,6 @@ function ContributorProfile() {
                           {m.week_or_module && <span>· {m.week_or_module}</span>}
                           <span>· {formatDistanceToNow(new Date(m.created_at), { addSuffix: true })}</span>
                         </div>
-                      </div>
-                      <div className="shrink-0 inline-flex items-center gap-1 text-xs text-muted-foreground">
-                        <Download className="h-3.5 w-3.5" />
-                        {m.download_count ?? 0}
                       </div>
                     </Link>
                   ))}

@@ -37,7 +37,7 @@ function SubjectPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("materials")
-        .select("id,title,description,material_type,file_url,file_name,file_type,year,week_or_module,created_at,download_count,uploaded_by")
+        .select("id,title,description,material_type,file_url,file_name,file_type,year,week_or_module,created_at,uploaded_by")
         .eq("subject_id", id)
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -183,7 +183,7 @@ type MaterialRow = {
   id: string; title: string; description: string | null; material_type: string;
   file_url: string; file_name: string | null; file_type?: string | null;
   year: string | null; week_or_module: string | null;
-  created_at: string; download_count: number; uploaded_by: string | null;
+  created_at: string; uploaded_by: string | null;
 };
 
 function MaterialList({
@@ -210,7 +210,7 @@ function MaterialList({
             <div className="mt-3 flex items-center justify-between gap-2 flex-wrap">
               <div className="flex flex-col gap-1 min-w-0">
                 <UploaderBadge uploader={m.uploaded_by ? uploaders[m.uploaded_by] : null} />
-                <div className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(m.created_at), { addSuffix: true })} · {m.download_count} downloads</div>
+                <div className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(m.created_at), { addSuffix: true })}</div>
               </div>
               <div className="flex gap-2">
                 <Button size="sm" variant="outline" onClick={() => setPreviewing(m)}>

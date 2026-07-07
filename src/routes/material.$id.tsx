@@ -25,7 +25,7 @@ function MaterialPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("materials")
-        .select("id,title,description,material_type,file_url,file_name,file_type,year,week_or_module,created_at,subject_id,semester_id,download_count,uploaded_by")
+        .select("id,title,description,material_type,file_url,file_name,file_type,year,week_or_module,created_at,subject_id,semester_id,uploaded_by")
         .eq("id", id)
         .maybeSingle();
       if (error) throw error;
@@ -132,7 +132,7 @@ function MaterialPage() {
                 <div className="flex flex-col gap-1 text-xs text-muted-foreground">
                   <UploaderBadge uploader={m.uploaded_by ? uploadersQ.data?.[m.uploaded_by] ?? null : null} />
                   <div>
-                    Uploaded {format(new Date(m.created_at), "MMM d, yyyy")} · {m.download_count} downloads
+                    Uploaded {format(new Date(m.created_at), "MMM d, yyyy")}
                   </div>
                 </div>
                 <div className="flex gap-2">
