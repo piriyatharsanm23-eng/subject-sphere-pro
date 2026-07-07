@@ -178,22 +178,86 @@ function Body() {
       </section>
 
       {/* Help */}
-      <section className="rounded-2xl border border-border bg-card p-6 shadow-soft">
-        <div className="flex items-center gap-3">
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
-            <LifeBuoy className="h-5 w-5" />
-          </div>
-          <div>
-            <div className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">
-              Need help
-            </div>
-            <h2 className="text-lg font-bold tracking-tight">Stuck? Reach the super admin</h2>
-          </div>
+      <SuperAdminContacts />
+    </div>
+  );
+}
+
+function initials(name: string | null, email: string | null) {
+  const src = (name || email || "?").trim();
+  const parts = src.split(/\s+/).slice(0, 2);
+  return parts.map((p) => p[0]?.toUpperCase() ?? "").join("") || "?";
+}
+
+function SuperAdminContacts() {
+  const q = useQuery({
+    queryKey: ["super-admin-contacts"],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("super_admin_contacts")
+        .select("id, full_name, avatar_url, phone, email");
+      if (error) throw error;
+      return (data ?? []) as { id: string; full_name: string | null; avatar_url: string | null; phone: string | null; email: string | null }[];
+    },
+  });
+  const admins = q.data ?? [];
+
+  return (
+    <section className="rounded-2xl border border-border bg-card p-6 shadow-soft">
+      <div className="flex items-center gap-3">
+        <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
+          <LifeBuoy className="h-5 w-5" />
         </div>
-        <p className="mt-3 text-sm text-muted-foreground">
-          For access issues, missing semesters, or anything that blocks you from working —
-          email the super admin.
-        </p>
+        <div>
+          <div className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">
+            Need help
+          </div>
+          <h2 className="text-lg font-bold tracking-tight">Stuck? Reach a super admin</h2>
+        </div>
+      </div>
+      <p className="mt-3 text-sm text-muted-foreground">
+        For access issues, missing semesters, or anything that blocks you from working —
+        contact a super admin directly.
+      </p>
+
+      {admins.length > 0 ? (
+        <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+          {admins.map((a) => (
+            <li key={a.id} className="rounded-xl border border-border bg-background/40 p-4">
+              <div className="flex items-center gap-3">
+                <Avatar className="h-11 w-11 ring-1 ring-border">
+                  {a.avatar_url ? <AvatarImage src={a.avatar_url} alt={a.full_name ?? "Super admin"} /> : null}
+                  <AvatarFallback className="bg-primary/10 text-primary text-sm">
+                    {initials(a.full_name, a.email)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="min-w-0">
+                  <div className="font-semibold truncate">{a.full_name ?? "Super admin"}</div>
+                  <div className="text-[11px] uppercase tracking-wider text-primary font-semibold">Super admin</div>
+                </div>
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {a.phone ? (
+                  <Button asChild size="sm" variant="outline">
+                    <a href={`tel:${a.phone.replace(/\s+/g, "")}`}>
+                      <Phone className="mr-2 h-4 w-4" /> {a.phone}
+                    </a>
+                  </Button>
+                ) : (
+                  <span className="text-xs text-muted-foreground italic">No phone added yet</span>
+                )}
+                {a.email && (
+                  <Button asChild size="sm" variant="ghost">
+                    <a href={`mailto:${a.email}`}>
+                      <Mail className="mr-2 h-4 w-4" /> {a.email}
+                    </a>
+                  </Button>
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : (
         <div className="mt-3">
           <Button asChild size="sm" variant="outline">
             <a href={`mailto:${SUPPORT_EMAIL}`}>
@@ -201,7 +265,11 @@ function Body() {
             </a>
           </Button>
         </div>
-      </section>
+      )}
+      <p className="mt-3 text-[11px] text-muted-foreground">
+        Super admins can add or update their phone number from their <b>Profile</b> page.
+      </p>
+    </section>
     </div>
   );
 }
