@@ -35,6 +35,7 @@ import { Route as ContributorsIdRouteImport } from './routes/contributors_.$id'
 import { Route as AdminRequestsRouteImport } from './routes/admin.requests'
 import { Route as AdminProfileRouteImport } from './routes/admin.profile'
 import { Route as AdminMaterialsRouteImport } from './routes/admin.materials'
+import { Route as AdminGuideRouteImport } from './routes/admin.guide'
 import { Route as AdminFeedbackRouteImport } from './routes/admin.feedback'
 import { Route as AdminDeadlinesRouteImport } from './routes/admin.deadlines'
 import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram/webhook'
@@ -171,6 +172,11 @@ const AdminMaterialsRoute = AdminMaterialsRouteImport.update({
   path: '/materials',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminGuideRoute = AdminGuideRouteImport.update({
+  id: '/guide',
+  path: '/guide',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminFeedbackRoute = AdminFeedbackRouteImport.update({
   id: '/feedback',
   path: '/feedback',
@@ -210,6 +216,7 @@ export interface FileRoutesByFullPath {
   '/super': typeof SuperRouteWithChildren
   '/admin/deadlines': typeof AdminDeadlinesRoute
   '/admin/feedback': typeof AdminFeedbackRoute
+  '/admin/guide': typeof AdminGuideRoute
   '/admin/materials': typeof AdminMaterialsRoute
   '/admin/profile': typeof AdminProfileRoute
   '/admin/requests': typeof AdminRequestsRoute
@@ -241,6 +248,7 @@ export interface FileRoutesByTo {
   '/select': typeof SelectRoute
   '/admin/deadlines': typeof AdminDeadlinesRoute
   '/admin/feedback': typeof AdminFeedbackRoute
+  '/admin/guide': typeof AdminGuideRoute
   '/admin/materials': typeof AdminMaterialsRoute
   '/admin/profile': typeof AdminProfileRoute
   '/admin/requests': typeof AdminRequestsRoute
@@ -275,6 +283,7 @@ export interface FileRoutesById {
   '/super': typeof SuperRouteWithChildren
   '/admin/deadlines': typeof AdminDeadlinesRoute
   '/admin/feedback': typeof AdminFeedbackRoute
+  '/admin/guide': typeof AdminGuideRoute
   '/admin/materials': typeof AdminMaterialsRoute
   '/admin/profile': typeof AdminProfileRoute
   '/admin/requests': typeof AdminRequestsRoute
@@ -310,6 +319,7 @@ export interface FileRouteTypes {
     | '/super'
     | '/admin/deadlines'
     | '/admin/feedback'
+    | '/admin/guide'
     | '/admin/materials'
     | '/admin/profile'
     | '/admin/requests'
@@ -341,6 +351,7 @@ export interface FileRouteTypes {
     | '/select'
     | '/admin/deadlines'
     | '/admin/feedback'
+    | '/admin/guide'
     | '/admin/materials'
     | '/admin/profile'
     | '/admin/requests'
@@ -374,6 +385,7 @@ export interface FileRouteTypes {
     | '/super'
     | '/admin/deadlines'
     | '/admin/feedback'
+    | '/admin/guide'
     | '/admin/materials'
     | '/admin/profile'
     | '/admin/requests'
@@ -599,6 +611,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminMaterialsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/guide': {
+      id: '/admin/guide'
+      path: '/guide'
+      fullPath: '/admin/guide'
+      preLoaderRoute: typeof AdminGuideRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/feedback': {
       id: '/admin/feedback'
       path: '/feedback'
@@ -640,6 +659,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminDeadlinesRoute: typeof AdminDeadlinesRoute
   AdminFeedbackRoute: typeof AdminFeedbackRoute
+  AdminGuideRoute: typeof AdminGuideRoute
   AdminMaterialsRoute: typeof AdminMaterialsRoute
   AdminProfileRoute: typeof AdminProfileRoute
   AdminRequestsRoute: typeof AdminRequestsRoute
@@ -649,6 +669,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminDeadlinesRoute: AdminDeadlinesRoute,
   AdminFeedbackRoute: AdminFeedbackRoute,
+  AdminGuideRoute: AdminGuideRoute,
   AdminMaterialsRoute: AdminMaterialsRoute,
   AdminProfileRoute: AdminProfileRoute,
   AdminRequestsRoute: AdminRequestsRoute,
