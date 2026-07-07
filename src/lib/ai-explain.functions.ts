@@ -192,7 +192,9 @@ export const explainMaterial = createServerFn({ method: "POST" })
       .replaceAll("{{file_name}}", material.file_name ?? "material");
 
     const model =
-      data.provider === "gemini" ? "google/gemini-2.5-flash" : "openai/gpt-5-mini";
+      data.provider === "gemini"
+        ? "google/gemini-2.5-flash-lite"
+        : "openai/gpt-5-nano";
 
     const aiRes = await fetch(GATEWAY_URL, {
       method: "POST",
@@ -206,11 +208,11 @@ export const explainMaterial = createServerFn({ method: "POST" })
           {
             role: "system",
             content:
-              "You are an expert university tutor. Produce very thorough, exam-focused explanations in clean Markdown.",
+              "You are an expert university tutor. Produce thorough, exam-focused explanations in clean Markdown. Be concise where possible.",
           },
           {
             role: "user",
-            content: `${prompt}\n\n---\nPDF CONTENT BELOW\n---\n\n${trimmed.slice(0, 180_000)}`,
+            content: `${prompt}\n\n---\nPDF CONTENT BELOW\n---\n\n${trimmed.slice(0, 80_000)}`,
           },
         ],
       }),
@@ -233,6 +235,17 @@ export const explainMaterial = createServerFn({ method: "POST" })
       json?.choices?.[0]?.message?.content?.toString() ?? "";
     if (!explanation.trim()) throw new Error("AI returned an empty response.");
 
+    // Cache for future clicks (don't block the response)
+    (admin as any)
+      .from("ai_explanations")
+      .upsert({
+        material_id: material.id,
+        provider: data.provider,
+        explanation,
+      })
+      .then(() => {})
+      .catch((e: any) => console.error("cache save failed", e));
+
     return {
       explanation,
       material: {
@@ -245,5 +258,6 @@ export const explainMaterial = createServerFn({ method: "POST" })
       subject_code: subject?.code ?? null,
       semester: semester?.name ?? null,
       provider: data.provider,
+      cached: false,
     };
   });
