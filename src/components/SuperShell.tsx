@@ -23,6 +23,7 @@ const NAV: NavItem[] = [
   { to: "/super/feedback", label: "Feedback", icon: Star },
   { to: "/super/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/super/activity", label: "Activity Log", icon: Activity },
+  { to: "/super/profile", label: "Your profile", icon: User },
 ];
 
 export function SuperShell({
