@@ -30,7 +30,11 @@ function SubjectPage() {
   const subjectQ = useQuery({
     queryKey: ["subject", id],
     queryFn: async () => {
-      const { data, error } = await supabase.from("subjects").select("id,name,code,description,semester_id").eq("id", id).maybeSingle();
+      const { data, error } = await supabase
+        .from("subjects")
+        .select("id,name,code,description,semester_id, semester:semesters(name)")
+        .eq("id", id)
+        .maybeSingle();
       if (error) throw error;
       return data;
     },
