@@ -223,3 +223,55 @@ export function AdminShell({
     </div>
   );
 }
+
+function SemesterPicker({
+  semesters,
+  value,
+  onChange,
+}: {
+  semesters: AdminSemester[];
+  value: string;
+  onChange: (id: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const current = semesters.find((s) => s.id === value);
+  if (semesters.length <= 1) {
+    return (
+      <div className="mt-1 text-sm font-semibold truncate px-1">{current?.name ?? "Semester"}</div>
+    );
+  }
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className="mt-1 w-full flex items-center justify-between gap-2 rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium hover:bg-accent/40 transition-colors"
+        >
+          <span className="truncate">{current?.name ?? "Select semester"}</span>
+          <ChevronsUpDown className="h-4 w-4 shrink-0 text-muted-foreground" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-56 p-1">
+        <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold px-2 py-1">
+          {semesters.length} semesters
+        </div>
+        <div className="max-h-64 overflow-auto">
+          {semesters.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => { onChange(s.id); setOpen(false); }}
+              className={`w-full flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-left hover:bg-accent/40 ${
+                s.id === value ? "font-semibold text-primary" : ""
+              }`}
+            >
+              <Check className={`h-4 w-4 ${s.id === value ? "opacity-100" : "opacity-0"}`} />
+              <span className="truncate">{s.name}</span>
+            </button>
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
