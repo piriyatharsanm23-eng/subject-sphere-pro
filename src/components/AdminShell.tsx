@@ -170,10 +170,15 @@ export function AdminShell({
         <div className="grid gap-4 sm:gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
           <aside className="lg:sticky lg:top-20 lg:self-start min-w-0">
             <div className="rounded-2xl border border-border bg-card p-2 shadow-soft">
-              <div className="px-3 py-2 hidden lg:block">
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Admin</div>
-                <div className="mt-0.5 text-sm font-semibold truncate">{ctx.semesterName}</div>
+              <div className="px-2 py-2">
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold px-1 hidden lg:block">Current semester</div>
+                <SemesterPicker
+                  semesters={ctx.semesters}
+                  value={ctx.semesterId}
+                  onChange={ctx.setSemesterId}
+                />
               </div>
+
               <nav className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible scrollbar-thin">
                 {NAV.map((item) => {
                   const active = item.exact ? path === item.to : path.startsWith(item.to);
