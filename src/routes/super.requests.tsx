@@ -133,10 +133,23 @@ function RequestsPage() {
             <div key={r.id} className="rounded-2xl border border-border bg-card p-4 shadow-soft">
               <div className="flex flex-wrap items-start gap-3 justify-between">
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 text-sm">
+                  <div className="flex items-center gap-2 text-sm flex-wrap">
                     <MessageSquare className="h-4 w-4 text-muted-foreground" />
                     <span className="font-medium">Anonymous</span>
-
+                    {r.issue_type && (
+                      <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium bg-amber-500/10 text-amber-300 border border-amber-500/30">
+                        {materialIssueLabel(r.issue_type)}
+                      </span>
+                    )}
+                    {r.material_id && (
+                      <Link
+                        to="/material/$id"
+                        params={{ id: r.material_id }}
+                        className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline"
+                      >
+                        <ExternalLink className="h-3 w-3" />View material
+                      </Link>
+                    )}
                     <span className={`ml-auto inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium border ${STATUS_STYLE[r.status] ?? ""}`}>
                       {r.status.replace("_", " ")}
                     </span>
