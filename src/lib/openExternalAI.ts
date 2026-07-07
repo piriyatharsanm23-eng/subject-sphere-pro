@@ -1,16 +1,22 @@
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export type AIProvider = "chatgpt" | "gemini";
-
-const PROVIDER_URL: Record<AIProvider, string> = {
-  chatgpt: "https://chat.openai.com/",
-  gemini: "https://gemini.google.com/app",
-};
 
 const PROVIDER_LABEL: Record<AIProvider, string> = {
   chatgpt: "ChatGPT",
   gemini: "Gemini",
 };
+
+/** ChatGPT supports ?q= to prefill and auto-send the first message.
+ *  Gemini's public web UI does NOT support any URL prefill, so we just
+ *  open a new chat and rely on the clipboard for the prompt.            */
+function providerUrl(provider: AIProvider, prompt: string): string {
+  if (provider === "chatgpt") {
+    return `https://chatgpt.com/?q=${encodeURIComponent(prompt)}`;
+  }
+  return "https://gemini.google.com/app";
+}
 
 function buildPrompt(input: {
   materialTitle: string;
@@ -20,21 +26,18 @@ function buildPrompt(input: {
   fileName?: string | null;
 }) {
   const { materialTitle, materialType, subject, semester, fileName } = input;
-  return `I am a university student. Teach me the attached PDF/lecture slide completely and clearly.
+  return `I am a university student. I have attached the PDF "${fileName ?? "material.pdf"}". Please teach me it completely and clearly.
 
 Material details:
 - Title: ${materialTitle}
 - Subject: ${subject ?? "Unknown"}
 - Semester: ${semester ?? "Unknown"}
 - Material type: ${materialType}
-- File name: ${fileName ?? "material.pdf"}
 
-Please explain the whole PDF without missing important content, in simple student-friendly English.
-
-Follow this structure:
+Explain the whole PDF without missing important content, in simple student-friendly English. Follow this structure:
 1. Short overview of the PDF.
 2. Every major heading/topic in order.
-3. For each topic, clear theory.
+3. Clear theory for each topic.
 4. All formulas with the meaning of each symbol (use LaTeX).
 5. How to substitute values for any calculations.
 6. Small easy examples for difficult concepts.
@@ -44,25 +47,30 @@ Follow this structure:
 10. Common viva questions with speaking-style answers.
 11. Possible short-answer questions.
 12. Possible long-answer questions.
-13. A final quick revision summary.
+13. Final quick revision summary.
 
-Teach me like I am preparing for a quiz or exam. Do not skip small points.`;
+Do not skip small points. Teach me like I am preparing for a quiz or exam.`;
 }
 
 /**
- * Copies a ready-to-use study prompt to the clipboard and opens the chosen
- * AI provider (ChatGPT or Gemini) in a new browser tab.
- * Uses the user's own account on ChatGPT / Gemini — does NOT consume any
- * Lovable AI credits.
+ * Opens ChatGPT (with the prompt pre-filled) or Gemini (empty chat, prompt on
+ * clipboard) in a new browser tab, and starts a PDF download of the material
+ * so the student can drag it straight into the attach box.
+ *
+ * ⚠ Neither ChatGPT nor Gemini allow attaching a file via URL parameters, so
+ * the PDF must be attached manually by the student in the opened tab.
+ * This uses the student's own AI account — it consumes ZERO Lovable credits.
  */
 export async function openExternalAIExplain(
   provider: AIProvider,
   material: {
+    id?: string;
     title: string;
     material_type: string;
     subject?: string | null;
     semester?: string | null;
     file_name?: string | null;
+    file_url?: string | null;
   },
 ) {
   const prompt = buildPrompt({
@@ -73,19 +81,46 @@ export async function openExternalAIExplain(
     fileName: material.file_name,
   });
 
+  // Copy the prompt so Gemini users can paste; ChatGPT prefills via ?q= but
+  // we still copy as a backup.
   try {
     if (typeof navigator !== "undefined" && navigator.clipboard) {
       await navigator.clipboard.writeText(prompt);
     }
   } catch {
-    // clipboard may be blocked — fall through and still open the tab
+    // ignore — clipboard blocked
   }
 
+  // Open the AI provider in a new tab
   if (typeof window !== "undefined") {
-    window.open(PROVIDER_URL[provider], "_blank", "noopener,noreferrer");
+    window.open(providerUrl(provider, prompt), "_blank", "noopener,noreferrer");
   }
 
-  toast.success(`Prompt copied — paste it in ${PROVIDER_LABEL[provider]}`, {
-    description: `After pasting, attach the downloaded PDF (${material.file_name ?? "your file"}) and press send.`,
+  // Trigger a download of the PDF so the student has the exact file ready to
+  // attach in the AI tab. Done best-effort — never block or fail loudly.
+  if (material.file_url) {
+    try {
+      const { data } = await supabase.storage
+        .from("learning-materials")
+        .createSignedUrl(material.file_url, 60 * 5);
+      if (data?.signedUrl) {
+        const a = document.createElement("a");
+        a.href = data.signedUrl;
+        a.download = material.file_name ?? "material.pdf";
+        a.rel = "noopener";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      }
+    } catch (e) {
+      console.error("PDF download for AI attach failed", e);
+    }
+  }
+
+  toast.success(`${PROVIDER_LABEL[provider]} opened in a new tab`, {
+    description:
+      provider === "chatgpt"
+        ? `Prompt is prefilled. Attach the downloaded "${material.file_name ?? "PDF"}" and press send.`
+        : `Prompt was copied. Paste it, attach the downloaded "${material.file_name ?? "PDF"}", and press send.`,
   });
 }
