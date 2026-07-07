@@ -402,38 +402,9 @@ function KuppiSection({ items }: { items: KuppiRow[] }) {
       {filtered.length === 0 ? (
         <Empty label="No Kuppi in this medium." />
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2">
           {filtered.map((k) => (
-            <div key={k.id} className="rounded-2xl border border-border bg-card p-4 shadow-soft">
-              <div className="flex items-start gap-3">
-                {k.presenter_photo_url ? (
-                  <img src={k.presenter_photo_url} alt={k.presenter_name} className="h-12 w-12 rounded-full object-cover ring-1 ring-border" />
-                ) : (
-                  <div className="h-12 w-12 rounded-full bg-primary/10 text-primary grid place-items-center font-semibold">
-                    {k.presenter_name.slice(0, 2).toUpperCase()}
-                  </div>
-                )}
-                <div className="min-w-0 flex-1">
-                  <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium bg-primary/10 text-primary">
-                    {mediumLabel(k.medium)}
-                  </span>
-                  <h4 className="mt-1 font-semibold">{k.title}</h4>
-                  <div className="text-xs text-muted-foreground">by {k.presenter_name} · {formatDistanceToNow(new Date(k.created_at), { addSuffix: true })}</div>
-                  {k.sections_covered && <p className="mt-1 text-xs text-muted-foreground"><b>Covered:</b> {k.sections_covered}</p>}
-                  {k.description && <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{k.description}</p>}
-                </div>
-              </div>
-              <div className="mt-3 flex gap-2">
-                <Button size="sm" onClick={() => setPlaying(k)}>
-                  <Video className="mr-2 h-4 w-4" /> Watch
-                </Button>
-                <Button asChild size="sm" variant="outline">
-                  <a href={k.video_url} target="_blank" rel="noopener">
-                    <ExternalLink className="mr-2 h-4 w-4" /> Open
-                  </a>
-                </Button>
-              </div>
-            </div>
+            <KuppiCard key={k.id} k={k} onPlay={() => setPlaying(k)} />
           ))}
         </div>
       )}
