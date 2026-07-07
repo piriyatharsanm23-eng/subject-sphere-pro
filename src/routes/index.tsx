@@ -275,35 +275,11 @@ function Landing() {
             <Link to="/select">View all <ArrowRight className="ml-1 h-4 w-4" /></Link>
           </Button>
         </div>
-        <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {semesters && semesters.length > 0 ? (
-            semesters.map((s) => (
-              <Link
-                key={s.id}
-                to="/select"
-                className="group relative overflow-hidden rounded-2xl border border-border bg-card-soft p-5 sm:p-6 shadow-soft hover:shadow-elevated hover:-translate-y-0.5 transition-all"
-              >
-                <div className="absolute -top-12 -right-12 h-32 w-32 rounded-full bg-primary/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="relative flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary-gradient text-primary-foreground shadow-glow">
-                      <GraduationCap className="h-5 w-5" />
-                    </div>
-                    <h3 className="text-base sm:text-lg font-semibold truncate group-hover:text-primary transition-colors">{s.name}</h3>
-                  </div>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all shrink-0" />
-                </div>
-                {s.description && <p className="relative mt-3 text-sm text-muted-foreground line-clamp-2">{s.description}</p>}
-              </Link>
-            ))
-          ) : (
-            <div className="sm:col-span-2 lg:col-span-3 rounded-2xl border border-dashed border-border bg-card p-12 text-center">
-              <Download className="mx-auto h-8 w-8 text-muted-foreground" />
-              <p className="mt-3 text-muted-foreground">No semesters yet. An administrator will add them soon.</p>
-            </div>
-          )}
-        </div>
+        <SemesterCards semesters={semesters ?? []} />
       </section>
+
+      <RecentUploads />
+
 
       {/* CTA */}
       <section className="container mx-auto px-4 sm:px-6 mt-16 sm:mt-24 mb-16 sm:mb-24">
