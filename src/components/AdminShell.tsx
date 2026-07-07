@@ -43,7 +43,7 @@ export function AdminShell({
   const navigate = useNavigate();
   const path = useRouterState({ select: (s) => s.location.pathname });
   const [state, setState] = useState<"checking" | "denied" | "no-semester" | "ok">("checking");
-  const [ctx, setCtx] = useState<AdminContext | null>(null);
+  
 
   const [semesterId, setSemesterIdState] = useState<string | null>(null);
   const [semesters, setSemesters] = useState<AdminSemester[]>([]);
