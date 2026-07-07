@@ -385,3 +385,14 @@ function Tip({
     </div>
   );
 }
+
+function CmdRow({ cmd, desc }: { cmd: string; desc: string }) {
+  return (
+    <div className="flex items-center gap-3 rounded-lg border border-border/60 bg-background/60 px-3 py-2">
+      <code className="rounded bg-muted px-1.5 py-0.5 text-xs font-semibold text-primary shrink-0">
+        {cmd}
+      </code>
+      <span className="text-xs text-muted-foreground">{desc}</span>
+    </div>
+  );
+}
