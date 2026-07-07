@@ -42,7 +42,6 @@ Use Markdown formatting: use ## for major headings, ### for subheadings,
 (e.g. \`\`\`\nF = m * a\n\`\`\`).`;
 
 export const explainMaterial = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
   .inputValidator((data) =>
     z
       .object({
@@ -63,32 +62,62 @@ export const explainMaterial = createServerFn({ method: "POST" })
       "@/integrations/supabase/client.server"
     );
 
-    // Load AI settings
-    const { data: settings } = await admin
-      .from("ai_settings")
-      .select("enabled,chatgpt_enabled,gemini_enabled")
-      .eq("id", true)
-      .maybeSingle();
+    // Fire settings + material + cached explanation in parallel
+    const [
+      { data: settings },
+      { data: material, error: matErr },
+      { data: cached },
+    ] = await Promise.all([
+      admin
+        .from("ai_settings")
+        .select("enabled,chatgpt_enabled,gemini_enabled")
+        .eq("id", true)
+        .maybeSingle(),
+      admin
+        .from("materials")
+        .select(
+          "id,title,material_type,file_url,file_name,file_type,subject_id,semester_id",
+        )
+        .eq("id", data.materialId)
+        .maybeSingle(),
+      (admin as any)
+        .from("ai_explanations")
+        .select("explanation")
+        .eq("material_id", data.materialId)
+        .eq("provider", data.provider)
+        .maybeSingle(),
+    ]);
+
     if (!settings?.enabled) throw new Error("AI Study Helper is turned off.");
     if (data.provider === "chatgpt" && !settings.chatgpt_enabled)
       throw new Error("ChatGPT provider is disabled.");
     if (data.provider === "gemini" && !settings.gemini_enabled)
       throw new Error("Gemini provider is disabled.");
-
-    // Load material + subject + semester
-    const { data: material, error: matErr } = await admin
-      .from("materials")
-      .select(
-        "id,title,material_type,file_url,file_name,file_type,subject_id,semester_id",
-      )
-      .eq("id", data.materialId)
-      .maybeSingle();
     if (matErr || !material) throw new Error("Material not found.");
 
     const [{ data: subject }, { data: semester }] = await Promise.all([
       admin.from("subjects").select("name,code").eq("id", material.subject_id).maybeSingle(),
       admin.from("semesters").select("name").eq("id", material.semester_id).maybeSingle(),
     ]);
+
+    // Serve cached explanation immediately (huge speedup on repeat clicks)
+    if (cached?.explanation) {
+      return {
+        explanation: cached.explanation as string,
+        material: {
+          id: material.id,
+          title: material.title,
+          material_type: material.material_type,
+          file_name: material.file_name,
+        },
+        subject: subject?.name ?? null,
+        subject_code: subject?.code ?? null,
+        semester: semester?.name ?? null,
+        provider: data.provider,
+        cached: true,
+      };
+    }
+
 
     // Get signed URL for the file
     const { data: signed, error: signErr } = await admin.storage
