@@ -201,7 +201,7 @@ function Section({ title, icon, items }: { title: string; icon: React.ReactNode;
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((c) => (
           <Link
-            key={`${c.id}-${c.role}`}
+            key={`${c.id}-${c.role}-${c.assigned_semester_id ?? "unassigned"}`}
             to="/contributors/$id"
             params={{ id: c.id }}
             className="group rounded-2xl border border-border bg-card p-5 shadow-soft hover:border-primary/40 hover:shadow-elevated transition-all"
