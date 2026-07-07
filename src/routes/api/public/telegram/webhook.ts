@@ -595,7 +595,7 @@ async function cmdDeadlines(chatId: number) {
     .limit(20);
   if (!data || data.length === 0) return sendMessage(chatId, "🎉 No upcoming deadlines.");
   const lines = data.map(
-    (d: any) => `⏰ <b>${escape(d.title)}</b> — ${escape(d.subjects?.name ?? "")}\n   ${new Date(d.deadline_at).toUTCString()}`,
+    (d: any) => `⏰ <b>${escape(d.title)}</b> — ${escape(d.subjects?.name ?? "")}\n   ${formatDeadline(d.deadline_at)}`,
   );
   await sendMessage(chatId, `📌 <b>Upcoming deadlines</b>\n\n${lines.join("\n\n")}`);
 }
