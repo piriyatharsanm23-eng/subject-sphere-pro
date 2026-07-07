@@ -308,3 +308,152 @@ function Landing() {
     </div>
   );
 }
+
+function SemesterCards({ semesters }: { semesters: { id: string; name: string; description: string | null }[] }) {
+  const ids = semesters.map((s) => s.id);
+  const statsQ = useQuery({
+    queryKey: ["home-sem-stats", ids.join(",")],
+    enabled: ids.length > 0,
+    queryFn: async () => {
+      const [mat, dead] = await Promise.all([
+        supabase.from("materials").select("semester_id,material_type").in("semester_id", ids).eq("is_archived", false),
+        supabase.from("deadlines").select("semester_id").in("semester_id", ids).eq("is_archived", false).eq("status", "active").gte("deadline_at", new Date().toISOString()),
+        // subjects loaded separately below
+      ]);
+      const subs = await supabase.from("subjects").select("id,semester_id").in("semester_id", ids);
+      const by: Record<string, { subjects: number; slides: number; notes: number; papers: number; deadlines: number }> = {};
+      for (const id of ids) by[id] = { subjects: 0, slides: 0, notes: 0, papers: 0, deadlines: 0 };
+      for (const s of subs.data ?? []) by[s.semester_id].subjects += 1;
+      for (const m of mat.data ?? []) {
+        const b = by[m.semester_id]; if (!b) continue;
+        if (m.material_type === "lecture_slide") b.slides += 1;
+        else if (m.material_type === "note") b.notes += 1;
+        else if (m.material_type === "past_paper") b.papers += 1;
+      }
+      for (const d of dead.data ?? []) if (by[d.semester_id]) by[d.semester_id].deadlines += 1;
+      return by;
+    },
+  });
+
+  if (semesters.length === 0) {
+    return (
+      <div className="rounded-2xl border border-dashed border-border bg-card p-12 text-center">
+        <GraduationCap className="mx-auto h-8 w-8 text-muted-foreground" />
+        <p className="mt-3 font-semibold">No semesters yet</p>
+        <p className="mt-1 text-sm text-muted-foreground">Admins can add semesters from the admin dashboard.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {semesters.map((s) => {
+        const st = statsQ.data?.[s.id];
+        const empty = st && st.subjects === 0 && st.slides === 0 && st.notes === 0 && st.papers === 0 && st.deadlines === 0;
+        return (
+          <Link
+            key={s.id}
+            to="/semester/$id"
+            params={{ id: s.id }}
+            className="group relative overflow-hidden rounded-2xl border border-border bg-card-soft p-5 sm:p-6 shadow-soft hover:shadow-elevated hover:-translate-y-0.5 transition-all"
+          >
+            <div className="absolute -top-12 -right-12 h-32 w-32 rounded-full bg-primary/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="relative flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary-gradient text-primary-foreground shadow-glow">
+                  <GraduationCap className="h-5 w-5" />
+                </div>
+                <h3 className="text-base sm:text-lg font-semibold truncate group-hover:text-primary transition-colors">{s.name}</h3>
+              </div>
+              <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all shrink-0" />
+            </div>
+            {s.description && <p className="relative mt-3 text-sm text-muted-foreground line-clamp-2">{s.description}</p>}
+            {empty ? (
+              <p className="relative mt-4 text-xs text-muted-foreground italic">No materials uploaded yet.</p>
+            ) : (
+              <div className="relative mt-4 grid grid-cols-5 gap-1.5 text-center">
+                {[
+                  { k: "Subj", v: st?.subjects },
+                  { k: "Slides", v: st?.slides },
+                  { k: "Notes", v: st?.notes },
+                  { k: "Papers", v: st?.papers },
+                  { k: "Due", v: st?.deadlines },
+                ].map((x) => (
+                  <div key={x.k} className="rounded-lg bg-muted/60 py-1.5">
+                    <div className="text-sm font-bold tabular-nums">{x.v ?? "—"}</div>
+                    <div className="text-[9px] uppercase tracking-wider text-muted-foreground">{x.k}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
+
+function RecentUploads() {
+  const q = useQuery({
+    queryKey: ["home-recent-uploads"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("materials")
+        .select("id,title,material_type,created_at,subject_id,semester_id,subject:subjects(name),semester:semesters(name)")
+        .eq("is_archived", false)
+        .order("created_at", { ascending: false })
+        .limit(6);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  return (
+    <section className="container mx-auto px-4 sm:px-6 mt-16 sm:mt-24">
+      <div className="flex items-end justify-between gap-4 mb-6 flex-wrap">
+        <div>
+          <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider">
+            <Sparkles className="h-3 w-3" /> Fresh
+          </div>
+          <h2 className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight">Recent uploads</h2>
+          <p className="mt-1 text-muted-foreground text-sm">The latest lecture slides, notes and papers added by your admins.</p>
+        </div>
+      </div>
+      {q.isLoading ? (
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {[0, 1, 2].map((i) => <div key={i} className="h-32 rounded-2xl bg-muted animate-pulse" />)}
+        </div>
+      ) : (q.data ?? []).length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-border bg-card p-10 text-center">
+          <FileText className="mx-auto h-8 w-8 text-muted-foreground" />
+          <p className="mt-3 font-semibold">Nothing here yet</p>
+          <p className="mt-1 text-sm text-muted-foreground">Recent uploads will appear here after admins upload materials.</p>
+        </div>
+      ) : (
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {q.data!.map((m: any) => (
+            <Link
+              key={m.id}
+              to="/material/$id"
+              params={{ id: m.id }}
+              className="group rounded-2xl border border-border bg-card p-4 shadow-soft hover:shadow-elevated hover:-translate-y-0.5 transition-all"
+            >
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span className="rounded-full bg-primary/10 text-primary px-2 py-0.5 font-medium capitalize">
+                  {String(m.material_type).replace("_", " ")}
+                </span>
+                <span className="truncate">{m.semester?.name}</span>
+              </div>
+              <h3 className="mt-2 font-semibold group-hover:text-primary transition-colors line-clamp-2">{m.title}</h3>
+              <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
+                <span className="truncate">{m.subject?.name}</span>
+                <span className="shrink-0">{new Date(m.created_at).toLocaleDateString()}</span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
