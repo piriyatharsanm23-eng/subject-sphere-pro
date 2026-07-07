@@ -60,14 +60,15 @@ function SubjectPage() {
 
   const groups = useMemo(() => {
     const m = materialsQ.data ?? [];
+    // Treat legacy "lecture_slide" rows as tutorials in the merged Tutorials tab.
     return {
-      lecture_slide: m.filter((x) => x.material_type === "lecture_slide"),
       note: m.filter((x) => x.material_type === "note"),
       past_paper: m.filter((x) => x.material_type === "past_paper"),
       assignment: m.filter((x) => x.material_type === "assignment"),
-      other: m.filter((x) => x.material_type === "other"),
+      other: m.filter((x) => x.material_type === "other" || x.material_type === "lecture_slide"),
     };
   }, [materialsQ.data]);
+
 
   // Realtime — invalidate when this subject's data changes.
   useRealtimeInvalidate(`subject:${id}`, [
@@ -118,20 +119,21 @@ function SubjectPage() {
           )}
         </header>
 
-        <Tabs defaultValue="lecture_slide" className="mt-6">
+        <Tabs defaultValue="note" className="mt-6">
           <TabsList className="flex-wrap h-auto">
-            <TabsTrigger value="lecture_slide">Lecture Slides ({groups.lecture_slide.length})</TabsTrigger>
             <TabsTrigger value="note">Notes ({groups.note.length})</TabsTrigger>
             <TabsTrigger value="past_paper">Past Papers ({groups.past_paper.length})</TabsTrigger>
             <TabsTrigger value="assignment">Assignments ({groups.assignment.length})</TabsTrigger>
+            <TabsTrigger value="other">Tutorials ({groups.other.length})</TabsTrigger>
             <TabsTrigger value="deadlines">Deadlines ({(deadlinesQ.data ?? []).length})</TabsTrigger>
           </TabsList>
 
-          {(["lecture_slide","note","assignment"] as const).map((t) => (
+          {(["note","assignment","other"] as const).map((t) => (
             <TabsContent key={t} value={t} className="mt-4">
               {materialsQ.isLoading ? <MaterialSkeleton /> : <MaterialList items={groups[t]} uploaders={uploadersQ.data ?? {}} />}
             </TabsContent>
           ))}
+
 
           <TabsContent value="past_paper" className="mt-4 space-y-6">
             {materialsQ.isLoading ? <MaterialSkeleton /> : papersByYear.length === 0 ? <Empty label="No past papers yet" /> : papersByYear.map(([year, items]) => (

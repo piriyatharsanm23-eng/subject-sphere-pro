@@ -1,20 +1,22 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export const MATERIAL_TYPES = [
-  { value: "lecture_slide", label: "Lecture Slides", badge: "bg-badge-lecture/10 text-badge-lecture border border-badge-lecture/30" },
   { value: "note", label: "Notes", badge: "bg-badge-note/10 text-badge-note border border-badge-note/30" },
   { value: "past_paper", label: "Past Papers", badge: "bg-badge-paper/10 text-badge-paper border border-badge-paper/30" },
   { value: "assignment", label: "Assignments", badge: "bg-badge-assignment/10 text-badge-assignment border border-badge-assignment/30" },
-  { value: "other", label: "Other", badge: "bg-badge-other/10 text-badge-other border border-badge-other/30" },
+  { value: "other", label: "Tutorials", badge: "bg-badge-other/10 text-badge-other border border-badge-other/30" },
 ] as const;
 
 export type MaterialType = typeof MATERIAL_TYPES[number]["value"];
 
 export function materialTypeLabel(t: string) {
-  return MATERIAL_TYPES.find((m) => m.value === t)?.label ?? "Other";
+  // legacy "lecture_slide" rows are shown as Tutorials to match the updated catalog
+  if (t === "lecture_slide") return "Tutorial";
+  return MATERIAL_TYPES.find((m) => m.value === t)?.label ?? "Tutorial";
 }
 export function materialTypeBadge(t: string) {
-  return MATERIAL_TYPES.find((m) => m.value === t)?.badge ?? MATERIAL_TYPES[4].badge;
+  if (t === "lecture_slide") return MATERIAL_TYPES[3].badge;
+  return MATERIAL_TYPES.find((m) => m.value === t)?.badge ?? MATERIAL_TYPES[3].badge;
 }
 
 export async function downloadMaterial(material: { id: string; file_url: string; file_name: string | null }) {
@@ -24,7 +26,6 @@ export async function downloadMaterial(material: { id: string; file_url: string;
     .createSignedUrl(material.file_url, 60 * 5);
   if (error || !data) throw error ?? new Error("Could not generate download link");
 
-  // Trigger download
   const a = document.createElement("a");
   a.href = data.signedUrl;
   a.download = material.file_name ?? "download";
@@ -34,10 +35,8 @@ export async function downloadMaterial(material: { id: string; file_url: string;
   a.click();
   a.remove();
 
-  // Record the download — a DB trigger increments materials.download_count.
   const { error: insertError } = await supabase.from("downloads").insert({ material_id: material.id });
   if (insertError) {
-    // The file already downloaded; log but don't break the UX.
     console.warn("[downloads] failed to record download", insertError);
   }
 }

@@ -2,22 +2,28 @@ import { ReactNode, useEffect, useState } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   CalendarClock, FileText, LayoutDashboard, Loader2,
-  LogOut, MessageSquare, ShieldAlert, Star, UserCircle2,
+  LogOut, MessageSquare, ShieldAlert, Star, UserCircle2, Check, ChevronsUpDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
+
+export type AdminSemester = { id: string; name: string };
 export type AdminContext = {
   userId: string;
   semesterId: string;
   semesterName: string;
   isSuper: boolean;
+  semesters: AdminSemester[];
+  setSemesterId: (id: string) => void;
 };
 
 type NavItem = { to: string; label: string; icon: typeof FileText; exact?: boolean };
+
 const NAV: NavItem[] = [
   { to: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
   { to: "/admin/materials", label: "Materials", icon: FileText },
@@ -37,7 +43,11 @@ export function AdminShell({
   const navigate = useNavigate();
   const path = useRouterState({ select: (s) => s.location.pathname });
   const [state, setState] = useState<"checking" | "denied" | "no-semester" | "ok">("checking");
-  const [ctx, setCtx] = useState<AdminContext | null>(null);
+  
+
+  const [semesterId, setSemesterIdState] = useState<string | null>(null);
+  const [semesters, setSemesters] = useState<AdminSemester[]>([]);
+  const [meta, setMeta] = useState<{ userId: string; isSuper: boolean } | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -53,41 +63,55 @@ export function AdminShell({
         .eq("user_id", uid);
 
       if (!mounted) return;
-      const adminRow = (roles ?? []).find((r) => r.role === "admin");
+      const adminRows = (roles ?? []).filter((r) => r.role === "admin" && r.assigned_semester_id);
       const superRow = (roles ?? []).find((r) => r.role === "super_admin");
 
-      if (!adminRow && !superRow && !isSuper) {
+      if (adminRows.length === 0 && !superRow && !isSuper) {
         setState("denied");
         return;
       }
 
-      let semesterId = adminRow?.assigned_semester_id ?? null;
-      // Super admins without an assignment fall back to the newest active semester
-      if (!semesterId) {
-        const { data: sem } = await supabase
-          .from("semesters")
-          .select("id")
-          .eq("is_active", true)
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .maybeSingle();
-        semesterId = sem?.id ?? null;
+      let list: AdminSemester[] = [];
+      if (isSuper || superRow) {
+        const { data: all } = await supabase.from("semesters").select("id,name").order("name");
+        list = all ?? [];
+      } else {
+        const ids = adminRows.map((r) => r.assigned_semester_id!).filter(Boolean);
+        if (ids.length > 0) {
+          const { data: sems } = await supabase.from("semesters").select("id,name").in("id", ids).order("name");
+          list = sems ?? [];
+        }
       }
-      if (!semesterId) { setState("no-semester"); return; }
+      if (!mounted) return;
+      if (list.length === 0) { setState("no-semester"); return; }
 
-      const { data: semRow } = await supabase
-        .from("semesters").select("id,name").eq("id", semesterId).maybeSingle();
+      const saved = typeof window !== "undefined" ? localStorage.getItem("admin.semesterId") : null;
+      const initial = list.find((s) => s.id === saved)?.id ?? list[0].id;
 
-      setCtx({
-        userId: uid,
-        semesterId,
-        semesterName: semRow?.name ?? "Semester",
-        isSuper: !!isSuper,
-      });
+      setSemesters(list);
+      setSemesterIdState(initial);
+      setMeta({ userId: uid, isSuper: !!isSuper });
       setState("ok");
     })();
     return () => { mounted = false; };
   }, [navigate]);
+
+  const setSemesterId = (id: string) => {
+    setSemesterIdState(id);
+    if (typeof window !== "undefined") localStorage.setItem("admin.semesterId", id);
+  };
+
+  const ctx: AdminContext | null = meta && semesterId
+    ? {
+        userId: meta.userId,
+        semesterId,
+        semesterName: semesters.find((s) => s.id === semesterId)?.name ?? "Semester",
+        isSuper: meta.isSuper,
+        semesters,
+        setSemesterId,
+      }
+    : null;
+
 
   const signOut = async () => {
     await supabase.auth.signOut();
@@ -146,10 +170,15 @@ export function AdminShell({
         <div className="grid gap-4 sm:gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
           <aside className="lg:sticky lg:top-20 lg:self-start min-w-0">
             <div className="rounded-2xl border border-border bg-card p-2 shadow-soft">
-              <div className="px-3 py-2 hidden lg:block">
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Admin</div>
-                <div className="mt-0.5 text-sm font-semibold truncate">{ctx.semesterName}</div>
+              <div className="px-2 py-2">
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold px-1 hidden lg:block">Current semester</div>
+                <SemesterPicker
+                  semesters={ctx.semesters}
+                  value={ctx.semesterId}
+                  onChange={ctx.setSemesterId}
+                />
               </div>
+
               <nav className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible scrollbar-thin">
                 {NAV.map((item) => {
                   const active = item.exact ? path === item.to : path.startsWith(item.to);
@@ -194,3 +223,55 @@ export function AdminShell({
     </div>
   );
 }
+
+function SemesterPicker({
+  semesters,
+  value,
+  onChange,
+}: {
+  semesters: AdminSemester[];
+  value: string;
+  onChange: (id: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const current = semesters.find((s) => s.id === value);
+  if (semesters.length <= 1) {
+    return (
+      <div className="mt-1 text-sm font-semibold truncate px-1">{current?.name ?? "Semester"}</div>
+    );
+  }
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className="mt-1 w-full flex items-center justify-between gap-2 rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium hover:bg-accent/40 transition-colors"
+        >
+          <span className="truncate">{current?.name ?? "Select semester"}</span>
+          <ChevronsUpDown className="h-4 w-4 shrink-0 text-muted-foreground" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-56 p-1">
+        <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold px-2 py-1">
+          {semesters.length} semesters
+        </div>
+        <div className="max-h-64 overflow-auto">
+          {semesters.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => { onChange(s.id); setOpen(false); }}
+              className={`w-full flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-left hover:bg-accent/40 ${
+                s.id === value ? "font-semibold text-primary" : ""
+              }`}
+            >
+              <Check className={`h-4 w-4 ${s.id === value ? "opacity-100" : "opacity-0"}`} />
+              <span className="truncate">{s.name}</span>
+            </button>
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
