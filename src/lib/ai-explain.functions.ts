@@ -37,9 +37,16 @@ Do not skip small points.
 If any page is unclear, mention which page or section is unclear.
 Teach me like I am preparing for a quiz or exam.
 
-Use Markdown formatting: use ## for major headings, ### for subheadings,
-**bold** for key terms, - for bullets, and fenced code blocks for formulas
-(e.g. \`\`\`\nF = m * a\n\`\`\`).`;
+FORMATTING RULES (very important — the UI renders Markdown + KaTeX):
+- Use ## for major headings, ### for subheadings, **bold** for key terms, - for bullets.
+- ALL mathematical formulas, equations, symbols, subscripts, superscripts, Greek letters,
+  vectors, matrices and units MUST be written in LaTeX math, NEVER as plain text.
+- Inline math: wrap with single dollar signs, e.g. $I_a = V_{an}/Z_a$, $\\alpha$, $\\angle{-120^\\circ}$.
+- Display math (equations on their own line): wrap with double dollar signs, e.g.
+  $$I_{neutral} = I_a + I_b + I_c = 0 \\quad \\text{(if balanced)}$$
+- Never use \`\`\`code fences\`\`\` for formulas — always use $...$ or $$...$$.
+- Use \\text{...} for words inside math, \\angle for angles, ^\\circ for degrees,
+  \\frac{a}{b} for fractions, \\sqrt{x}, \\sum, \\int, \\vec{v}, \\hat{x}, \\overline{X}.`;
 
 export const explainMaterial = createServerFn({ method: "POST" })
   .inputValidator((data) =>
