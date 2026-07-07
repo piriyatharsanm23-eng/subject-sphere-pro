@@ -615,24 +615,13 @@ async function handleMessage(msg: any) {
     case "/materials":
       return showDownloadSubjects(chatId);
     case "/enroll":
-      if (arg) return cmdEnrollToggle(chatId, arg);
-      return cmdEnrollStart(chatId);
+      return showEnrollSemesters(chatId, undefined, "enroll");
     case "/change_subjects":
-      return cmdChangeSubjects(chatId);
+      return showEnrollSemesters(chatId, undefined, "change");
     case "/my_subjects":
-    case "/mysubjects":
-    case "/myenrollments":
       return cmdMySubjects(chatId);
     case "/deadlines":
       return cmdDeadlines(chatId);
-    case "/semesters":
-      return cmdSemesters(chatId);
-    case "/semester":
-      return cmdSemesterPick(chatId, arg);
-    case "/subjects":
-      return cmdSubjectsList(chatId);
-    case "/enrollall":
-      return cmdEnrollAll(chatId);
     case "/stop":
       return cmdStop(chatId);
     case "/adminalerts": {
