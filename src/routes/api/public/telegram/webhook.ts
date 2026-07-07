@@ -281,7 +281,6 @@ async function sendMaterial(chatId: number, m: any) {
       parse_mode: "HTML",
     });
     if (res?.ok) {
-      await sb().from("downloads").insert({ material_id: m.id }).then(() => {}, () => {});
       return true;
     }
     // Fallback: send the link if Telegram couldn't fetch the file directly.
