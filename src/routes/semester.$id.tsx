@@ -84,6 +84,12 @@ function SemesterPage() {
       deadlines: deadlines.filter((d) => d.subject_id === s.id).length,
       latest,
     };
+  }).sort((a, b) => {
+    // Most recently updated subjects first; subjects with no uploads last (alphabetical).
+    if (a.latest && b.latest) return b.latest.localeCompare(a.latest);
+    if (a.latest) return -1;
+    if (b.latest) return 1;
+    return a.name.localeCompare(b.name);
   });
 
   const totals = {
