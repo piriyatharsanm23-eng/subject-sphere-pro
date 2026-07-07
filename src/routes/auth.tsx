@@ -5,12 +5,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({ meta: [{ title: "Admin sign in — StudyHub" }] }),
   component: AuthPage,
 });
+
+function GoogleIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="#EA4335" d="M12 10.2v3.9h5.5c-.24 1.44-1.66 4.22-5.5 4.22-3.31 0-6.01-2.74-6.01-6.12S8.69 6.08 12 6.08c1.88 0 3.14.8 3.86 1.49l2.63-2.53C16.9 3.6 14.65 2.6 12 2.6 6.86 2.6 2.7 6.76 2.7 11.9S6.86 21.2 12 21.2c6.93 0 9.3-4.87 9.3-9.3 0-.62-.07-1.09-.16-1.7H12z"/>
+    </svg>
+  );
+}
 
 function AuthPage() {
   const navigate = useNavigate();
@@ -62,6 +71,38 @@ function AuthPage() {
     }
   };
 
+  const signInWithGoogle = async () => {
+    setBusy(true);
+    try {
+      const res = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/auth" });
+      if ((res as { error?: Error }).error) throw (res as { error: Error }).error;
+      // On successful token exchange without redirect
+      if (!(res as { redirected?: boolean }).redirected) await routeToRole();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Google sign-in failed";
+      toast.error(msg);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const forgotPassword = async () => {
+    if (!email) { toast.error("Enter your email above first"); return; }
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + "/reset-password",
+      });
+      if (error) throw error;
+      toast.success("Password reset link sent. Check your email.");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Could not send reset email";
+      toast.error(msg);
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <div className="min-h-screen grid lg:grid-cols-2">
       {/* Brand panel */}
@@ -101,11 +142,23 @@ function AuthPage() {
               <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
             </div>
             <div>
-              <Label htmlFor="password" className="mb-1.5 block">Password</Label>
+              <div className="flex items-center justify-between mb-1.5">
+                <Label htmlFor="password">Password</Label>
+                {mode === "signin" && (
+                  <button type="button" onClick={forgotPassword} className="text-xs text-primary hover:underline">Forgot password?</button>
+                )}
+              </div>
               <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} autoComplete={mode === "signin" ? "current-password" : "new-password"} />
             </div>
             <Button type="submit" className="w-full" disabled={busy}>{busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}</Button>
           </form>
+
+          <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
+            <div className="h-px flex-1 bg-border" /> OR <div className="h-px flex-1 bg-border" />
+          </div>
+          <Button type="button" variant="outline" className="w-full" onClick={signInWithGoogle} disabled={busy}>
+            <GoogleIcon className="mr-2 h-4 w-4" /> Continue with Google
+          </Button>
 
           <p className="mt-4 text-center text-sm text-muted-foreground">
             {mode === "signin" ? "Don't have an account?" : "Already have an account?"}{" "}

@@ -227,7 +227,85 @@ function ProfileForm({ userId }: { userId: string }) {
             Save changes
           </Button>
         </div>
+
+        <ChangePassword />
       </div>
+    </div>
+  );
+}
+
+function ChangePassword() {
+  const [current, setCurrent] = useState("");
+  const [next, setNext] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [sending, setSending] = useState(false);
+
+  const change = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (next.length < 6) { toast.error("Password must be at least 6 characters"); return; }
+    if (next !== confirm) { toast.error("Passwords do not match"); return; }
+    setBusy(true);
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      const email = userData.user?.email;
+      if (email && current) {
+        const { error: reErr } = await supabase.auth.signInWithPassword({ email, password: current });
+        if (reErr) throw new Error("Current password is incorrect");
+      }
+      const { error } = await supabase.auth.updateUser({ password: next });
+      if (error) throw error;
+      setCurrent(""); setNext(""); setConfirm("");
+      toast.success("Password updated");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Could not update password";
+      toast.error(msg);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const sendReset = async () => {
+    setSending(true);
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      const email = userData.user?.email;
+      if (!email) throw new Error("No email on account");
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + "/reset-password",
+      });
+      if (error) throw error;
+      toast.success("Reset email sent");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Could not send email";
+      toast.error(msg);
+    } finally {
+      setSending(false);
+    }
+  };
+
+  return (
+    <div className="mt-8 border-t border-border pt-6">
+      <h3 className="font-semibold">Change password</h3>
+      <p className="text-xs text-muted-foreground mb-4">Update your account password. Skip the current-password field if you signed in with Google.</p>
+      <form onSubmit={change} className="space-y-4 max-w-md">
+        <div>
+          <Label htmlFor="cpw" className="mb-1.5 block">Current password (optional)</Label>
+          <Input id="cpw" type="password" value={current} onChange={(e) => setCurrent(e.target.value)} autoComplete="current-password" />
+        </div>
+        <div>
+          <Label htmlFor="npw" className="mb-1.5 block">New password</Label>
+          <Input id="npw" type="password" value={next} onChange={(e) => setNext(e.target.value)} required minLength={6} autoComplete="new-password" />
+        </div>
+        <div>
+          <Label htmlFor="npw2" className="mb-1.5 block">Confirm new password</Label>
+          <Input id="npw2" type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} required minLength={6} autoComplete="new-password" />
+        </div>
+        <div className="flex gap-2">
+          <Button type="submit" disabled={busy}>{busy ? "Updating…" : "Update password"}</Button>
+          <Button type="button" variant="outline" onClick={sendReset} disabled={sending}>{sending ? "Sending…" : "Email reset link"}</Button>
+        </div>
+      </form>
     </div>
   );
 }

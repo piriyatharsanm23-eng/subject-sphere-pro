@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SuperRouteImport } from './routes/super'
 import { Route as SelectRouteImport } from './routes/select'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContributorsRouteImport } from './routes/contributors'
@@ -54,6 +55,11 @@ const SuperRoute = SuperRouteImport.update({
 const SelectRoute = SelectRouteImport.update({
   id: '/select',
   path: '/select',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HelpRoute = HelpRouteImport.update({
@@ -236,6 +242,7 @@ export interface FileRoutesByFullPath {
   '/contributors': typeof ContributorsRoute
   '/dashboard': typeof DashboardRoute
   '/help': typeof HelpRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/select': typeof SelectRoute
   '/super': typeof SuperRouteWithChildren
   '/admin/deadlines': typeof AdminDeadlinesRoute
@@ -273,6 +280,7 @@ export interface FileRoutesByTo {
   '/contributors': typeof ContributorsRoute
   '/dashboard': typeof DashboardRoute
   '/help': typeof HelpRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/select': typeof SelectRoute
   '/admin/deadlines': typeof AdminDeadlinesRoute
   '/admin/feedback': typeof AdminFeedbackRoute
@@ -311,6 +319,7 @@ export interface FileRoutesById {
   '/contributors': typeof ContributorsRoute
   '/dashboard': typeof DashboardRoute
   '/help': typeof HelpRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/select': typeof SelectRoute
   '/super': typeof SuperRouteWithChildren
   '/admin/deadlines': typeof AdminDeadlinesRoute
@@ -351,6 +360,7 @@ export interface FileRouteTypes {
     | '/contributors'
     | '/dashboard'
     | '/help'
+    | '/reset-password'
     | '/select'
     | '/super'
     | '/admin/deadlines'
@@ -388,6 +398,7 @@ export interface FileRouteTypes {
     | '/contributors'
     | '/dashboard'
     | '/help'
+    | '/reset-password'
     | '/select'
     | '/admin/deadlines'
     | '/admin/feedback'
@@ -425,6 +436,7 @@ export interface FileRouteTypes {
     | '/contributors'
     | '/dashboard'
     | '/help'
+    | '/reset-password'
     | '/select'
     | '/super'
     | '/admin/deadlines'
@@ -464,6 +476,7 @@ export interface RootRouteChildren {
   ContributorsRoute: typeof ContributorsRoute
   DashboardRoute: typeof DashboardRoute
   HelpRoute: typeof HelpRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SelectRoute: typeof SelectRoute
   SuperRoute: typeof SuperRouteWithChildren
   ContributorsIdRoute: typeof ContributorsIdRoute
@@ -490,6 +503,13 @@ declare module '@tanstack/react-router' {
       path: '/select'
       fullPath: '/select'
       preLoaderRoute: typeof SelectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/help': {
@@ -796,6 +816,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContributorsRoute: ContributorsRoute,
   DashboardRoute: DashboardRoute,
   HelpRoute: HelpRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SelectRoute: SelectRoute,
   SuperRoute: SuperRouteWithChildren,
   ContributorsIdRoute: ContributorsIdRoute,
