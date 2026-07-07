@@ -127,7 +127,7 @@ export function AIExplainDialog({
 
   // Auto-fire when opened with a fresh target
   const targetId = target?.id ?? "";
-  useMemo(() => {
+  useEffect(() => {
     if (open && targetId && !mut.isPending && !result) {
       mut.mutate(provider);
     }
