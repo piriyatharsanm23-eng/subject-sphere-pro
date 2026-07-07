@@ -22,6 +22,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as SuperSubjectsRouteImport } from './routes/super.subjects'
 import { Route as SuperSemestersRouteImport } from './routes/super.semesters'
 import { Route as SuperRequestsRouteImport } from './routes/super.requests'
+import { Route as SuperModulesRouteImport } from './routes/super.modules'
 import { Route as SuperMaterialsRouteImport } from './routes/super.materials'
 import { Route as SuperFeedbackRouteImport } from './routes/super.feedback'
 import { Route as SuperDeadlinesRouteImport } from './routes/super.deadlines'
@@ -34,7 +35,9 @@ import { Route as MaterialIdRouteImport } from './routes/material.$id'
 import { Route as ContributorsIdRouteImport } from './routes/contributors_.$id'
 import { Route as AdminRequestsRouteImport } from './routes/admin.requests'
 import { Route as AdminProfileRouteImport } from './routes/admin.profile'
+import { Route as AdminModulesRouteImport } from './routes/admin.modules'
 import { Route as AdminMaterialsRouteImport } from './routes/admin.materials'
+import { Route as AdminGuideRouteImport } from './routes/admin.guide'
 import { Route as AdminFeedbackRouteImport } from './routes/admin.feedback'
 import { Route as AdminDeadlinesRouteImport } from './routes/admin.deadlines'
 import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram/webhook'
@@ -106,6 +109,11 @@ const SuperRequestsRoute = SuperRequestsRouteImport.update({
   path: '/requests',
   getParentRoute: () => SuperRoute,
 } as any)
+const SuperModulesRoute = SuperModulesRouteImport.update({
+  id: '/modules',
+  path: '/modules',
+  getParentRoute: () => SuperRoute,
+} as any)
 const SuperMaterialsRoute = SuperMaterialsRouteImport.update({
   id: '/materials',
   path: '/materials',
@@ -166,9 +174,19 @@ const AdminProfileRoute = AdminProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminModulesRoute = AdminModulesRouteImport.update({
+  id: '/modules',
+  path: '/modules',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminMaterialsRoute = AdminMaterialsRouteImport.update({
   id: '/materials',
   path: '/materials',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminGuideRoute = AdminGuideRouteImport.update({
+  id: '/guide',
+  path: '/guide',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminFeedbackRoute = AdminFeedbackRouteImport.update({
@@ -210,7 +228,9 @@ export interface FileRoutesByFullPath {
   '/super': typeof SuperRouteWithChildren
   '/admin/deadlines': typeof AdminDeadlinesRoute
   '/admin/feedback': typeof AdminFeedbackRoute
+  '/admin/guide': typeof AdminGuideRoute
   '/admin/materials': typeof AdminMaterialsRoute
+  '/admin/modules': typeof AdminModulesRoute
   '/admin/profile': typeof AdminProfileRoute
   '/admin/requests': typeof AdminRequestsRoute
   '/contributors/$id': typeof ContributorsIdRoute
@@ -223,6 +243,7 @@ export interface FileRoutesByFullPath {
   '/super/deadlines': typeof SuperDeadlinesRoute
   '/super/feedback': typeof SuperFeedbackRoute
   '/super/materials': typeof SuperMaterialsRoute
+  '/super/modules': typeof SuperModulesRoute
   '/super/requests': typeof SuperRequestsRoute
   '/super/semesters': typeof SuperSemestersRoute
   '/super/subjects': typeof SuperSubjectsRoute
@@ -241,7 +262,9 @@ export interface FileRoutesByTo {
   '/select': typeof SelectRoute
   '/admin/deadlines': typeof AdminDeadlinesRoute
   '/admin/feedback': typeof AdminFeedbackRoute
+  '/admin/guide': typeof AdminGuideRoute
   '/admin/materials': typeof AdminMaterialsRoute
+  '/admin/modules': typeof AdminModulesRoute
   '/admin/profile': typeof AdminProfileRoute
   '/admin/requests': typeof AdminRequestsRoute
   '/contributors/$id': typeof ContributorsIdRoute
@@ -254,6 +277,7 @@ export interface FileRoutesByTo {
   '/super/deadlines': typeof SuperDeadlinesRoute
   '/super/feedback': typeof SuperFeedbackRoute
   '/super/materials': typeof SuperMaterialsRoute
+  '/super/modules': typeof SuperModulesRoute
   '/super/requests': typeof SuperRequestsRoute
   '/super/semesters': typeof SuperSemestersRoute
   '/super/subjects': typeof SuperSubjectsRoute
@@ -275,7 +299,9 @@ export interface FileRoutesById {
   '/super': typeof SuperRouteWithChildren
   '/admin/deadlines': typeof AdminDeadlinesRoute
   '/admin/feedback': typeof AdminFeedbackRoute
+  '/admin/guide': typeof AdminGuideRoute
   '/admin/materials': typeof AdminMaterialsRoute
+  '/admin/modules': typeof AdminModulesRoute
   '/admin/profile': typeof AdminProfileRoute
   '/admin/requests': typeof AdminRequestsRoute
   '/contributors_/$id': typeof ContributorsIdRoute
@@ -288,6 +314,7 @@ export interface FileRoutesById {
   '/super/deadlines': typeof SuperDeadlinesRoute
   '/super/feedback': typeof SuperFeedbackRoute
   '/super/materials': typeof SuperMaterialsRoute
+  '/super/modules': typeof SuperModulesRoute
   '/super/requests': typeof SuperRequestsRoute
   '/super/semesters': typeof SuperSemestersRoute
   '/super/subjects': typeof SuperSubjectsRoute
@@ -310,7 +337,9 @@ export interface FileRouteTypes {
     | '/super'
     | '/admin/deadlines'
     | '/admin/feedback'
+    | '/admin/guide'
     | '/admin/materials'
+    | '/admin/modules'
     | '/admin/profile'
     | '/admin/requests'
     | '/contributors/$id'
@@ -323,6 +352,7 @@ export interface FileRouteTypes {
     | '/super/deadlines'
     | '/super/feedback'
     | '/super/materials'
+    | '/super/modules'
     | '/super/requests'
     | '/super/semesters'
     | '/super/subjects'
@@ -341,7 +371,9 @@ export interface FileRouteTypes {
     | '/select'
     | '/admin/deadlines'
     | '/admin/feedback'
+    | '/admin/guide'
     | '/admin/materials'
+    | '/admin/modules'
     | '/admin/profile'
     | '/admin/requests'
     | '/contributors/$id'
@@ -354,6 +386,7 @@ export interface FileRouteTypes {
     | '/super/deadlines'
     | '/super/feedback'
     | '/super/materials'
+    | '/super/modules'
     | '/super/requests'
     | '/super/semesters'
     | '/super/subjects'
@@ -374,7 +407,9 @@ export interface FileRouteTypes {
     | '/super'
     | '/admin/deadlines'
     | '/admin/feedback'
+    | '/admin/guide'
     | '/admin/materials'
+    | '/admin/modules'
     | '/admin/profile'
     | '/admin/requests'
     | '/contributors_/$id'
@@ -387,6 +422,7 @@ export interface FileRouteTypes {
     | '/super/deadlines'
     | '/super/feedback'
     | '/super/materials'
+    | '/super/modules'
     | '/super/requests'
     | '/super/semesters'
     | '/super/subjects'
@@ -508,6 +544,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SuperRequestsRouteImport
       parentRoute: typeof SuperRoute
     }
+    '/super/modules': {
+      id: '/super/modules'
+      path: '/modules'
+      fullPath: '/super/modules'
+      preLoaderRoute: typeof SuperModulesRouteImport
+      parentRoute: typeof SuperRoute
+    }
     '/super/materials': {
       id: '/super/materials'
       path: '/materials'
@@ -592,11 +635,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProfileRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/modules': {
+      id: '/admin/modules'
+      path: '/modules'
+      fullPath: '/admin/modules'
+      preLoaderRoute: typeof AdminModulesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/materials': {
       id: '/admin/materials'
       path: '/materials'
       fullPath: '/admin/materials'
       preLoaderRoute: typeof AdminMaterialsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/guide': {
+      id: '/admin/guide'
+      path: '/guide'
+      fullPath: '/admin/guide'
+      preLoaderRoute: typeof AdminGuideRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/feedback': {
@@ -640,7 +697,9 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminDeadlinesRoute: typeof AdminDeadlinesRoute
   AdminFeedbackRoute: typeof AdminFeedbackRoute
+  AdminGuideRoute: typeof AdminGuideRoute
   AdminMaterialsRoute: typeof AdminMaterialsRoute
+  AdminModulesRoute: typeof AdminModulesRoute
   AdminProfileRoute: typeof AdminProfileRoute
   AdminRequestsRoute: typeof AdminRequestsRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -649,7 +708,9 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminDeadlinesRoute: AdminDeadlinesRoute,
   AdminFeedbackRoute: AdminFeedbackRoute,
+  AdminGuideRoute: AdminGuideRoute,
   AdminMaterialsRoute: AdminMaterialsRoute,
+  AdminModulesRoute: AdminModulesRoute,
   AdminProfileRoute: AdminProfileRoute,
   AdminRequestsRoute: AdminRequestsRoute,
   AdminIndexRoute: AdminIndexRoute,
@@ -664,6 +725,7 @@ interface SuperRouteChildren {
   SuperDeadlinesRoute: typeof SuperDeadlinesRoute
   SuperFeedbackRoute: typeof SuperFeedbackRoute
   SuperMaterialsRoute: typeof SuperMaterialsRoute
+  SuperModulesRoute: typeof SuperModulesRoute
   SuperRequestsRoute: typeof SuperRequestsRoute
   SuperSemestersRoute: typeof SuperSemestersRoute
   SuperSubjectsRoute: typeof SuperSubjectsRoute
@@ -677,6 +739,7 @@ const SuperRouteChildren: SuperRouteChildren = {
   SuperDeadlinesRoute: SuperDeadlinesRoute,
   SuperFeedbackRoute: SuperFeedbackRoute,
   SuperMaterialsRoute: SuperMaterialsRoute,
+  SuperModulesRoute: SuperModulesRoute,
   SuperRequestsRoute: SuperRequestsRoute,
   SuperSemestersRoute: SuperSemestersRoute,
   SuperSubjectsRoute: SuperSubjectsRoute,
