@@ -280,6 +280,10 @@ function Landing() {
 
       <RecentUploads />
 
+      <HelpBar />
+
+
+
 
       {/* CTA */}
       <section className="container mx-auto px-4 sm:px-6 mt-16 sm:mt-24 mb-16 sm:mb-24">
