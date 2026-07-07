@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Video, Loader2, Plus, Trash2, Pencil, ExternalLink, Search } from "lucide-react";
+import { Video, Loader2, Plus, Trash2, Pencil, ExternalLink, Search, Upload, X as XIcon } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { AdminShell, type AdminContext } from "@/components/AdminShell";
@@ -217,10 +217,36 @@ function KuppiDialog({
   const [medium, setMedium] = useState(editing?.medium ?? "sinhala");
   const [videoUrl, setVideoUrl] = useState(editing?.video_url ?? "");
   const [presenterName, setPresenterName] = useState(editing?.presenter_name ?? "");
-  const [presenterPhoto, setPresenterPhoto] = useState(editing?.presenter_photo_url ?? "");
+  const [presenterPhoto, setPresenterPhoto] = useState<string>(editing?.presenter_photo_url ?? "");
   const [sections, setSections] = useState(editing?.sections_covered ?? "");
   const [description, setDescription] = useState(editing?.description ?? "");
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement | null>(null);
+
+  const onPickPhoto = async (file: File) => {
+    if (!file.type.startsWith("image/")) return toast.error("Please choose an image");
+    if (file.size > 5 * 1024 * 1024) return toast.error("Image must be under 5 MB");
+    setUploading(true);
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      const uid = sess.session?.user.id;
+      if (!uid) throw new Error("Not signed in");
+      const ext = (file.name.split(".").pop() || "png").toLowerCase().replace(/[^a-z0-9]+/g, "");
+      const path = `${uid}/kuppi-${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from("avatars").upload(path, file, { upsert: true, contentType: file.type });
+      if (upErr) throw upErr;
+      const { data: signed, error: signErr } = await supabase.storage.from("avatars").createSignedUrl(path, 60 * 60 * 24 * 365 * 5);
+      if (signErr || !signed) throw signErr ?? new Error("Sign URL failed");
+      setPresenterPhoto(signed.signedUrl);
+      toast.success("Photo uploaded");
+    } catch (e) {
+      toast.error("Could not upload photo", { description: (e as Error).message });
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  };
 
   const save = async () => {
     if (!subjectId) return toast.error("Pick a subject");
@@ -300,8 +326,35 @@ function KuppiDialog({
           <Input value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="https://youtu.be/…" />
         </div>
         <div className="grid gap-1.5">
-          <Label>Presenter photo URL (optional)</Label>
-          <Input value={presenterPhoto} onChange={(e) => setPresenterPhoto(e.target.value)} placeholder="https://…" />
+          <Label>Presenter photo (optional)</Label>
+          <div className="flex items-center gap-3">
+            {presenterPhoto ? (
+              <img src={presenterPhoto} alt="Presenter" className="h-14 w-14 rounded-full object-cover ring-1 ring-border" />
+            ) : (
+              <div className="h-14 w-14 rounded-full bg-primary/10 text-primary grid place-items-center font-semibold">
+                {(presenterName || "?").slice(0, 2).toUpperCase()}
+              </div>
+            )}
+            <div className="flex gap-2">
+              <Button type="button" size="sm" variant="outline" onClick={() => fileRef.current?.click()} disabled={uploading}>
+                {uploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+                {presenterPhoto ? "Replace" : "Upload"}
+              </Button>
+              {presenterPhoto && (
+                <Button type="button" size="sm" variant="ghost" onClick={() => setPresenterPhoto("")} disabled={uploading}>
+                  <XIcon className="mr-2 h-4 w-4" />Remove
+                </Button>
+              )}
+            </div>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) onPickPhoto(f); }}
+            />
+          </div>
+          <p className="text-[11px] text-muted-foreground">PNG or JPG, up to 5 MB.</p>
         </div>
         <div className="grid gap-1.5">
           <Label>Sections covered</Label>

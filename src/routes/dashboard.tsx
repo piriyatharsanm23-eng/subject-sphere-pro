@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Search, Download, ArrowRight, Settings2, Inbox, FileText, MessageSquarePlus, Star } from "lucide-react";
+import { Search, Download, Eye, ArrowRight, Settings2, Inbox, FileText, MessageSquarePlus, Star } from "lucide-react";
+import { MaterialPreviewDialog, type PreviewableMaterial } from "@/components/MaterialPreview";
 import { DeadlineBanner, AllDeadlinesList } from "@/components/DeadlineBanner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,6 +46,7 @@ function DashboardContent({ sel }: { sel: Selection }) {
   const [q, setQ] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [subjectFilter, setSubjectFilter] = useState<string>("all");
+  const [previewing, setPreviewing] = useState<PreviewableMaterial | null>(null);
 
   const semesterQ = useQuery({
     queryKey: ["semester", sel.semesterId],
@@ -259,17 +261,22 @@ function DashboardContent({ sel }: { sel: Selection }) {
                           
                         </div>
                       </div>
-                      <Button size="sm" onClick={async () => {
-                        const id = toast.loading("Preparing your download…");
-                        try {
-                          await downloadMaterial(m);
-                          toast.success("Download started", { id });
-                        } catch (err) {
-                          toast.error("Could not download this file", { id, description: (err as Error)?.message });
-                        }
-                      }}>
-                        <Download className="mr-2 h-4 w-4" /> Download
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button size="sm" variant="outline" onClick={() => setPreviewing(m as PreviewableMaterial)}>
+                          <Eye className="mr-2 h-4 w-4" /> Preview
+                        </Button>
+                        <Button size="sm" onClick={async () => {
+                          const id = toast.loading("Preparing your download…");
+                          try {
+                            await downloadMaterial(m);
+                            toast.success("Download started", { id });
+                          } catch (err) {
+                            toast.error("Could not download this file", { id, description: (err as Error)?.message });
+                          }
+                        }}>
+                          <Download className="mr-2 h-4 w-4" /> Download
+                        </Button>
+                      </div>
                     </div>
                   </article>
                 ))
@@ -288,6 +295,8 @@ function DashboardContent({ sel }: { sel: Selection }) {
             )}
           </aside>
         </div>
+
+        <MaterialPreviewDialog material={previewing} onClose={() => setPreviewing(null)} />
 
       </main>
       <SiteFooter />

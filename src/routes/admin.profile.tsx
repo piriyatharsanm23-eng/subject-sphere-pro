@@ -31,6 +31,7 @@ function ProfileForm({ userId }: { userId: string }) {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [avatarPath, setAvatarPath] = useState<string | null>(null);
@@ -40,7 +41,7 @@ function ProfileForm({ userId }: { userId: string }) {
     (async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("full_name,email,avatar_url,avatar_path")
+        .select("full_name,email,avatar_url,avatar_path,phone")
         .eq("id", userId)
         .maybeSingle();
       if (!error && data) {
@@ -48,6 +49,7 @@ function ProfileForm({ userId }: { userId: string }) {
         setEmail(data.email ?? null);
         setAvatarUrl(data.avatar_url ?? null);
         setAvatarPath(data.avatar_path ?? null);
+        setPhone((data as { phone?: string | null }).phone ?? "");
       }
       setLoading(false);
     })();
@@ -55,9 +57,9 @@ function ProfileForm({ userId }: { userId: string }) {
 
   const saveName = async () => {
     setSaving(true);
-    const { error } = await supabase.from("profiles").update({ full_name: fullName.trim() || null }).eq("id", userId);
+    const { error } = await supabase.from("profiles").update({ full_name: fullName.trim() || null, phone: phone.trim() || null } as never).eq("id", userId);
     setSaving(false);
-    if (error) { toast.error("Could not save name"); return; }
+    if (error) { toast.error("Could not save"); return; }
     toast.success("Profile updated");
   };
 
@@ -201,6 +203,18 @@ function ProfileForm({ userId }: { userId: string }) {
               placeholder="e.g. Dr. Anika Perera"
               maxLength={80}
             />
+          </div>
+          <div>
+            <Label htmlFor="phone" className="mb-1.5 block">Phone number</Label>
+            <Input
+              id="phone"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="e.g. +94 77 123 4567"
+              maxLength={40}
+              inputMode="tel"
+            />
+            <p className="mt-1 text-[11px] text-muted-foreground">Super admins: your number appears in the admin guide so semester admins can reach you.</p>
           </div>
           <div>
             <Label className="mb-1.5 block">Email</Label>
