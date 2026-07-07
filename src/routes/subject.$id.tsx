@@ -228,16 +228,27 @@ type MaterialRow = {
 function MaterialList({
   items,
   uploaders,
+  subjectName,
+  semesterName,
 }: {
   items: MaterialRow[];
   uploaders: Record<string, UploaderInfo>;
+  subjectName?: string | null;
+  semesterName?: string | null;
 }) {
   const [previewing, setPreviewing] = useState<MaterialRow | null>(null);
-  const [aiTarget, setAiTarget] = useState<{ m: MaterialRow; provider: AIProvider } | null>(null);
   const aiSettings = useAISettings().data;
   const aiOn = !!aiSettings?.enabled;
   const showChatGPT = aiOn && aiSettings?.chatgpt_enabled;
   const showGemini = aiOn && aiSettings?.gemini_enabled;
+  const openAI = (m: MaterialRow, provider: AIProvider) =>
+    openExternalAIExplain(provider, {
+      title: m.title,
+      material_type: materialTypeLabel(m.material_type),
+      subject: subjectName ?? null,
+      semester: semesterName ?? null,
+      file_name: m.file_name,
+    });
   if (items.length === 0) return <Empty label="Nothing here yet" />;
   return (
     <>
@@ -269,13 +280,15 @@ function MaterialList({
                 }
               }}><Download className="mr-2 h-4 w-4" />Download</Button>
               {showChatGPT && (
-                <Button size="sm" variant="secondary" onClick={() => setAiTarget({ m, provider: "chatgpt" })}>
+                <Button size="sm" variant="secondary" onClick={() => openAI(m, "chatgpt")}>
                   <Bot className="mr-2 h-4 w-4 text-emerald-400" />ChatGPT
+                  <ExternalLink className="ml-1 h-3 w-3 opacity-70" />
                 </Button>
               )}
               {showGemini && (
-                <Button size="sm" variant="secondary" onClick={() => setAiTarget({ m, provider: "gemini" })}>
+                <Button size="sm" variant="secondary" onClick={() => openAI(m, "gemini")}>
                   <Sparkles className="mr-2 h-4 w-4 text-sky-400" />Gemini
+                  <ExternalLink className="ml-1 h-3 w-3 opacity-70" />
                 </Button>
               )}
             </div>
@@ -283,12 +296,13 @@ function MaterialList({
         ))}
       </div>
 
-      <PreviewDialog material={previewing} onClose={() => setPreviewing(null)} onExplain={(p) => previewing && setAiTarget({ m: previewing, provider: p })} aiOn={aiOn} showChatGPT={!!showChatGPT} showGemini={!!showGemini} />
-      <AIExplainDialog
-        open={!!aiTarget}
-        onClose={() => setAiTarget(null)}
-        target={aiTarget ? { id: aiTarget.m.id, title: aiTarget.m.title, material_type: materialTypeLabel(aiTarget.m.material_type) } : null}
-        initialProvider={aiTarget?.provider ?? "chatgpt"}
+      <PreviewDialog
+        material={previewing}
+        onClose={() => setPreviewing(null)}
+        onExplain={(p) => previewing && openAI(previewing, p)}
+        aiOn={aiOn}
+        showChatGPT={!!showChatGPT}
+        showGemini={!!showGemini}
       />
     </>
   );
