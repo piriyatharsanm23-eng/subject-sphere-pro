@@ -52,6 +52,40 @@ export function AdminShell({
   const [semesterId, setSemesterIdState] = useState<string | null>(null);
   const [semesters, setSemesters] = useState<AdminSemester[]>([]);
   const [meta, setMeta] = useState<{ userId: string; isSuper: boolean } | null>(null);
+  const [unreadRequests, setUnreadRequests] = useState(0);
+
+  // Poll unread student-request notifications every 60s.
+  useEffect(() => {
+    if (!meta?.userId) return;
+    let stopped = false;
+    const load = async () => {
+      const { count } = await (supabase as any)
+        .from("notifications")
+        .select("id", { head: true, count: "exact" })
+        .eq("user_id", meta.userId)
+        .eq("kind", "student_request")
+        .is("read_at", null);
+      if (!stopped) setUnreadRequests(count ?? 0);
+    };
+    load();
+    const iv = setInterval(load, 60_000);
+    return () => { stopped = true; clearInterval(iv); };
+  }, [meta?.userId]);
+
+  // Clear the badge when viewing the requests page.
+  useEffect(() => {
+    if (!meta?.userId) return;
+    if (!path.startsWith("/admin/requests")) return;
+    (async () => {
+      await (supabase as any)
+        .from("notifications")
+        .update({ read_at: new Date().toISOString() })
+        .eq("user_id", meta.userId)
+        .eq("kind", "student_request")
+        .is("read_at", null);
+      setUnreadRequests(0);
+    })();
+  }, [path, meta?.userId]);
 
   useEffect(() => {
     let mounted = true;
@@ -186,6 +220,7 @@ export function AdminShell({
               <nav className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible scrollbar-thin">
                 {NAV.map((item) => {
                   const active = item.exact ? path === item.to : path.startsWith(item.to);
+                  const showBadge = item.to === "/admin/requests" && unreadRequests > 0;
                   return (
                     <Link
                       key={item.to}
@@ -198,6 +233,11 @@ export function AdminShell({
                     >
                       <item.icon className="h-4 w-4 shrink-0" />
                       <span>{item.label}</span>
+                      {showBadge && (
+                        <span className="ml-auto rounded-full bg-rose-500 text-white text-[10px] font-semibold px-1.5 min-w-[18px] text-center tabular-nums">
+                          {unreadRequests > 99 ? "99+" : unreadRequests}
+                        </span>
+                      )}
                     </Link>
                   );
                 })}
