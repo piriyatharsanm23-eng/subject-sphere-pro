@@ -321,16 +321,17 @@ function SemesterCards({ semesters }: { semesters: { id: string; name: string; d
         // subjects loaded separately below
       ]);
       const subs = await supabase.from("subjects").select("id,semester_id").in("semester_id", ids);
-      const by: Record<string, { subjects: number; slides: number; notes: number; papers: number; deadlines: number }> = {};
-      for (const id of ids) by[id] = { subjects: 0, slides: 0, notes: 0, papers: 0, deadlines: 0 };
+      const by: Record<string, { subjects: number; tutorials: number; notes: number; papers: number; deadlines: number }> = {};
+      for (const id of ids) by[id] = { subjects: 0, tutorials: 0, notes: 0, papers: 0, deadlines: 0 };
       for (const s of subs.data ?? []) by[s.semester_id].subjects += 1;
       for (const m of mat.data ?? []) {
         const b = by[m.semester_id]; if (!b) continue;
-        if (m.material_type === "lecture_slide") b.slides += 1;
+        if (m.material_type === "other" || m.material_type === "lecture_slide") b.tutorials += 1;
         else if (m.material_type === "note") b.notes += 1;
         else if (m.material_type === "past_paper") b.papers += 1;
       }
       for (const d of dead.data ?? []) if (by[d.semester_id]) by[d.semester_id].deadlines += 1;
+
       return by;
     },
   });
@@ -349,7 +350,7 @@ function SemesterCards({ semesters }: { semesters: { id: string; name: string; d
     <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {semesters.map((s) => {
         const st = statsQ.data?.[s.id];
-        const empty = st && st.subjects === 0 && st.slides === 0 && st.notes === 0 && st.papers === 0 && st.deadlines === 0;
+        const empty = st && st.subjects === 0 && st.tutorials === 0 && st.notes === 0 && st.papers === 0 && st.deadlines === 0;
         return (
           <Link
             key={s.id}
@@ -374,7 +375,7 @@ function SemesterCards({ semesters }: { semesters: { id: string; name: string; d
               <div className="relative mt-4 grid grid-cols-5 gap-1.5 text-center">
                 {[
                   { k: "Subj", v: st?.subjects },
-                  { k: "Slides", v: st?.slides },
+                  { k: "Tutorials", v: st?.tutorials },
                   { k: "Notes", v: st?.notes },
                   { k: "Papers", v: st?.papers },
                   { k: "Due", v: st?.deadlines },
