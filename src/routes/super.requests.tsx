@@ -1,8 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format, formatDistanceToNow } from "date-fns";
-import { Loader2, MessageSquare, Search, Trash2 } from "lucide-react";
+import { ExternalLink, Loader2, MessageSquare, Search, Trash2 } from "lucide-react";
+import { materialIssueLabel } from "@/components/ReportMaterialButton";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
