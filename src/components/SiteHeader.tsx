@@ -3,6 +3,7 @@ import { GraduationCap, Settings, LogIn, Users, Menu, LayoutDashboard } from "lu
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useState } from "react";
+import { GlobalSearch, SearchTrigger, useGlobalSearch } from "@/components/GlobalSearch";
 
 const NAV = [
   { to: "/dashboard" as const, label: "Dashboard", icon: LayoutDashboard },
@@ -12,9 +13,10 @@ const NAV = [
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const search = useGlobalSearch();
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur-xl">
-      <div className="container mx-auto flex h-14 sm:h-16 items-center justify-between px-4 sm:px-6">
+      <div className="container mx-auto flex h-14 sm:h-16 items-center justify-between gap-3 px-4 sm:px-6">
         <Link to="/" className="flex items-center gap-2 min-w-0 group">
           <div className="grid h-8 w-8 sm:h-9 sm:w-9 shrink-0 place-items-center rounded-xl bg-primary-gradient shadow-glow">
             <GraduationCap className="h-4 w-4 sm:h-5 sm:w-5 text-primary-foreground" />
@@ -23,6 +25,10 @@ export function SiteHeader() {
             StudyHub
           </span>
         </Link>
+
+        <div className="hidden md:flex flex-1 justify-center max-w-md">
+          <SearchTrigger onClick={() => search.setOpen(true)} className="w-full" />
+        </div>
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-1">
@@ -41,8 +47,12 @@ export function SiteHeader() {
           </Button>
         </nav>
 
-        {/* Mobile menu */}
-        <div className="md:hidden">
+        {/* Mobile actions */}
+        <div className="md:hidden flex items-center gap-1">
+          <Button size="icon" variant="ghost" aria-label="Search" className="h-9 w-9" onClick={() => search.setOpen(true)}>
+            <Menu className="hidden" />
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" /></svg>
+          </Button>
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <Button size="icon" variant="ghost" aria-label="Open menu" className="h-9 w-9">
@@ -78,6 +88,7 @@ export function SiteHeader() {
           </Sheet>
         </div>
       </div>
+      <GlobalSearch open={search.open} onOpenChange={search.setOpen} />
     </header>
   );
 }
