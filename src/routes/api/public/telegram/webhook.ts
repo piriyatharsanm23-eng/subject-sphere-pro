@@ -673,12 +673,25 @@ async function handleCallback(cb: any) {
         return sendMaterial(chatId, parts[0]);
       case "en":
         await answerCallback(cb.id);
-        await cmdEnrollStart(chatId);
-        return;
+        return showEnrollSemesters(chatId, messageId, "enroll");
       case "cs":
         await answerCallback(cb.id);
-        await cmdChangeSubjects(chatId);
-        return;
+        return showEnrollSemesters(chatId, messageId, "change");
+      case "esp":
+        await answerCallback(cb.id);
+        return showEnrollSubjects(chatId, messageId, parts[0]);
+      case "est":
+        await answerCallback(cb.id);
+        return toggleEnrollSubject(chatId, messageId, parts[0]);
+      case "esa":
+        await answerCallback(cb.id, "Enrolled in all");
+        return enrollAllInSemester(chatId, messageId, parts[0]);
+      case "esc":
+        await answerCallback(cb.id, "Cleared");
+        return clearEnrolledInSemester(chatId, messageId, parts[0]);
+      case "edn":
+        await answerCallback(cb.id, "Saved");
+        return enrollDone(chatId, messageId);
       case "ms":
         await answerCallback(cb.id);
         await cmdMySubjects(chatId);
