@@ -445,6 +445,91 @@ function KuppiSection({ items }: { items: KuppiRow[] }) {
   );
 }
 
+function KuppiCard({ k, onPlay }: { k: KuppiRow; onPlay: () => void }) {
+  const mediumTone: Record<string, string> = {
+    sinhala: "from-fuchsia-500/20 via-purple-500/10 to-transparent",
+    tamil: "from-amber-500/20 via-orange-500/10 to-transparent",
+    english: "from-sky-500/20 via-cyan-500/10 to-transparent",
+  };
+  const chipTone: Record<string, string> = {
+    sinhala: "bg-fuchsia-500/15 text-fuchsia-300 ring-1 ring-fuchsia-400/30",
+    tamil: "bg-amber-500/15 text-amber-300 ring-1 ring-amber-400/30",
+    english: "bg-sky-500/15 text-sky-300 ring-1 ring-sky-400/30",
+  };
+  const embed = toYoutubeEmbed(k.video_url);
+  const ytId = embed?.split("/embed/")[1]?.split(/[?&]/)[0];
+  const thumb = ytId ? `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg` : null;
+
+  return (
+    <div className="group relative overflow-hidden rounded-2xl border border-border bg-card shadow-soft transition-all hover:border-primary/40 hover:shadow-elevated">
+      <div className={`pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b ${mediumTone[k.medium] ?? "from-primary/15 to-transparent"}`} />
+      <button
+        type="button"
+        onClick={onPlay}
+        className="relative block w-full aspect-video overflow-hidden bg-gradient-to-br from-primary/20 via-primary/10 to-background"
+      >
+        {thumb ? (
+          <img src={thumb} alt={k.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+        ) : (
+          <div className="absolute inset-0 grid place-items-center text-muted-foreground">
+            <Video className="h-10 w-10 opacity-40" />
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+        <div className="absolute left-3 top-3">
+          <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold ${chipTone[k.medium] ?? "bg-primary/15 text-primary ring-1 ring-primary/30"}`}>
+            {mediumLabel(k.medium)}
+          </span>
+        </div>
+        <div className="absolute inset-0 grid place-items-center">
+          <div className="grid h-14 w-14 place-items-center rounded-full bg-white/95 text-primary shadow-lg backdrop-blur transition-transform duration-300 group-hover:scale-110">
+            <Video className="h-6 w-6 fill-current" />
+          </div>
+        </div>
+        <div className="absolute bottom-2 right-2 rounded-md bg-black/70 px-2 py-0.5 text-[10px] font-medium text-white/90">
+          {formatDistanceToNow(new Date(k.created_at), { addSuffix: true })}
+        </div>
+      </button>
+
+      <div className="relative p-4">
+        <h4 className="font-semibold leading-snug line-clamp-2">{k.title}</h4>
+        {k.sections_covered && (
+          <p className="mt-1.5 text-xs text-muted-foreground line-clamp-2">
+            <span className="font-semibold text-foreground/80">Covered:</span> {k.sections_covered}
+          </p>
+        )}
+        {k.description && !k.sections_covered && (
+          <p className="mt-1.5 text-xs text-muted-foreground line-clamp-2">{k.description}</p>
+        )}
+
+        <div className="mt-3 flex items-center gap-3">
+          {k.presenter_photo_url ? (
+            <img src={k.presenter_photo_url} alt={k.presenter_name} className="h-9 w-9 rounded-full object-cover ring-2 ring-primary/20" />
+          ) : (
+            <div className="h-9 w-9 rounded-full bg-primary/10 text-primary grid place-items-center text-xs font-semibold ring-2 ring-primary/20">
+              {k.presenter_name.slice(0, 2).toUpperCase()}
+            </div>
+          )}
+          <div className="min-w-0 flex-1">
+            <div className="text-xs text-muted-foreground">Presented by</div>
+            <div className="text-sm font-semibold truncate">{k.presenter_name}</div>
+          </div>
+          <div className="flex gap-1.5">
+            <Button size="sm" onClick={onPlay} className="h-8 px-3">
+              <Video className="mr-1.5 h-3.5 w-3.5" /> Watch
+            </Button>
+            <Button asChild size="sm" variant="outline" className="h-8 px-2">
+              <a href={k.video_url} target="_blank" rel="noopener" aria-label="Open external link">
+                <ExternalLink className="h-3.5 w-3.5" />
+              </a>
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function MediumChip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
     <button
