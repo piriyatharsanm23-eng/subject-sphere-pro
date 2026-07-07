@@ -18,6 +18,7 @@ import { KUPPI_MEDIUMS, mediumLabel, toYoutubeEmbed } from "@/lib/kuppi";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AIExplainDialog, type AIProvider } from "@/components/AIExplainDialog";
 import { useAISettings } from "@/hooks/useAISettings";
+import { openExternalAIExplain } from "@/lib/openExternalAI";
 
 export const Route = createFileRoute("/subject/$id")({
   head: () => ({ meta: [{ title: "Subject — StudyHub" }] }),
@@ -30,7 +31,11 @@ function SubjectPage() {
   const subjectQ = useQuery({
     queryKey: ["subject", id],
     queryFn: async () => {
-      const { data, error } = await supabase.from("subjects").select("id,name,code,description,semester_id").eq("id", id).maybeSingle();
+      const { data, error } = await supabase
+        .from("subjects")
+        .select("id,name,code,description,semester_id, semester:semesters(name)")
+        .eq("id", id)
+        .maybeSingle();
       if (error) throw error;
       return data;
     },
@@ -149,7 +154,14 @@ function SubjectPage() {
 
           {(["note","assignment","other"] as const).map((t) => (
             <TabsContent key={t} value={t} className="mt-4">
-              {materialsQ.isLoading ? <MaterialSkeleton /> : <MaterialList items={groups[t]} uploaders={uploadersQ.data ?? {}} />}
+              {materialsQ.isLoading ? <MaterialSkeleton /> : (
+                <MaterialList
+                  items={groups[t]}
+                  uploaders={uploadersQ.data ?? {}}
+                  subjectName={(subjectQ.data as any)?.name ?? null}
+                  semesterName={(subjectQ.data as any)?.semester?.name ?? null}
+                />
+              )}
             </TabsContent>
           ))}
 
@@ -163,7 +175,12 @@ function SubjectPage() {
             {materialsQ.isLoading ? <MaterialSkeleton /> : papersByYear.length === 0 ? <Empty label="No past papers yet" /> : papersByYear.map(([year, items]) => (
               <div key={year}>
                 <h3 className="text-sm font-semibold text-muted-foreground mb-2">{year}</h3>
-                <MaterialList items={items} uploaders={uploadersQ.data ?? {}} />
+                <MaterialList
+                  items={items}
+                  uploaders={uploadersQ.data ?? {}}
+                  subjectName={(subjectQ.data as any)?.name ?? null}
+                  semesterName={(subjectQ.data as any)?.semester?.name ?? null}
+                />
               </div>
             ))}
           </TabsContent>
@@ -212,16 +229,27 @@ type MaterialRow = {
 function MaterialList({
   items,
   uploaders,
+  subjectName,
+  semesterName,
 }: {
   items: MaterialRow[];
   uploaders: Record<string, UploaderInfo>;
+  subjectName?: string | null;
+  semesterName?: string | null;
 }) {
   const [previewing, setPreviewing] = useState<MaterialRow | null>(null);
-  const [aiTarget, setAiTarget] = useState<{ m: MaterialRow; provider: AIProvider } | null>(null);
   const aiSettings = useAISettings().data;
   const aiOn = !!aiSettings?.enabled;
   const showChatGPT = aiOn && aiSettings?.chatgpt_enabled;
   const showGemini = aiOn && aiSettings?.gemini_enabled;
+  const openAI = (m: MaterialRow, provider: AIProvider) =>
+    openExternalAIExplain(provider, {
+      title: m.title,
+      material_type: materialTypeLabel(m.material_type),
+      subject: subjectName ?? null,
+      semester: semesterName ?? null,
+      file_name: m.file_name,
+    });
   if (items.length === 0) return <Empty label="Nothing here yet" />;
   return (
     <>
@@ -253,13 +281,15 @@ function MaterialList({
                 }
               }}><Download className="mr-2 h-4 w-4" />Download</Button>
               {showChatGPT && (
-                <Button size="sm" variant="secondary" onClick={() => setAiTarget({ m, provider: "chatgpt" })}>
+                <Button size="sm" variant="secondary" onClick={() => openAI(m, "chatgpt")}>
                   <Bot className="mr-2 h-4 w-4 text-emerald-400" />ChatGPT
+                  <ExternalLink className="ml-1 h-3 w-3 opacity-70" />
                 </Button>
               )}
               {showGemini && (
-                <Button size="sm" variant="secondary" onClick={() => setAiTarget({ m, provider: "gemini" })}>
+                <Button size="sm" variant="secondary" onClick={() => openAI(m, "gemini")}>
                   <Sparkles className="mr-2 h-4 w-4 text-sky-400" />Gemini
+                  <ExternalLink className="ml-1 h-3 w-3 opacity-70" />
                 </Button>
               )}
             </div>
@@ -267,12 +297,13 @@ function MaterialList({
         ))}
       </div>
 
-      <PreviewDialog material={previewing} onClose={() => setPreviewing(null)} onExplain={(p) => previewing && setAiTarget({ m: previewing, provider: p })} aiOn={aiOn} showChatGPT={!!showChatGPT} showGemini={!!showGemini} />
-      <AIExplainDialog
-        open={!!aiTarget}
-        onClose={() => setAiTarget(null)}
-        target={aiTarget ? { id: aiTarget.m.id, title: aiTarget.m.title, material_type: materialTypeLabel(aiTarget.m.material_type) } : null}
-        initialProvider={aiTarget?.provider ?? "chatgpt"}
+      <PreviewDialog
+        material={previewing}
+        onClose={() => setPreviewing(null)}
+        onExplain={(p) => previewing && openAI(previewing, p)}
+        aiOn={aiOn}
+        showChatGPT={!!showChatGPT}
+        showGemini={!!showGemini}
       />
     </>
   );
