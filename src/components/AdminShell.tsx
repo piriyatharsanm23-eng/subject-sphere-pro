@@ -2,22 +2,28 @@ import { ReactNode, useEffect, useState } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   CalendarClock, FileText, LayoutDashboard, Loader2,
-  LogOut, MessageSquare, ShieldAlert, Star, UserCircle2,
+  LogOut, MessageSquare, ShieldAlert, Star, UserCircle2, Check, ChevronsUpDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
+
+export type AdminSemester = { id: string; name: string };
 export type AdminContext = {
   userId: string;
   semesterId: string;
   semesterName: string;
   isSuper: boolean;
+  semesters: AdminSemester[];
+  setSemesterId: (id: string) => void;
 };
 
 type NavItem = { to: string; label: string; icon: typeof FileText; exact?: boolean };
+
 const NAV: NavItem[] = [
   { to: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
   { to: "/admin/materials", label: "Materials", icon: FileText },
