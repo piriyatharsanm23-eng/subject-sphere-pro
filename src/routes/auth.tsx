@@ -142,11 +142,23 @@ function AuthPage() {
               <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
             </div>
             <div>
-              <Label htmlFor="password" className="mb-1.5 block">Password</Label>
+              <div className="flex items-center justify-between mb-1.5">
+                <Label htmlFor="password">Password</Label>
+                {mode === "signin" && (
+                  <button type="button" onClick={forgotPassword} className="text-xs text-primary hover:underline">Forgot password?</button>
+                )}
+              </div>
               <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} autoComplete={mode === "signin" ? "current-password" : "new-password"} />
             </div>
             <Button type="submit" className="w-full" disabled={busy}>{busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}</Button>
           </form>
+
+          <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
+            <div className="h-px flex-1 bg-border" /> OR <div className="h-px flex-1 bg-border" />
+          </div>
+          <Button type="button" variant="outline" className="w-full" onClick={signInWithGoogle} disabled={busy}>
+            <GoogleIcon className="mr-2 h-4 w-4" /> Continue with Google
+          </Button>
 
           <p className="mt-4 text-center text-sm text-muted-foreground">
             {mode === "signin" ? "Don't have an account?" : "Already have an account?"}{" "}
