@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const MAX_PDF_BYTES = 20 * 1024 * 1024; // 20 MB
 const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
