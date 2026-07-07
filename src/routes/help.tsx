@@ -18,7 +18,8 @@ import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 
-const TELEGRAM_BOT_URL = "https://t.me/StudyHub_Materials_Bot";
+const TELEGRAM_BOT_URL = "https://t.me/StudyGeniusX_bot";
+const TELEGRAM_BOT_HANDLE = "@StudyGeniusX_bot";
 const SUPPORT_EMAIL = "piriyatharsan2611@gmail.com";
 
 export const Route = createFileRoute("/help")({
@@ -117,33 +118,88 @@ function HelpPage() {
             accent
           >
             <p className="text-sm text-muted-foreground">
-              Our Telegram bot mirrors every uploaded material so you can grab notes, past papers
-              and tutorials straight to your phone — even on weak connections.
+              The <strong>{TELEGRAM_BOT_HANDLE}</strong> bot mirrors every uploaded material and
+              deadline so you can grab notes, past papers, tutorials and PDFs straight to your
+              phone — with ChatGPT / Gemini shortcuts on every file.
             </p>
-            <Steps
-              items={[
-                {
-                  title: "Open Telegram and start the bot",
-                  desc: "Tap the button below or search the bot on Telegram, then press Start.",
-                },
-                {
-                  title: "Pick your semester and subject",
-                  desc: "The bot shows the same catalogue as the website — choose what you need.",
-                },
-                {
-                  title: "Send the material name or code",
-                  desc: 'Type a subject code (e.g. "EE2024") or a keyword from the material title.',
-                },
-                {
-                  title: "Receive the file",
-                  desc: "The bot replies with the PDF instantly. Forward it to friends or save it offline.",
-                },
-              ]}
-            />
+
+            <div className="mt-5">
+              <div className="text-xs uppercase tracking-wider font-semibold text-muted-foreground mb-2">
+                First-time setup
+              </div>
+              <Steps
+                items={[
+                  {
+                    title: "Open the bot and press Start",
+                    desc: `Tap the button below (or search ${TELEGRAM_BOT_HANDLE} on Telegram) and send /start. A main menu with buttons appears.`,
+                  },
+                  {
+                    title: "Enroll — pick your semester",
+                    desc: "Tap 📚 Enroll / Change Subjects (or send /enroll). Pick your current semester from the buttons.",
+                  },
+                  {
+                    title: "Tap subjects to enroll",
+                    desc: "Toggle each subject you take this semester (✅ = enrolled). Use ✅ Enroll All if you want every subject, then press ✔️ Done.",
+                  },
+                ]}
+              />
+            </div>
+
+            <div className="mt-6">
+              <div className="text-xs uppercase tracking-wider font-semibold text-muted-foreground mb-2">
+                Download materials (any time after enrolling)
+              </div>
+              <Steps
+                items={[
+                  {
+                    title: "Send /download or /materials",
+                    desc: "The bot shows only your enrolled subjects — no need to pick a semester again.",
+                  },
+                  {
+                    title: "Pick a subject → pick a category",
+                    desc: "Choose 📘 Lecture Slides, 📝 Notes, 📄 Past Papers, 📌 Tutorials / Assignments, or ⏰ Deadlines.",
+                  },
+                  {
+                    title: "Tap a material",
+                    desc: "The bot sends the PDF right into the chat with buttons: ⬇️ Download PDF, 🌐 Open in Website, 🤖 Open in ChatGPT, ✨ Open in Gemini.",
+                  },
+                  {
+                    title: "Ask AI to teach it",
+                    desc: "🤖 ChatGPT and ✨ Gemini open a new chat pre-filled with a full study prompt. Attach the PDF and press send — the AI walks you through the material.",
+                  },
+                ]}
+              />
+            </div>
+
+            <div className="mt-6">
+              <div className="text-xs uppercase tracking-wider font-semibold text-muted-foreground mb-2">
+                All commands
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <CmdRow cmd="/start" desc="Main menu with buttons" />
+                <CmdRow cmd="/download" desc="Download materials (same as /materials)" />
+                <CmdRow cmd="/materials" desc="Download materials" />
+                <CmdRow cmd="/enroll" desc="Enroll in subjects (buttons)" />
+                <CmdRow cmd="/change_subjects" desc="Change your enrolled subjects" />
+                <CmdRow cmd="/my_subjects" desc="Show your enrolled subjects" />
+                <CmdRow cmd="/deadlines" desc="Upcoming deadlines for your subjects" />
+                <CmdRow cmd="/stop" desc="Unsubscribe (send /start to resume)" />
+                <CmdRow cmd="/help" desc="Show help inside Telegram" />
+              </div>
+            </div>
+
+            <div className="mt-6 rounded-xl border border-border/60 bg-muted/40 p-4 text-sm">
+              <div className="font-semibold mb-1">🔔 Auto reminders</div>
+              <p className="text-muted-foreground">
+                Once enrolled, the bot sends deadline reminders 7 days, 2 days, 1 day before, and
+                on the due day — only for your subjects.
+              </p>
+            </div>
+
             <div className="mt-6 flex flex-wrap items-center gap-3">
               <Button asChild size="sm" className="bg-sky-500 hover:bg-sky-500/90 text-white">
                 <a href={TELEGRAM_BOT_URL} target="_blank" rel="noopener noreferrer">
-                  <Send className="mr-2 h-4 w-4" /> Open Telegram bot
+                  <Send className="mr-2 h-4 w-4" /> Open {TELEGRAM_BOT_HANDLE}
                 </a>
               </Button>
               <code className="rounded-md border border-border bg-muted/60 px-2.5 py-1 text-xs">
@@ -326,6 +382,17 @@ function Tip({
         </div>
         <div className="mt-0.5 text-xs text-muted-foreground">{desc}</div>
       </div>
+    </div>
+  );
+}
+
+function CmdRow({ cmd, desc }: { cmd: string; desc: string }) {
+  return (
+    <div className="flex items-center gap-3 rounded-lg border border-border/60 bg-background/60 px-3 py-2">
+      <code className="rounded bg-muted px-1.5 py-0.5 text-xs font-semibold text-primary shrink-0">
+        {cmd}
+      </code>
+      <span className="text-xs text-muted-foreground">{desc}</span>
     </div>
   );
 }
