@@ -18,6 +18,7 @@ import { KUPPI_MEDIUMS, mediumLabel, toYoutubeEmbed } from "@/lib/kuppi";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AIExplainDialog, type AIProvider } from "@/components/AIExplainDialog";
 import { useAISettings } from "@/hooks/useAISettings";
+import { openExternalAIExplain } from "@/lib/openExternalAI";
 
 export const Route = createFileRoute("/subject/$id")({
   head: () => ({ meta: [{ title: "Subject — StudyHub" }] }),
