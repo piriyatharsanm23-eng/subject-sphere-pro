@@ -218,14 +218,8 @@ const HELP_TEXT = [
   "/change_subjects — change your enrolled subjects",
   "/my_subjects — show your enrolled subjects",
   "/deadlines — upcoming deadlines",
-  "/help — this menu",
-  "",
-  "<b>Enrollment (text)</b>",
-  "/semesters — list semesters",
-  "/semester &lt;n&gt; — pick semester by number",
-  "/subjects — list subjects and toggle with /enroll &lt;n&gt;",
-  "/enrollall — enroll in every subject in the semester",
   "/stop — unsubscribe",
+  "/help — this menu",
 ].join("\n");
 
 async function showMainMenu(chatId: number) {
