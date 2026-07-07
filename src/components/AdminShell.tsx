@@ -3,7 +3,7 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   CalendarClock, FileText, LayoutDashboard, Loader2,
   LogOut, MessageSquare, ShieldAlert, Star, UserCircle2, Check, ChevronsUpDown,
-  BookPlus, LifeBuoy,
+  BookPlus, LifeBuoy, Video,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -28,6 +28,7 @@ type NavItem = { to: string; label: string; icon: typeof FileText; exact?: boole
 const NAV: NavItem[] = [
   { to: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
   { to: "/admin/materials", label: "Materials", icon: FileText },
+  { to: "/admin/kuppi", label: "Kuppi videos", icon: Video },
   { to: "/admin/deadlines", label: "Deadlines", icon: CalendarClock },
   { to: "/admin/modules", label: "Module requests", icon: BookPlus },
   { to: "/admin/requests", label: "Student requests", icon: MessageSquare },
