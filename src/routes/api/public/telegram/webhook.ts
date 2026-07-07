@@ -563,14 +563,6 @@ async function cmdMySubjects(chatId: number) {
   await sendMessage(chatId, `🎓 <b>Your subjects</b>\n\n${lines.join("\n")}`);
 }
 
-async function cmdMySubjects(chatId: number) {
-  const subjects = await getEnrolledSubjects(chatId);
-  if (subjects.length === 0) {
-    return sendMessage(chatId, "You have not selected subjects yet. Please enroll first with /enroll.");
-  }
-  const lines = subjects.map((s: any) => `✅ ${escape(s.code ?? "")} — ${escape(s.name)}`);
-  await sendMessage(chatId, `🎓 <b>Your subjects</b>\n\n${lines.join("\n")}`);
-}
 
 async function cmdDeadlines(chatId: number) {
   const subjects = await getEnrolledSubjects(chatId);
