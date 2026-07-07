@@ -157,6 +157,12 @@ function MaterialPage() {
                   >
                     <Download className="mr-2 h-4 w-4" />Download
                   </Button>
+                  <ReportMaterialButton
+                    materialId={m.id}
+                    materialTitle={m.title}
+                    semesterId={m.semester_id}
+                    subjectId={m.subject_id}
+                  />
                 </div>
               </div>
             </header>
