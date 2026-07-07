@@ -150,7 +150,12 @@ function KuppiPresenters() {
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {grouped.map((g) => (
-          <div key={g.name} className="rounded-2xl border border-border bg-card p-5 shadow-soft">
+          <Link
+            key={g.name}
+            to="/kuppi-presenter/$name"
+            params={{ name: encodeURIComponent(g.name) }}
+            className="group rounded-2xl border border-border bg-card p-5 shadow-soft hover:border-primary/40 hover:shadow-elevated transition-all"
+          >
             <div className="flex items-center gap-3">
               <Avatar className="h-14 w-14 ring-2 ring-primary/10">
                 {g.photo ? <AvatarImage src={g.photo} alt={g.name} /> : null}
@@ -159,7 +164,7 @@ function KuppiPresenters() {
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0 flex-1">
-                <div className="font-semibold truncate">{g.name}</div>
+                <div className="font-semibold truncate group-hover:text-primary transition-colors">{g.name}</div>
                 <div className="text-xs text-muted-foreground">{g.total} kuppi{g.total === 1 ? "" : "s"}</div>
               </div>
             </div>
@@ -178,7 +183,7 @@ function KuppiPresenters() {
                 </Badge>
               ))}
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </section>

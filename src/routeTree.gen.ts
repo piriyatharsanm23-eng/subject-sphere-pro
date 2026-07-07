@@ -32,6 +32,7 @@ import { Route as SuperActivityRouteImport } from './routes/super.activity'
 import { Route as SubjectIdRouteImport } from './routes/subject.$id'
 import { Route as SemesterIdRouteImport } from './routes/semester.$id'
 import { Route as MaterialIdRouteImport } from './routes/material.$id'
+import { Route as KuppiPresenterNameRouteImport } from './routes/kuppi-presenter.$name'
 import { Route as ContributorsIdRouteImport } from './routes/contributors_.$id'
 import { Route as AdminRequestsRouteImport } from './routes/admin.requests'
 import { Route as AdminProfileRouteImport } from './routes/admin.profile'
@@ -160,6 +161,11 @@ const MaterialIdRoute = MaterialIdRouteImport.update({
   path: '/material/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KuppiPresenterNameRoute = KuppiPresenterNameRouteImport.update({
+  id: '/kuppi-presenter/$name',
+  path: '/kuppi-presenter/$name',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContributorsIdRoute = ContributorsIdRouteImport.update({
   id: '/contributors_/$id',
   path: '/contributors/$id',
@@ -241,6 +247,7 @@ export interface FileRoutesByFullPath {
   '/admin/profile': typeof AdminProfileRoute
   '/admin/requests': typeof AdminRequestsRoute
   '/contributors/$id': typeof ContributorsIdRoute
+  '/kuppi-presenter/$name': typeof KuppiPresenterNameRoute
   '/material/$id': typeof MaterialIdRoute
   '/semester/$id': typeof SemesterIdRoute
   '/subject/$id': typeof SubjectIdRoute
@@ -276,6 +283,7 @@ export interface FileRoutesByTo {
   '/admin/profile': typeof AdminProfileRoute
   '/admin/requests': typeof AdminRequestsRoute
   '/contributors/$id': typeof ContributorsIdRoute
+  '/kuppi-presenter/$name': typeof KuppiPresenterNameRoute
   '/material/$id': typeof MaterialIdRoute
   '/semester/$id': typeof SemesterIdRoute
   '/subject/$id': typeof SubjectIdRoute
@@ -314,6 +322,7 @@ export interface FileRoutesById {
   '/admin/profile': typeof AdminProfileRoute
   '/admin/requests': typeof AdminRequestsRoute
   '/contributors_/$id': typeof ContributorsIdRoute
+  '/kuppi-presenter/$name': typeof KuppiPresenterNameRoute
   '/material/$id': typeof MaterialIdRoute
   '/semester/$id': typeof SemesterIdRoute
   '/subject/$id': typeof SubjectIdRoute
@@ -353,6 +362,7 @@ export interface FileRouteTypes {
     | '/admin/profile'
     | '/admin/requests'
     | '/contributors/$id'
+    | '/kuppi-presenter/$name'
     | '/material/$id'
     | '/semester/$id'
     | '/subject/$id'
@@ -388,6 +398,7 @@ export interface FileRouteTypes {
     | '/admin/profile'
     | '/admin/requests'
     | '/contributors/$id'
+    | '/kuppi-presenter/$name'
     | '/material/$id'
     | '/semester/$id'
     | '/subject/$id'
@@ -425,6 +436,7 @@ export interface FileRouteTypes {
     | '/admin/profile'
     | '/admin/requests'
     | '/contributors_/$id'
+    | '/kuppi-presenter/$name'
     | '/material/$id'
     | '/semester/$id'
     | '/subject/$id'
@@ -455,6 +467,7 @@ export interface RootRouteChildren {
   SelectRoute: typeof SelectRoute
   SuperRoute: typeof SuperRouteWithChildren
   ContributorsIdRoute: typeof ContributorsIdRoute
+  KuppiPresenterNameRoute: typeof KuppiPresenterNameRoute
   MaterialIdRoute: typeof MaterialIdRoute
   SemesterIdRoute: typeof SemesterIdRoute
   SubjectIdRoute: typeof SubjectIdRoute
@@ -626,6 +639,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MaterialIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/kuppi-presenter/$name': {
+      id: '/kuppi-presenter/$name'
+      path: '/kuppi-presenter/$name'
+      fullPath: '/kuppi-presenter/$name'
+      preLoaderRoute: typeof KuppiPresenterNameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contributors_/$id': {
       id: '/contributors_/$id'
       path: '/contributors/$id'
@@ -779,6 +799,7 @@ const rootRouteChildren: RootRouteChildren = {
   SelectRoute: SelectRoute,
   SuperRoute: SuperRouteWithChildren,
   ContributorsIdRoute: ContributorsIdRoute,
+  KuppiPresenterNameRoute: KuppiPresenterNameRoute,
   MaterialIdRoute: MaterialIdRoute,
   SemesterIdRoute: SemesterIdRoute,
   SubjectIdRoute: SubjectIdRoute,
