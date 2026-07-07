@@ -42,7 +42,6 @@ export const Route = createFileRoute("/api/public/telegram/notify-materials")({
           return Response.json({ ok: false, error: "Bot not configured" }, { status: 500 });
         }
 
-        // Fetch new materials not yet pushed to Telegram.
         const { data: materials, error } = await sb()
           .from("materials")
           .select("id,title,material_type,subject_id,subjects(name,code)")
@@ -57,19 +56,19 @@ export const Route = createFileRoute("/api/public/telegram/notify-materials")({
           return Response.json({ ok: true, notified: 0 });
         }
 
+        // Pull all subscribed users once, then filter by their subject_ids array in memory.
+        const { data: subs } = await sb()
+          .from("telegram_subscribers")
+          .select("chat_id, subject_ids")
+          .eq("is_subscribed", true);
+
         let sends = 0;
         const notifiedIds: string[] = [];
 
         for (const m of materials as any[]) {
-          // Find all enrolled, subscribed chat IDs for this subject.
-          const { data: enrolls } = await sb()
-            .from("telegram_subject_enrollments")
-            .select("chat_id, telegram_subscribers!inner(is_subscribed)")
-            .eq("subject_id", m.subject_id);
-
-          const chatIds = (enrolls ?? [])
-            .filter((r: any) => r.telegram_subscribers?.is_subscribed)
-            .map((r: any) => r.chat_id as number);
+          const chatIds = (subs ?? [])
+            .filter((s: any) => Array.isArray(s.subject_ids) && s.subject_ids.includes(m.subject_id))
+            .map((s: any) => s.chat_id as number);
 
           const subjectLabel = m.subjects?.code
             ? `${m.subjects.code} — ${m.subjects.name ?? ""}`

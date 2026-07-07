@@ -50,7 +50,7 @@ async function runHealthCheck(alertOnFailure: boolean) {
   const missingKeys = !process.env.LOVABLE_API_KEY || !process.env.TELEGRAM_API_KEY;
   if (missingKeys) {
     return {
-      status: "misconfigured",
+      status: "misconfigured" as const,
       error: "Missing LOVABLE_API_KEY or TELEGRAM_API_KEY",
     };
   }
@@ -72,17 +72,6 @@ async function runHealthCheck(alertOnFailure: boolean) {
       : unhealthy
         ? "degraded"
         : "healthy";
-
-  await sb()
-    .from("telegram_health_logs")
-    .insert({
-      status,
-      pending_update_count: pending,
-      last_error_message: lastErrorMessage,
-      last_error_at: lastErrorDate ? new Date(lastErrorDate * 1000).toISOString() : null,
-      webhook_url: webhookUrl,
-      raw: info.data ?? {},
-    });
 
   if (alertOnFailure && unhealthy) {
     const lines = [
@@ -125,7 +114,6 @@ export const Route = createFileRoute("/api/public/telegram/health")({
           );
         }
       },
-      // Cron endpoint: runs the check AND sends alerts to admin chats if unhealthy.
       POST: async () => {
         try {
           const result = await runHealthCheck(true);
