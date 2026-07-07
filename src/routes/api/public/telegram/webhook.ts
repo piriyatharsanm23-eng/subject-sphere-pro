@@ -3,15 +3,27 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { createHash, timingSafeEqual } from "crypto";
 import type { Database } from "@/integrations/supabase/types";
 
-// ---------- Telegram gateway ----------
+// ---------- Config ----------
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/telegram";
+const SITE_URL = "https://subject-sphere-pro.lovable.app";
+const PAGE_SIZE = 8;
 
+const MATERIAL_TYPES: { key: string; label: string; emoji: string }[] = [
+  { key: "lecture_slide", label: "Lecture Slides", emoji: "📘" },
+  { key: "note", label: "Notes", emoji: "📝" },
+  { key: "past_paper", label: "Past Papers", emoji: "📄" },
+  { key: "assignment", label: "Tutorials / Assignments", emoji: "📌" },
+];
+
+function typeLabel(key: string) {
+  return MATERIAL_TYPES.find((t) => t.key === key)?.label ?? key;
+}
+
+// ---------- Telegram helpers ----------
 async function tg(method: string, payload: unknown) {
   const lovableApiKey = process.env.LOVABLE_API_KEY;
   const telegramApiKey = process.env.TELEGRAM_API_KEY;
-  if (!lovableApiKey || !telegramApiKey) {
-    throw new Error("Telegram gateway is not configured");
-  }
+  if (!lovableApiKey || !telegramApiKey) throw new Error("Telegram gateway is not configured");
 
   const res = await fetch(`${GATEWAY_URL}/${method}`, {
     method: "POST",
@@ -27,6 +39,8 @@ async function tg(method: string, payload: unknown) {
   return data;
 }
 
+type Kb = { inline_keyboard: Array<Array<Record<string, unknown>>> };
+
 async function sendMessage(chatId: number, text: string, extra: Record<string, unknown> = {}) {
   return tg("sendMessage", {
     chat_id: chatId,
@@ -35,6 +49,21 @@ async function sendMessage(chatId: number, text: string, extra: Record<string, u
     disable_web_page_preview: true,
     ...extra,
   });
+}
+
+async function editMessage(chatId: number, messageId: number, text: string, kb?: Kb) {
+  return tg("editMessageText", {
+    chat_id: chatId,
+    message_id: messageId,
+    text,
+    parse_mode: "HTML",
+    disable_web_page_preview: true,
+    ...(kb ? { reply_markup: kb } : {}),
+  });
+}
+
+async function answerCallback(id: string, text?: string) {
+  return tg("answerCallbackQuery", { callback_query_id: id, ...(text ? { text } : {}) });
 }
 
 // ---------- Auth ----------
@@ -47,7 +76,7 @@ function safeEqual(a: string, b: string) {
   return l.length === r.length && timingSafeEqual(l, r);
 }
 
-// ---------- Supabase (service role, webhook only) ----------
+// ---------- Supabase ----------
 let _sb: SupabaseClient<Database> | null = null;
 function sb(): SupabaseClient<Database> {
   if (!_sb) {
@@ -60,28 +89,50 @@ function sb(): SupabaseClient<Database> {
   return _sb;
 }
 
-// ---------- Command handling ----------
-const HELP = [
-  "<b>📚 StudyHub bot</b>",
-  "",
-  "<b>Commands</b>",
-  "/start – subscribe",
-  "/stop – unsubscribe (no more messages)",
-  "/semesters – list semesters",
-  "/semester &lt;n&gt; – pick a semester by number",
-  "/subjects – list subjects in your chosen semester",
-"/enroll &lt;n&gt; – toggle enrollment for subject #n",
-  "/enrollall – enroll every subject in the semester",
-  "/mysubjects – show your enrolled subjects",
-  "/materials – list available materials for your subjects",
-  "/get &lt;n&gt; – download material #n from the last list",
-  "/getall – download every available material (up to 20)",
-  "/deadlines – upcoming deadlines",
-  "/adminalerts on|off – receive bot health alerts (admins)",
-  "/help – show this menu",
-].join("\n");
+// ---------- Utilities ----------
+function escape(s: string | null | undefined) {
+  if (!s) return "";
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
 
+function buildAIPrompt(m: any) {
+  const subj = m.subjects?.name ?? "Unknown";
+  const sem = m.semesters?.name ?? "Unknown";
+  return `I am a university student. I want you to teach me this PDF/lecture material completely and clearly.
 
+Material details:
+Title: ${m.title}
+Subject: ${subj}
+Semester: ${sem}
+Material type: ${typeLabel(m.material_type)}
+File name: ${m.file_name ?? "Unknown"}
+PDF/file link: ${m.file_url_public ?? "PDF/file link not available"}
+
+Please explain the whole material without missing important content.
+
+Use simple student-friendly English.
+
+Follow this structure:
+1. Short overview of the material.
+2. Explain every major heading/topic in order.
+3. Explain the theory clearly.
+4. Explain all formulas with the meaning of each symbol.
+5. Show substitution steps for calculations.
+6. Give small easy examples.
+7. Explain diagrams, graphs, tables, and flowcharts.
+8. Mention important definitions.
+9. Mention exam-important points.
+10. Give viva questions with simple speaking-style answers.
+11. Give possible short-answer questions.
+12. Give possible long-answer questions.
+13. Give final quick revision summary.
+14. Do not skip important small points.
+15. If you cannot access the PDF link, ask me to upload the PDF manually.
+
+Teach me like I am preparing for a quiz or exam.`;
+}
+
+// ---------- Subscriber helpers ----------
 async function ensureSubscriber(msg: any) {
   const chat = msg.chat;
   const from = msg.from ?? {};
@@ -116,7 +167,7 @@ async function listSemesters() {
   return data ?? [];
 }
 
-async function listSubjects(semesterId: string) {
+async function listSubjectsBySemester(semesterId: string) {
   const { data } = await sb()
     .from("subjects")
     .select("id,name,code")
@@ -125,19 +176,296 @@ async function listSubjects(semesterId: string) {
   return data ?? [];
 }
 
-async function cmdStart(chatId: number, msg: any) {
-  await ensureSubscriber(msg);
+async function getEnrolledSubjects(chatId: number) {
+  const sub = await getSubscriber(chatId);
+  const ids = ((sub as any)?.subject_ids as string[] | null) ?? [];
+  if (ids.length === 0) return [];
+  const { data } = await sb()
+    .from("subjects")
+    .select("id,name,code,semester_id,semesters(name)")
+    .in("id", ids)
+    .order("name");
+  return data ?? [];
+}
+
+async function signedUrlFor(path: string) {
+  const { data, error } = await sb().storage
+    .from("learning-materials")
+    .createSignedUrl(path, 60 * 60 * 4);
+  if (error || !data) throw error ?? new Error("signed url failed");
+  return data.signedUrl;
+}
+
+// ---------- Main menu ----------
+const MAIN_MENU_KB: Kb = {
+  inline_keyboard: [
+    [{ text: "📥 Download Materials", callback_data: "d" }],
+    [{ text: "📚 Enroll / Change Subjects", callback_data: "en" }],
+    [{ text: "⏰ View Deadlines", callback_data: "dl" }],
+    [{ text: "📌 My Subjects", callback_data: "ms" }],
+    [{ text: "❓ Help", callback_data: "hp" }],
+  ],
+};
+
+const HELP_TEXT = [
+  "<b>📚 StudyGeniusX Bot</b>",
+  "",
+  "<b>Commands</b>",
+  "/start — main menu",
+  "/download — download materials (same as /materials)",
+  "/materials — download materials",
+  "/enroll — enroll in subjects",
+  "/change_subjects — change your enrolled subjects",
+  "/my_subjects — show your enrolled subjects",
+  "/deadlines — upcoming deadlines",
+  "/help — this menu",
+  "",
+  "<b>Enrollment (text)</b>",
+  "/semesters — list semesters",
+  "/semester &lt;n&gt; — pick semester by number",
+  "/subjects — list subjects and toggle with /enroll &lt;n&gt;",
+  "/enrollall — enroll in every subject in the semester",
+  "/stop — unsubscribe",
+].join("\n");
+
+async function showMainMenu(chatId: number) {
+  await sendMessage(chatId, "<b>Welcome to StudyGeniusX Bot 🎓</b>\n\nPick an option below:", {
+    reply_markup: MAIN_MENU_KB,
+  });
+}
+
+// ---------- Download flow ----------
+async function showDownloadSubjects(chatId: number, messageId?: number) {
+  const subjects = await getEnrolledSubjects(chatId);
+  if (subjects.length === 0) {
+    const text = "❗ You are not enrolled yet.\nPlease select your semester and subjects first.";
+    const kb: Kb = { inline_keyboard: [[{ text: "📚 Enroll Now", callback_data: "en" }]] };
+    if (messageId) return editMessage(chatId, messageId, text, kb);
+    return sendMessage(chatId, text, { reply_markup: kb });
+  }
+
+  const rows: Array<Array<Record<string, unknown>>> = subjects.map((s: any) => [
+    { text: s.name, callback_data: `ds:${s.id}` },
+  ]);
+  rows.push([
+    { text: "🔄 Change Subjects", callback_data: "cs" },
+    { text: "❌ Cancel", callback_data: "x" },
+  ]);
+  const kb: Kb = { inline_keyboard: rows };
+  const text = "<b>📥 Download Materials</b>\n\nSelect one of your enrolled subjects:";
+  if (messageId) return editMessage(chatId, messageId, text, kb);
+  return sendMessage(chatId, text, { reply_markup: kb });
+}
+
+async function showCategories(chatId: number, messageId: number, subjectId: string) {
+  const { data: subject } = await sb()
+    .from("subjects")
+    .select("id,name,semester_id,semesters(name)")
+    .eq("id", subjectId)
+    .maybeSingle();
+  if (!subject) return editMessage(chatId, messageId, "This subject no longer exists.");
+
+  const rows: Array<Array<Record<string, unknown>>> = MATERIAL_TYPES.map((t) => [
+    { text: `${t.emoji} ${t.label}`, callback_data: `dc:${subjectId}:${t.key}:0` },
+  ]);
+  rows.push([{ text: "⏰ Deadlines", callback_data: `dd:${subjectId}` }]);
+  rows.push([
+    { text: "🔙 Back to Subjects", callback_data: "d" },
+    { text: "❌ Cancel", callback_data: "x" },
+  ]);
+  const kb: Kb = { inline_keyboard: rows };
+  const text = `<b>${escape((subject as any).name)}</b>\n${escape((subject as any).semesters?.name ?? "")}\n\nPick a category:`;
+  return editMessage(chatId, messageId, text, kb);
+}
+
+async function showMaterialList(
+  chatId: number,
+  messageId: number,
+  subjectId: string,
+  type: string,
+  page: number,
+) {
+  const { data: subject } = await sb()
+    .from("subjects")
+    .select("id,name")
+    .eq("id", subjectId)
+    .maybeSingle();
+
+  const from = page * PAGE_SIZE;
+  const to = from + PAGE_SIZE - 1;
+  const { data: materials, count } = await sb()
+    .from("materials")
+    .select("id,title,material_type", { count: "exact" })
+    .eq("subject_id", subjectId)
+    .eq("material_type", type)
+    .eq("is_archived", false)
+    .order("created_at", { ascending: false })
+    .range(from, to);
+
+  if (!materials || materials.length === 0) {
+    const kb: Kb = {
+      inline_keyboard: [
+        [{ text: "🔙 Back to Categories", callback_data: `ds:${subjectId}` }],
+        [{ text: "❌ Cancel", callback_data: "x" }],
+      ],
+    };
+    return editMessage(
+      chatId,
+      messageId,
+      `<b>${escape((subject as any)?.name ?? "")}</b> → ${escape(typeLabel(type))}\n\nNo materials uploaded for this category yet.`,
+      kb,
+    );
+  }
+
+  const rows: Array<Array<Record<string, unknown>>> = materials.map((m, i) => [
+    { text: `${from + i + 1}. ${m.title}`.slice(0, 60), callback_data: `dm:${m.id}` },
+  ]);
+
+  const nav: Array<Record<string, unknown>> = [];
+  if (page > 0) nav.push({ text: "⬅️ Previous", callback_data: `dc:${subjectId}:${type}:${page - 1}` });
+  if ((count ?? 0) > to + 1) nav.push({ text: "➡️ Next", callback_data: `dc:${subjectId}:${type}:${page + 1}` });
+  if (nav.length) rows.push(nav);
+
+  rows.push([
+    { text: "🔙 Back to Categories", callback_data: `ds:${subjectId}` },
+    { text: "❌ Cancel", callback_data: "x" },
+  ]);
+
+  const kb: Kb = { inline_keyboard: rows };
+  const header = `<b>${escape((subject as any)?.name ?? "")}</b> → ${escape(typeLabel(type))}\n\nAvailable materials:`;
+  return editMessage(chatId, messageId, header, kb);
+}
+
+async function sendMaterial(chatId: number, materialId: string) {
+  const { data: m } = await sb()
+    .from("materials")
+    .select("id,title,material_type,file_url,file_name,created_at,subject_id,semester_id,subjects(name),semesters(name)")
+    .eq("id", materialId)
+    .maybeSingle();
+
+  if (!m) {
+    return sendMessage(chatId, "This material is no longer available.");
+  }
+  if (!m.file_url) {
+    return sendMessage(chatId, "This material file is not available right now.");
+  }
+
+  let signed = "";
+  try {
+    signed = await signedUrlFor(m.file_url);
+  } catch (e) {
+    console.error("signed url failed", e);
+    return sendMessage(chatId, "This material file is not available right now.");
+  }
+
+  const uploaded = new Date(m.created_at as string).toISOString().slice(0, 10);
+  const caption = [
+    `📘 <b>${escape(m.title)}</b>`,
+    "",
+    `Subject: ${escape((m as any).subjects?.name ?? "")}`,
+    `Semester: ${escape((m as any).semesters?.name ?? "")}`,
+    `Type: ${escape(typeLabel(m.material_type))}`,
+    `Uploaded: ${uploaded}`,
+  ].join("\n");
+
+  const prompt = buildAIPrompt({ ...m, file_url_public: signed });
+  const encoded = encodeURIComponent(prompt).slice(0, 1800); // keep url button under limit
+  const websiteUrl = `${SITE_URL}/material/${m.id}`;
+  const chatgptUrl = `https://chatgpt.com/?q=${encoded}`;
+  const geminiUrl = `https://gemini.google.com/app?prompt=${encoded}`;
+
+  const buttonsKb: Kb = {
+    inline_keyboard: [
+      [
+        { text: "⬇️ Download PDF", url: signed },
+        { text: "🌐 Open in Website", url: websiteUrl },
+      ],
+      [
+        { text: "🤖 Open in ChatGPT", url: chatgptUrl },
+        { text: "✨ Open in Gemini", url: geminiUrl },
+      ],
+    ],
+  };
+
+  // Try direct document send with caption + buttons
+  const res = await tg("sendDocument", {
+    chat_id: chatId,
+    document: signed,
+    caption,
+    parse_mode: "HTML",
+    reply_markup: buttonsKb,
+  });
+
+  if (res?.ok) return;
+
+  // Fallback: message with link buttons
   await sendMessage(
     chatId,
-    `👋 Welcome to <b>StudyHub</b>!\n\nYou're subscribed. Use /semesters to pick your semester, then /subjects to enroll.\n\n${HELP}`,
+    `${caption}\n\n<i>Telegram could not send this PDF directly. Please use the buttons below.</i>`,
+    { reply_markup: buttonsKb },
   );
 }
 
-async function cmdStop(chatId: number) {
-  await sb().from("telegram_subscribers").update({ is_subscribed: false }).eq("chat_id", chatId);
-  await sendMessage(chatId, "🔕 Unsubscribed. You won't receive messages. Send /start to resubscribe.");
+async function showSubjectDeadlines(chatId: number, messageId: number, subjectId: string) {
+  const { data: subject } = await sb()
+    .from("subjects")
+    .select("id,name")
+    .eq("id", subjectId)
+    .maybeSingle();
+  const { data } = await sb()
+    .from("deadlines")
+    .select("title,description,deadline_at")
+    .eq("subject_id", subjectId)
+    .eq("is_archived", false)
+    .eq("status", "active")
+    .gte("deadline_at", new Date().toISOString())
+    .order("deadline_at", { ascending: true })
+    .limit(30);
+
+  const kb: Kb = {
+    inline_keyboard: [
+      [{ text: "🔙 Back to Categories", callback_data: `ds:${subjectId}` }],
+      [{ text: "❌ Cancel", callback_data: "x" }],
+    ],
+  };
+
+  if (!data || data.length === 0) {
+    return editMessage(
+      chatId,
+      messageId,
+      `<b>${escape((subject as any)?.name ?? "")}</b> → ⏰ Deadlines\n\n🎉 No upcoming deadlines.`,
+      kb,
+    );
+  }
+
+  const now = Date.now();
+  const DAY = 24 * 60 * 60 * 1000;
+  const buckets: Record<string, string[]> = { today: [], tomorrow: [], week: [], later: [] };
+  for (const d of data) {
+    const t = new Date(d.deadline_at as string).getTime();
+    const diff = t - now;
+    const days = Math.floor(diff / DAY);
+    const hours = Math.floor((diff % DAY) / (60 * 60 * 1000));
+    const remaining = diff < DAY ? `${Math.max(1, Math.floor(diff / (60 * 60 * 1000)))}h left` : `${days}d ${hours}h left`;
+    const when = new Date(d.deadline_at as string).toUTCString();
+    const line = `• <b>${escape(d.title)}</b>\n  ${when} — ${remaining}${d.description ? `\n  ${escape(d.description)}` : ""}`;
+    if (diff < DAY) buckets.today.push(line);
+    else if (diff < 2 * DAY) buckets.tomorrow.push(line);
+    else if (diff < 7 * DAY) buckets.week.push(line);
+    else buckets.later.push(line);
+  }
+
+  const sections: string[] = [];
+  if (buckets.today.length) sections.push(`🔴 <b>Due Today</b>\n${buckets.today.join("\n")}`);
+  if (buckets.tomorrow.length) sections.push(`🟠 <b>Due Tomorrow</b>\n${buckets.tomorrow.join("\n")}`);
+  if (buckets.week.length) sections.push(`🟡 <b>Due This Week</b>\n${buckets.week.join("\n")}`);
+  if (buckets.later.length) sections.push(`⚪ <b>Later</b>\n${buckets.later.join("\n")}`);
+
+  const text = `<b>${escape((subject as any)?.name ?? "")}</b> → ⏰ Deadlines\n\n${sections.join("\n\n")}`;
+  return editMessage(chatId, messageId, text, kb);
 }
 
+// ---------- Text command helpers (existing enrollment) ----------
 async function cmdSemesters(chatId: number) {
   const sems = await listSemesters();
   if (sems.length === 0) return sendMessage(chatId, "No active semesters yet.");
@@ -161,18 +489,18 @@ async function cmdSemesterPick(chatId: number, arg: string) {
     .eq("chat_id", chatId);
   await sendMessage(
     chatId,
-    `✅ Semester set to <b>${escape(chosen.name)}</b>.\n\nNow send /subjects to see subjects, then <code>/enroll &lt;n&gt;</code> to enroll.`,
+    `✅ Semester set to <b>${escape(chosen.name)}</b>.\n\nSend /subjects to view subjects, then <code>/enroll &lt;n&gt;</code> to toggle each one, or /enrollall.`,
   );
 }
 
-async function cmdSubjects(chatId: number) {
+async function cmdSubjectsList(chatId: number) {
   const sub = await getSubscriber(chatId);
   if (!sub?.selected_semester_id) return sendMessage(chatId, "Pick a semester first with /semesters.");
-  const subjects = await listSubjects(sub.selected_semester_id);
+  const subjects = await listSubjectsBySemester(sub.selected_semester_id);
   if (subjects.length === 0) return sendMessage(chatId, "No subjects in your semester yet.");
-  const enrolled = await getEnrolledIds(chatId);
+  const enrolled = new Set(((sub as any).subject_ids as string[]) ?? []);
   const lines = subjects.map(
-    (s, i) => `${enrolled.has(s.id) ? "✅" : "▫️"} <b>${i + 1}.</b> ${escape(s.code)} — ${escape(s.name)}`,
+    (s, i) => `${enrolled.has(s.id) ? "✅" : "▫️"} <b>${i + 1}.</b> ${escape(s.code ?? "")} — ${escape(s.name)}`,
   );
   await sendMessage(
     chatId,
@@ -180,22 +508,16 @@ async function cmdSubjects(chatId: number) {
   );
 }
 
-async function getEnrolledIds(chatId: number) {
-  const { data } = await sb()
-    .from("telegram_subscribers")
-    .select("subject_ids")
-    .eq("chat_id", chatId)
-    .maybeSingle();
-  const arr = (data as any)?.subject_ids as string[] | null;
-  return new Set(arr ?? []);
-}
-
-async function cmdEnroll(chatId: number, arg: string) {
+async function cmdEnrollToggle(chatId: number, arg: string) {
   const sub = await getSubscriber(chatId);
-  if (!sub?.selected_semester_id) return sendMessage(chatId, "Pick a semester first with /semesters.");
+  if (!sub?.selected_semester_id) {
+    // No semester selected → show enrollment start
+    return cmdEnrollStart(chatId);
+  }
   const n = Number(arg);
-  const subjects = await listSubjects(sub.selected_semester_id);
+  const subjects = await listSubjectsBySemester(sub.selected_semester_id);
   if (!Number.isInteger(n) || n < 1 || n > subjects.length) {
+    if (!arg) return cmdEnrollStart(chatId);
     return sendMessage(chatId, "Usage: /enroll <number> — see /subjects for the list.");
   }
   const s = subjects[n - 1];
@@ -208,14 +530,16 @@ async function cmdEnroll(chatId: number, arg: string) {
     .eq("chat_id", chatId);
   await sendMessage(
     chatId,
-    removed ? `➖ Unenrolled from <b>${escape(s.name)}</b>.` : `➕ Enrolled in <b>${escape(s.name)}</b>. Use /mysubjects to review.`,
+    removed
+      ? `➖ Unenrolled from <b>${escape(s.name)}</b>.`
+      : `➕ Enrolled in <b>${escape(s.name)}</b>. Use /my_subjects to review.`,
   );
 }
 
 async function cmdEnrollAll(chatId: number) {
   const sub = await getSubscriber(chatId);
   if (!sub?.selected_semester_id) return sendMessage(chatId, "Pick a semester first with /semesters.");
-  const subjects = await listSubjects(sub.selected_semester_id);
+  const subjects = await listSubjectsBySemester(sub.selected_semester_id);
   if (subjects.length === 0) return sendMessage(chatId, "No subjects to enroll in.");
   await sb()
     .from("telegram_subscribers")
@@ -224,107 +548,50 @@ async function cmdEnrollAll(chatId: number) {
   await sendMessage(chatId, `✅ Enrolled in all <b>${subjects.length}</b> subjects.`);
 }
 
-async function cmdMySubjects(chatId: number) {
+async function cmdEnrollStart(chatId: number) {
   const sub = await getSubscriber(chatId);
-  if (!sub?.selected_semester_id) return sendMessage(chatId, "Pick a semester first with /semesters.");
-  const enrolled = await getEnrolledIds(chatId);
-  if (enrolled.size === 0) return sendMessage(chatId, "You aren't enrolled in any subjects. Use /subjects.");
-  const subjects = (await listSubjects(sub.selected_semester_id)).filter((s) => enrolled.has(s.id));
-  const lines = subjects.map((s) => `✅ ${escape(s.code)} — ${escape(s.name)}`);
+  if (sub?.selected_semester_id) {
+    await sendMessage(
+      chatId,
+      "📚 <b>Enrollment</b>\n\nSend /subjects to see subjects in your semester, then use <code>/enroll &lt;n&gt;</code> to toggle each one, or /enrollall.\n\nTo pick a different semester, send /semesters.",
+    );
+  } else {
+    await sendMessage(
+      chatId,
+      "📚 <b>Enrollment</b>\n\nStep 1: send /semesters and pick your semester with <code>/semester &lt;n&gt;</code>.\nStep 2: send /subjects and toggle each subject with <code>/enroll &lt;n&gt;</code>, or /enrollall.",
+    );
+  }
+}
+
+async function cmdChangeSubjects(chatId: number) {
+  await sendMessage(
+    chatId,
+    "🔄 <b>Change subjects</b>\n\nSend /subjects to see your semester's subjects and toggle them with <code>/enroll &lt;n&gt;</code>.\n\nTo switch semester, send /semesters and pick with <code>/semester &lt;n&gt;</code> (this clears your subject list).",
+  );
+}
+
+async function cmdMySubjects(chatId: number) {
+  const subjects = await getEnrolledSubjects(chatId);
+  if (subjects.length === 0) {
+    return sendMessage(chatId, "You have not selected subjects yet. Please enroll first with /enroll.");
+  }
+  const lines = subjects.map((s: any) => `✅ ${escape(s.code ?? "")} — ${escape(s.name)}`);
   await sendMessage(chatId, `🎓 <b>Your subjects</b>\n\n${lines.join("\n")}`);
 }
 
-async function fetchMaterialsForChat(chatId: number, limit = 20) {
-  const enrolled = await getEnrolledIds(chatId);
-  if (enrolled.size === 0) return [];
-  const { data } = await sb()
-    .from("materials")
-    .select("id,title,material_type,file_url,file_name,subject_id,subjects(name,code)")
-    .in("subject_id", Array.from(enrolled))
-    .eq("is_archived", false)
-    .order("created_at", { ascending: false })
-    .limit(limit);
-  return data ?? [];
-}
-
-async function cmdMaterials(chatId: number) {
-  const enrolled = await getEnrolledIds(chatId);
-  if (enrolled.size === 0) return sendMessage(chatId, "Enroll in subjects first — /subjects.");
-  const data = await fetchMaterialsForChat(chatId, 20);
-  if (data.length === 0) return sendMessage(chatId, "No materials yet for your subjects.");
-  const lines = data.map(
-    (m: any, i: number) =>
-      `<b>${i + 1}.</b> ${escape(m.title)} <i>(${m.material_type})</i> — ${escape(m.subjects?.code ?? m.subjects?.name ?? "")}`,
-  );
-  await sendMessage(
-    chatId,
-    `📎 <b>Available materials</b>\n\n${lines.join("\n")}\n\nDownload one with <code>/get &lt;n&gt;</code> or all with /getall.`,
-  );
-}
-
-async function signedUrlFor(path: string) {
-  const { data, error } = await sb().storage
-    .from("learning-materials")
-    .createSignedUrl(path, 60 * 30);
-  if (error || !data) throw error ?? new Error("signed url failed");
-  return data.signedUrl;
-}
-
-async function sendMaterial(chatId: number, m: any) {
-  try {
-    const url = await signedUrlFor(m.file_url);
-    const caption = `📄 <b>${escape(m.title)}</b>\n${escape(m.subjects?.name ?? "")}`;
-    const res = await tg("sendDocument", {
-      chat_id: chatId,
-      document: url,
-      caption,
-      parse_mode: "HTML",
-    });
-    if (res?.ok) {
-      return true;
-    }
-    // Fallback: send the link if Telegram couldn't fetch the file directly.
-    await sendMessage(chatId, `⬇️ <b>${escape(m.title)}</b>\n<a href="${url}">Download link</a> (valid 30 min)`);
-    return false;
-  } catch (e) {
-    console.error("sendMaterial failed", e);
-    await sendMessage(chatId, `❌ Could not send <b>${escape(m.title)}</b>.`);
-    return false;
-  }
-}
-
-async function cmdGet(chatId: number, arg: string) {
-  const data = await fetchMaterialsForChat(chatId, 20);
-  if (data.length === 0) return sendMessage(chatId, "No materials available. Try /materials.");
-  const n = Number(arg);
-  if (!Number.isInteger(n) || n < 1 || n > data.length) {
-    return sendMessage(chatId, `Usage: /get <number> (1–${data.length}). See /materials.`);
-  }
-  await sendMaterial(chatId, data[n - 1]);
-}
-
-async function cmdGetAll(chatId: number) {
-  const data = await fetchMaterialsForChat(chatId, 20);
-  if (data.length === 0) return sendMessage(chatId, "No materials available. Try /materials.");
-  await sendMessage(chatId, `📦 Sending <b>${data.length}</b> materials…`);
-  for (const m of data) {
-    await sendMaterial(chatId, m);
-  }
-  await sendMessage(chatId, "✅ Done.");
-}
-
 async function cmdDeadlines(chatId: number) {
-  const enrolled = await getEnrolledIds(chatId);
-  if (enrolled.size === 0) return sendMessage(chatId, "Enroll in subjects first — /subjects.");
+  const subjects = await getEnrolledSubjects(chatId);
+  if (subjects.length === 0) return sendMessage(chatId, "Enroll in subjects first — /enroll.");
+  const ids = subjects.map((s: any) => s.id);
   const { data } = await sb()
     .from("deadlines")
     .select("title,deadline_at,subjects(name)")
-    .in("subject_id", Array.from(enrolled))
+    .in("subject_id", ids)
     .eq("is_archived", false)
     .eq("status", "active")
     .gte("deadline_at", new Date().toISOString())
     .order("deadline_at", { ascending: true })
-    .limit(15);
+    .limit(20);
   if (!data || data.length === 0) return sendMessage(chatId, "🎉 No upcoming deadlines.");
   const lines = data.map(
     (d: any) => `⏰ <b>${escape(d.title)}</b> — ${escape(d.subjects?.name ?? "")}\n   ${new Date(d.deadline_at).toUTCString()}`,
@@ -332,78 +599,144 @@ async function cmdDeadlines(chatId: number) {
   await sendMessage(chatId, `📌 <b>Upcoming deadlines</b>\n\n${lines.join("\n\n")}`);
 }
 
-function escape(s: string | null | undefined) {
-  if (!s) return "";
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+async function cmdStop(chatId: number) {
+  await sb().from("telegram_subscribers").update({ is_subscribed: false }).eq("chat_id", chatId);
+  await sendMessage(chatId, "🔕 Unsubscribed. Send /start to resubscribe.");
 }
 
-async function handleUpdate(update: any) {
-  const msg = update.message ?? update.edited_message;
-  if (!msg?.chat?.id || typeof msg.text !== "string") return;
+// ---------- Update dispatchers ----------
+async function handleMessage(msg: any) {
   const chatId: number = msg.chat.id;
-  const text: string = msg.text.trim();
-
-  // Respect unsubscribed users — only /start resubscribes.
-  const sub = await getSubscriber(chatId);
-  const isSubscribed = sub?.is_subscribed ?? false;
+  const text: string = (msg.text ?? "").trim();
+  if (!text) return;
 
   const [cmdRaw, ...rest] = text.split(/\s+/);
   const cmd = cmdRaw.split("@")[0].toLowerCase();
   const arg = rest.join(" ");
 
-  if (cmd === "/start") return cmdStart(chatId, msg);
-  if (!sub && cmd !== "/help") {
-    return sendMessage(chatId, "Please send /start first to subscribe to StudyHub.");
+  if (cmd === "/start") {
+    await ensureSubscriber(msg);
+    return showMainMenu(chatId);
   }
-  if (!isSubscribed && cmd !== "/help") return; // silent only after explicit unsubscribe
+
+  const sub = await getSubscriber(chatId);
+  if (!sub) return sendMessage(chatId, "Please send /start first.");
+  if (!sub.is_subscribed && cmd !== "/help") return;
 
   switch (cmd) {
     case "/help":
-      return sendMessage(chatId, HELP);
-    case "/stop":
-      return cmdStop(chatId);
+      return sendMessage(chatId, HELP_TEXT);
+    case "/download":
+    case "/materials":
+      return showDownloadSubjects(chatId);
+    case "/enroll":
+      if (arg) return cmdEnrollToggle(chatId, arg);
+      return cmdEnrollStart(chatId);
+    case "/change_subjects":
+      return cmdChangeSubjects(chatId);
+    case "/my_subjects":
+    case "/mysubjects":
+    case "/myenrollments":
+      return cmdMySubjects(chatId);
+    case "/deadlines":
+      return cmdDeadlines(chatId);
     case "/semesters":
       return cmdSemesters(chatId);
     case "/semester":
       return cmdSemesterPick(chatId, arg);
     case "/subjects":
-      return cmdSubjects(chatId);
-    case "/enroll":
-      return cmdEnroll(chatId, arg);
+      return cmdSubjectsList(chatId);
     case "/enrollall":
       return cmdEnrollAll(chatId);
-    case "/mysubjects":
-    case "/myenrollments":
-      return cmdMySubjects(chatId);
-    case "/materials":
-      return cmdMaterials(chatId);
-    case "/get":
-      return cmdGet(chatId, arg);
-    case "/getall":
-    case "/downloadall":
-      return cmdGetAll(chatId);
-    case "/deadlines":
-      return cmdDeadlines(chatId);
+    case "/stop":
+      return cmdStop(chatId);
     case "/adminalerts": {
       const on = /^on$/i.test(arg.trim());
       const off = /^off$/i.test(arg.trim());
-      if (!on && !off) {
-        return sendMessage(chatId, "Usage: <code>/adminalerts on</code> or <code>/adminalerts off</code>.");
-      }
+      if (!on && !off) return sendMessage(chatId, "Usage: <code>/adminalerts on|off</code>.");
       await sb()
         .from("telegram_subscribers")
         .update({ receive_admin_alerts: on })
         .eq("chat_id", chatId);
-      return sendMessage(
-        chatId,
-        on ? "🔔 You'll now receive bot health alerts." : "🔕 Health alerts disabled.",
-      );
+      return sendMessage(chatId, on ? "🔔 Admin alerts enabled." : "🔕 Admin alerts disabled.");
     }
     default:
-      return sendMessage(chatId, `Unknown command. Try /help.`);
+      return sendMessage(chatId, "Unknown command. Try /help.");
   }
 }
 
+async function handleCallback(cb: any) {
+  const chatId: number = cb.message?.chat?.id;
+  const messageId: number = cb.message?.message_id;
+  const data: string = cb.data ?? "";
+  if (!chatId || !messageId) {
+    await answerCallback(cb.id);
+    return;
+  }
+
+  const [action, ...parts] = data.split(":");
+
+  try {
+    switch (action) {
+      case "m":
+        await answerCallback(cb.id);
+        await editMessage(chatId, messageId, "<b>Welcome to StudyGeniusX Bot 🎓</b>\n\nPick an option below:", MAIN_MENU_KB);
+        return;
+      case "d":
+        await answerCallback(cb.id);
+        return showDownloadSubjects(chatId, messageId);
+      case "ds":
+        await answerCallback(cb.id);
+        return showCategories(chatId, messageId, parts[0]);
+      case "dc":
+        await answerCallback(cb.id);
+        return showMaterialList(chatId, messageId, parts[0], parts[1], Number(parts[2] ?? 0));
+      case "dd":
+        await answerCallback(cb.id);
+        return showSubjectDeadlines(chatId, messageId, parts[0]);
+      case "dm":
+        await answerCallback(cb.id, "Sending…");
+        return sendMaterial(chatId, parts[0]);
+      case "en":
+        await answerCallback(cb.id);
+        await cmdEnrollStart(chatId);
+        return;
+      case "cs":
+        await answerCallback(cb.id);
+        await cmdChangeSubjects(chatId);
+        return;
+      case "ms":
+        await answerCallback(cb.id);
+        await cmdMySubjects(chatId);
+        return;
+      case "dl":
+        await answerCallback(cb.id);
+        await cmdDeadlines(chatId);
+        return;
+      case "hp":
+        await answerCallback(cb.id);
+        await sendMessage(chatId, HELP_TEXT);
+        return;
+      case "x":
+        await answerCallback(cb.id, "Cancelled");
+        await tg("deleteMessage", { chat_id: chatId, message_id: messageId }).catch(() => {});
+        return;
+      default:
+        await answerCallback(cb.id, "This menu is outdated. Please type /download again.");
+        return;
+    }
+  } catch (e) {
+    console.error("callback error", action, e);
+    await answerCallback(cb.id, "Something went wrong.");
+  }
+}
+
+async function handleUpdate(update: any) {
+  if (update.callback_query) return handleCallback(update.callback_query);
+  const msg = update.message ?? update.edited_message;
+  if (!msg?.chat?.id) return;
+  return handleMessage(msg);
+}
 
 // ---------- Route ----------
 export const Route = createFileRoute("/api/public/telegram/webhook")({
@@ -421,8 +754,6 @@ export const Route = createFileRoute("/api/public/telegram/webhook")({
         if (!update) return new Response("Bad Request", { status: 400 });
 
         try {
-          // Wait for the reply/send work to finish before acknowledging the webhook.
-          // Serverless requests can stop background promises after the response is returned.
           await handleUpdate(update);
         } catch (e) {
           console.error("telegram handleUpdate error", e);
