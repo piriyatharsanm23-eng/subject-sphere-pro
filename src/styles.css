@@ -212,6 +212,20 @@
   100% { opacity: 1; transform: translateY(0); }
 }
 
+@media (max-width: 767px) {
+  html, body, * {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar,
+  *::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+}
+
 @utility bg-hero { background: var(--gradient-hero); }
 @utility bg-card-soft { background: var(--gradient-card); }
 @utility bg-primary-gradient { background: var(--gradient-primary); }
