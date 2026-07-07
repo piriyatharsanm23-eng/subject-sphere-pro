@@ -160,7 +160,7 @@ function ContributorProfile() {
               ) : (materials.data ?? []).length === 0 ? (
                 <EmptyRow text="No materials uploaded yet." />
               ) : (
-                <div className="grid gap-3">
+                <div className="grid grid-cols-1 gap-3">
                   {(materials.data ?? []).map((m) => (
                     <Link
                       key={m.id}
@@ -196,7 +196,7 @@ function ContributorProfile() {
               ) : (deadlines.data ?? []).length === 0 ? (
                 <EmptyRow text="No deadlines created yet." />
               ) : (
-                <div className="grid gap-3">
+                <div className="grid grid-cols-1 gap-3">
                   {(deadlines.data ?? []).map((d) => (
                     <Link
                       key={d.id}
