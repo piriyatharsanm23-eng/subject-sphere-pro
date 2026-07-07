@@ -84,6 +84,28 @@ function Body() {
         ]}
       />
 
+      {/* Section: Kuppi videos */}
+      <Guide
+        icon={<Video className="h-5 w-5" />}
+        title="Add a Kuppi (peer-led revision) video"
+        to="/admin/kuppi"
+        steps={[
+          "Open Kuppi videos → New Kuppi.",
+          "Pick the subject, add a clear title, and choose the medium — සිංහල, தமிழ் or English.",
+          "Paste the YouTube, OneDrive or DMS link. YouTube links play inline; other links open in a new tab.",
+          "Add the presenter's name (required). Add a photo URL if you have one — otherwise the initials appear.",
+          "Write the sections covered (e.g. 'Chapter 3 §3.1 – 3.4') and a short description. Save.",
+          "Students can filter Kuppi by Sinhala or Tamil on the subject page and watch inline.",
+        ]}
+        tips={[
+          "Use the presenter's full name consistently — the Contributors page groups Kuppi history by presenter name.",
+          "Keep titles short and specific to the topic covered, not just a week number.",
+          "For OneDrive/DMS, make sure the share link works without sign-in.",
+        ]}
+      />
+
+
+
       {/* Section: Module requests */}
       <Guide
         icon={<BookPlus className="h-5 w-5" />}
