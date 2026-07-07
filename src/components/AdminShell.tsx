@@ -45,6 +45,10 @@ export function AdminShell({
   const [state, setState] = useState<"checking" | "denied" | "no-semester" | "ok">("checking");
   const [ctx, setCtx] = useState<AdminContext | null>(null);
 
+  const [semesterId, setSemesterIdState] = useState<string | null>(null);
+  const [semesters, setSemesters] = useState<AdminSemester[]>([]);
+  const [meta, setMeta] = useState<{ userId: string; isSuper: boolean } | null>(null);
+
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -59,41 +63,55 @@ export function AdminShell({
         .eq("user_id", uid);
 
       if (!mounted) return;
-      const adminRow = (roles ?? []).find((r) => r.role === "admin");
+      const adminRows = (roles ?? []).filter((r) => r.role === "admin" && r.assigned_semester_id);
       const superRow = (roles ?? []).find((r) => r.role === "super_admin");
 
-      if (!adminRow && !superRow && !isSuper) {
+      if (adminRows.length === 0 && !superRow && !isSuper) {
         setState("denied");
         return;
       }
 
-      let semesterId = adminRow?.assigned_semester_id ?? null;
-      // Super admins without an assignment fall back to the newest active semester
-      if (!semesterId) {
-        const { data: sem } = await supabase
-          .from("semesters")
-          .select("id")
-          .eq("is_active", true)
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .maybeSingle();
-        semesterId = sem?.id ?? null;
+      let list: AdminSemester[] = [];
+      if (isSuper || superRow) {
+        const { data: all } = await supabase.from("semesters").select("id,name").order("name");
+        list = all ?? [];
+      } else {
+        const ids = adminRows.map((r) => r.assigned_semester_id!).filter(Boolean);
+        if (ids.length > 0) {
+          const { data: sems } = await supabase.from("semesters").select("id,name").in("id", ids).order("name");
+          list = sems ?? [];
+        }
       }
-      if (!semesterId) { setState("no-semester"); return; }
+      if (!mounted) return;
+      if (list.length === 0) { setState("no-semester"); return; }
 
-      const { data: semRow } = await supabase
-        .from("semesters").select("id,name").eq("id", semesterId).maybeSingle();
+      const saved = typeof window !== "undefined" ? localStorage.getItem("admin.semesterId") : null;
+      const initial = list.find((s) => s.id === saved)?.id ?? list[0].id;
 
-      setCtx({
-        userId: uid,
-        semesterId,
-        semesterName: semRow?.name ?? "Semester",
-        isSuper: !!isSuper,
-      });
+      setSemesters(list);
+      setSemesterIdState(initial);
+      setMeta({ userId: uid, isSuper: !!isSuper });
       setState("ok");
     })();
     return () => { mounted = false; };
   }, [navigate]);
+
+  const setSemesterId = (id: string) => {
+    setSemesterIdState(id);
+    if (typeof window !== "undefined") localStorage.setItem("admin.semesterId", id);
+  };
+
+  const ctx: AdminContext | null = meta && semesterId
+    ? {
+        userId: meta.userId,
+        semesterId,
+        semesterName: semesters.find((s) => s.id === semesterId)?.name ?? "Semester",
+        isSuper: meta.isSuper,
+        semesters,
+        setSemesterId,
+      }
+    : null;
+
 
   const signOut = async () => {
     await supabase.auth.signOut();
