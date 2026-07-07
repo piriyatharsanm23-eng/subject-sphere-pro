@@ -95,7 +95,7 @@ function SubjectPage() {
     <div className="min-h-screen flex flex-col bg-muted/40">
       <SiteHeader />
       <main className="container mx-auto px-4 sm:px-6 py-8 flex-1 max-w-6xl w-full">
-        <Button asChild variant="ghost" size="sm" className="mb-4"><Link to="/dashboard"><ArrowLeft className="mr-2 h-4 w-4" /> Back to dashboard</Link></Button>
+        <Button asChild variant="ghost" size="sm" className="mb-4"><Link to="/"><ArrowLeft className="mr-2 h-4 w-4" /> Back to home</Link></Button>
 
         <header className="rounded-2xl border border-border bg-card-soft p-6 shadow-soft">
           {subjectQ.isLoading ? (

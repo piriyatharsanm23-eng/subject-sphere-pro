@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SuperRouteImport } from './routes/super'
 import { Route as SelectRouteImport } from './routes/select'
+import { Route as HelpRouteImport } from './routes/help'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContributorsRouteImport } from './routes/contributors'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -48,6 +49,11 @@ const SuperRoute = SuperRouteImport.update({
 const SelectRoute = SelectRouteImport.update({
   id: '/select',
   path: '/select',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HelpRoute = HelpRouteImport.update({
+  id: '/help',
+  path: '/help',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -199,6 +205,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/contributors': typeof ContributorsRoute
   '/dashboard': typeof DashboardRoute
+  '/help': typeof HelpRoute
   '/select': typeof SelectRoute
   '/super': typeof SuperRouteWithChildren
   '/admin/deadlines': typeof AdminDeadlinesRoute
@@ -230,6 +237,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/contributors': typeof ContributorsRoute
   '/dashboard': typeof DashboardRoute
+  '/help': typeof HelpRoute
   '/select': typeof SelectRoute
   '/admin/deadlines': typeof AdminDeadlinesRoute
   '/admin/feedback': typeof AdminFeedbackRoute
@@ -262,6 +270,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/contributors': typeof ContributorsRoute
   '/dashboard': typeof DashboardRoute
+  '/help': typeof HelpRoute
   '/select': typeof SelectRoute
   '/super': typeof SuperRouteWithChildren
   '/admin/deadlines': typeof AdminDeadlinesRoute
@@ -296,6 +305,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/contributors'
     | '/dashboard'
+    | '/help'
     | '/select'
     | '/super'
     | '/admin/deadlines'
@@ -327,6 +337,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/contributors'
     | '/dashboard'
+    | '/help'
     | '/select'
     | '/admin/deadlines'
     | '/admin/feedback'
@@ -358,6 +369,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/contributors'
     | '/dashboard'
+    | '/help'
     | '/select'
     | '/super'
     | '/admin/deadlines'
@@ -391,6 +403,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ContributorsRoute: typeof ContributorsRoute
   DashboardRoute: typeof DashboardRoute
+  HelpRoute: typeof HelpRoute
   SelectRoute: typeof SelectRoute
   SuperRoute: typeof SuperRouteWithChildren
   ContributorsIdRoute: typeof ContributorsIdRoute
@@ -416,6 +429,13 @@ declare module '@tanstack/react-router' {
       path: '/select'
       fullPath: '/select'
       preLoaderRoute: typeof SelectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/help': {
+      id: '/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof HelpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -671,6 +691,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ContributorsRoute: ContributorsRoute,
   DashboardRoute: DashboardRoute,
+  HelpRoute: HelpRoute,
   SelectRoute: SelectRoute,
   SuperRoute: SuperRouteWithChildren,
   ContributorsIdRoute: ContributorsIdRoute,
@@ -684,13 +705,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

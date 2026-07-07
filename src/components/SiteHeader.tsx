@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { GraduationCap, Settings, LogIn, Users, Menu, LayoutDashboard } from "lucide-react";
+import { GraduationCap, Settings, LogIn, Users, Menu, LayoutDashboard, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useState } from "react";
@@ -8,6 +8,7 @@ import { GlobalSearch, SearchTrigger, useGlobalSearch } from "@/components/Globa
 const NAV = [
   { to: "/dashboard" as const, label: "Dashboard", icon: LayoutDashboard },
   { to: "/contributors" as const, label: "Contributors", icon: Users },
+  { to: "/help" as const, label: "Help", icon: HelpCircle },
   { to: "/select" as const, label: "Preferences", icon: Settings },
 ];
 

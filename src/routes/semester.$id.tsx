@@ -1,8 +1,9 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, ArrowRight, BookOpen, CalendarClock, FileText, Layers, NotebookPen, ScrollText } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, CalendarClock, FileText, Layers, NotebookPen, ScrollText, Users } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { supabase } from "@/integrations/supabase/client";
@@ -69,6 +70,18 @@ function SemesterPage() {
     },
   });
 
+  const contributorsQ = useQuery({
+    queryKey: ["semester-contributors", id],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("public_contributors")
+        .select("id, full_name, avatar_url")
+        .eq("assigned_semester_id", id);
+      if (error) throw error;
+      return (data ?? []) as { id: string; full_name: string | null; avatar_url: string | null }[];
+    },
+  });
+
   const subjects = subjectsQ.data ?? [];
   const materials = materialsQ.data ?? [];
   const deadlines = deadlinesQ.data ?? [];
@@ -125,6 +138,41 @@ function SemesterPage() {
             <Stat icon={CalendarClock} label="Deadlines" value={totals.deadlines} tone="text-rose-500" />
           </div>
         </header>
+
+        {(contributorsQ.data ?? []).length > 0 && (
+          <section className="mt-6 rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-soft">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-semibold text-muted-foreground">
+                <Users className="h-3.5 w-3.5" /> Contributors
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                {(contributorsQ.data ?? []).map((c) => (
+                  <Link
+                    key={c.id}
+                    to="/contributors/$id"
+                    params={{ id: c.id }}
+                    className="group inline-flex items-center gap-2 rounded-full border border-border bg-muted/40 hover:border-primary/40 hover:bg-primary/5 pl-1 pr-3 py-1 transition-all"
+                  >
+                    <Avatar className="h-6 w-6">
+                      {c.avatar_url ? <AvatarImage src={c.avatar_url} alt={c.full_name ?? "Admin"} /> : null}
+                      <AvatarFallback className="bg-primary/10 text-primary text-[10px] font-semibold">
+                        {(c.full_name ?? "?").trim().split(/\s+/).slice(0, 2).map((p) => p[0]?.toUpperCase() ?? "").join("") || "?"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-xs font-medium group-hover:text-primary transition-colors">
+                      {c.full_name ?? "Admin"}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+              <Link to="/contributors" className="ml-auto text-xs text-primary hover:underline">
+                View all
+              </Link>
+            </div>
+          </section>
+        )}
+
+
 
         <section className="mt-8">
           <h2 className="text-lg font-semibold mb-3">Subjects</h2>
