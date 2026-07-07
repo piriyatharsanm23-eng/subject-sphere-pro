@@ -236,12 +236,7 @@ export function AIExplainDialog({
               </div>
             </div>
           )}
-          {!mut.isPending && result && (
-            <article
-              className="prose prose-invert max-w-none text-sm"
-              dangerouslySetInnerHTML={{ __html: renderMd(result.explanation) }}
-            />
-          )}
+          {!mut.isPending && result && <MdView>{result.explanation}</MdView>}
         </div>
 
         <div className="flex flex-wrap items-center gap-2 px-4 sm:px-5 py-3 border-t border-border">
