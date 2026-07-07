@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import {
   Upload,
   CalendarClock,
@@ -9,11 +10,14 @@ import {
   Sparkles,
   LifeBuoy,
   Mail,
+  Phone,
   ArrowRight,
   Video,
 } from "lucide-react";
 import { AdminShell } from "@/components/AdminShell";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { supabase } from "@/integrations/supabase/client";
 
 const SUPPORT_EMAIL = "piriyatharsan2611@gmail.com";
 
