@@ -1,5 +1,4 @@
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 
 export type AIProvider = "chatgpt" | "gemini";
 
@@ -8,58 +7,58 @@ const PROVIDER_LABEL: Record<AIProvider, string> = {
   gemini: "Gemini",
 };
 
-/** ChatGPT supports ?q= to prefill and auto-send the first message.
- *  Gemini's public web UI does NOT support any URL prefill, so we just
- *  open a new chat and rely on the clipboard for the prompt.            */
-function providerUrl(provider: AIProvider, prompt: string): string {
-  if (provider === "chatgpt") {
-    return `https://chatgpt.com/?q=${encodeURIComponent(prompt)}`;
-  }
-  return "https://gemini.google.com/app";
-}
-
 function buildPrompt(input: {
   materialTitle: string;
   materialType: string;
   subject?: string | null;
   semester?: string | null;
   fileName?: string | null;
+  fileUrl?: string | null;
 }) {
-  const { materialTitle, materialType, subject, semester, fileName } = input;
-  return `I am a university student. I have attached the PDF "${fileName ?? "material.pdf"}". Please teach me it completely and clearly.
+  const { materialTitle, materialType, subject, semester, fileName, fileUrl } = input;
+  const link = fileUrl && fileUrl.length > 0 ? fileUrl : "PDF/file link not available";
+  return `I am a university student. I want you to teach me this PDF/lecture material completely and clearly.
 
 Material details:
-- Title: ${materialTitle}
-- Subject: ${subject ?? "Unknown"}
-- Semester: ${semester ?? "Unknown"}
-- Material type: ${materialType}
+Title: ${materialTitle}
+Subject: ${subject ?? "Unknown"}
+Semester: ${semester ?? "Unknown"}
+Material type: ${materialType}
+File name: ${fileName ?? "Unknown"}
+PDF/file link: ${link}
 
-Explain the whole PDF without missing important content, in simple student-friendly English. Follow this structure:
-1. Short overview of the PDF.
-2. Every major heading/topic in order.
-3. Clear theory for each topic.
-4. All formulas with the meaning of each symbol (use LaTeX).
-5. How to substitute values for any calculations.
-6. Small easy examples for difficult concepts.
-7. Diagrams, graphs, tables and flowcharts if present.
-8. Important definitions.
-9. Exam-important points.
-10. Common viva questions with speaking-style answers.
-11. Possible short-answer questions.
-12. Possible long-answer questions.
-13. Final quick revision summary.
+Please explain the whole material without missing important content.
+I need the explanation in simple student-friendly English.
 
-Do not skip small points. Teach me like I am preparing for a quiz or exam.`;
+Follow this structure:
+1. First give a short overview of what this material is about.
+2. Then explain every major heading/topic in order.
+3. For each topic, explain the theory clearly.
+4. Explain all formulas with the meaning of each symbol.
+5. Show how to substitute values if there are calculations.
+6. Give small easy examples for difficult concepts.
+7. Explain diagrams, graphs, tables, and flowcharts if they are in the PDF.
+8. Mention important definitions.
+9. Mention exam-important points.
+10. Give common viva questions and simple speaking-style answers.
+11. Give possible short-answer questions.
+12. Give possible long-answer questions.
+13. At the end, give a final quick revision summary.
+14. Do not skip small points.
+15. If you cannot access the PDF/file link, ask me to upload the PDF manually.
+
+Teach me like I am preparing for a quiz or exam.`;
+}
+
+function providerUrl(provider: AIProvider, encoded: string): string {
+  if (provider === "chatgpt") return `https://chatgpt.com/?q=${encoded}`;
+  return `https://gemini.google.com/app?prompt=${encoded}`;
 }
 
 /**
- * Opens ChatGPT (with the prompt pre-filled) or Gemini (empty chat, prompt on
- * clipboard) in a new browser tab, and starts a PDF download of the material
- * so the student can drag it straight into the attach box.
- *
- * ⚠ Neither ChatGPT nor Gemini allow attaching a file via URL parameters, so
- * the PDF must be attached manually by the student in the opened tab.
- * This uses the student's own AI account — it consumes ZERO Lovable credits.
+ * Opens ChatGPT or Gemini in a new tab with the study prompt prefilled via URL.
+ * Also copies the prompt to clipboard in the background as a fallback.
+ * Uses the student's own AI account — consumes ZERO Lovable credits.
  */
 export async function openExternalAIExplain(
   provider: AIProvider,
@@ -79,10 +78,12 @@ export async function openExternalAIExplain(
     subject: material.subject,
     semester: material.semester,
     fileName: material.file_name,
+    fileUrl: material.file_url,
   });
 
-  // Copy the prompt so Gemini users can paste; ChatGPT prefills via ?q= but
-  // we still copy as a backup.
+  const encoded = encodeURIComponent(prompt);
+
+  // Background clipboard copy as fallback (especially for Gemini).
   try {
     if (typeof navigator !== "undefined" && navigator.clipboard) {
       await navigator.clipboard.writeText(prompt);
@@ -91,36 +92,16 @@ export async function openExternalAIExplain(
     // ignore — clipboard blocked
   }
 
-  // Open the AI provider in a new tab
   if (typeof window !== "undefined") {
-    window.open(providerUrl(provider, prompt), "_blank", "noopener,noreferrer");
+    window.open(providerUrl(provider, encoded), "_blank", "noopener,noreferrer");
   }
 
-  // Trigger a download of the PDF so the student has the exact file ready to
-  // attach in the AI tab. Done best-effort — never block or fail loudly.
-  if (material.file_url) {
-    try {
-      const { data } = await supabase.storage
-        .from("learning-materials")
-        .createSignedUrl(material.file_url, 60 * 5);
-      if (data?.signedUrl) {
-        const a = document.createElement("a");
-        a.href = data.signedUrl;
-        a.download = material.file_name ?? "material.pdf";
-        a.rel = "noopener";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-      }
-    } catch (e) {
-      console.error("PDF download for AI attach failed", e);
-    }
+  if (provider === "gemini") {
+    toast.success("Study prompt prepared", {
+      description:
+        "If Gemini does not show it automatically, paste it manually.",
+    });
+  } else {
+    toast.success(`${PROVIDER_LABEL[provider]} opened in a new tab`);
   }
-
-  toast.success(`${PROVIDER_LABEL[provider]} opened in a new tab`, {
-    description:
-      provider === "chatgpt"
-        ? `Prompt is prefilled. Attach the downloaded "${material.file_name ?? "PDF"}" and press send.`
-        : `Prompt was copied. Paste it, attach the downloaded "${material.file_name ?? "PDF"}", and press send.`,
-  });
 }
