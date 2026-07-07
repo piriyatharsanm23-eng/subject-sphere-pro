@@ -24,6 +24,7 @@ export const Route = createFileRoute("/admin/requests")({
 type Req = {
   id: string; request_text: string; status: string;
   semester_id: string | null; subject_id: string | null; created_at: string;
+  material_id: string | null; issue_type: string | null;
 };
 
 const STATUSES = ["pending", "in_review", "resolved", "rejected"] as const;
