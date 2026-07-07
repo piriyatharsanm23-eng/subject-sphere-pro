@@ -218,14 +218,8 @@ const HELP_TEXT = [
   "/change_subjects — change your enrolled subjects",
   "/my_subjects — show your enrolled subjects",
   "/deadlines — upcoming deadlines",
-  "/help — this menu",
-  "",
-  "<b>Enrollment (text)</b>",
-  "/semesters — list semesters",
-  "/semester &lt;n&gt; — pick semester by number",
-  "/subjects — list subjects and toggle with /enroll &lt;n&gt;",
-  "/enrollall — enroll in every subject in the semester",
   "/stop — unsubscribe",
+  "/help — this menu",
 ].join("\n");
 
 async function showMainMenu(chatId: number) {
@@ -465,109 +459,99 @@ async function showSubjectDeadlines(chatId: number, messageId: number, subjectId
   return editMessage(chatId, messageId, text, kb);
 }
 
-// ---------- Text command helpers (existing enrollment) ----------
-async function cmdSemesters(chatId: number) {
+// ---------- Enrollment (inline buttons) ----------
+async function showEnrollSemesters(chatId: number, messageId?: number, mode: "enroll" | "change" = "enroll") {
   const sems = await listSemesters();
-  if (sems.length === 0) return sendMessage(chatId, "No active semesters yet.");
-  const lines = sems.map((s, i) => `<b>${i + 1}.</b> ${escape(s.name)}`);
-  await sendMessage(
-    chatId,
-    `📅 <b>Active semesters</b>\n\n${lines.join("\n")}\n\nReply with <code>/semester &lt;number&gt;</code> to choose.`,
-  );
-}
-
-async function cmdSemesterPick(chatId: number, arg: string) {
-  const n = Number(arg);
-  const sems = await listSemesters();
-  if (!Number.isInteger(n) || n < 1 || n > sems.length) {
-    return sendMessage(chatId, "Usage: /semester <number> — see /semesters for the list.");
+  if (sems.length === 0) {
+    const t = "No active semesters yet.";
+    return messageId ? editMessage(chatId, messageId, t) : sendMessage(chatId, t);
   }
-  const chosen = sems[n - 1];
-  await sb()
-    .from("telegram_subscribers")
-    .update({ selected_semester_id: chosen.id, subject_ids: [] })
-    .eq("chat_id", chatId);
-  await sendMessage(
-    chatId,
-    `✅ Semester set to <b>${escape(chosen.name)}</b>.\n\nSend /subjects to view subjects, then <code>/enroll &lt;n&gt;</code> to toggle each one, or /enrollall.`,
-  );
+  const rows: Array<Array<Record<string, unknown>>> = sems.map((s) => [
+    { text: s.name, callback_data: `esp:${s.id}` },
+  ]);
+  rows.push([{ text: "❌ Cancel", callback_data: "x" }]);
+  const kb: Kb = { inline_keyboard: rows };
+  const title = mode === "change" ? "🔄 <b>Change subjects</b>" : "📚 <b>Enrollment</b>";
+  const text = `${title}\n\nStep 1 — pick your semester:`;
+  if (messageId) return editMessage(chatId, messageId, text, kb);
+  return sendMessage(chatId, text, { reply_markup: kb });
 }
 
-async function cmdSubjectsList(chatId: number) {
+async function showEnrollSubjects(chatId: number, messageId: number, semesterId: string) {
+  // Set selected semester if changing (only reset subjects when switching semester)
   const sub = await getSubscriber(chatId);
-  if (!sub?.selected_semester_id) return sendMessage(chatId, "Pick a semester first with /semesters.");
-  const subjects = await listSubjectsBySemester(sub.selected_semester_id);
-  if (subjects.length === 0) return sendMessage(chatId, "No subjects in your semester yet.");
-  const enrolled = new Set(((sub as any).subject_ids as string[]) ?? []);
-  const lines = subjects.map(
-    (s, i) => `${enrolled.has(s.id) ? "✅" : "▫️"} <b>${i + 1}.</b> ${escape(s.code ?? "")} — ${escape(s.name)}`,
-  );
-  await sendMessage(
+  if (sub?.selected_semester_id !== semesterId) {
+    await sb()
+      .from("telegram_subscribers")
+      .update({ selected_semester_id: semesterId, subject_ids: [] })
+      .eq("chat_id", chatId);
+  }
+
+  const subjects = await listSubjectsBySemester(semesterId);
+  if (subjects.length === 0) {
+    return editMessage(chatId, messageId, "No subjects in this semester yet.");
+  }
+  const enrolled = new Set(((sub as any)?.subject_ids as string[] | null) ?? []);
+  // If we just switched semesters, enrolled is empty
+  const effective = sub?.selected_semester_id === semesterId ? enrolled : new Set<string>();
+
+  const rows: Array<Array<Record<string, unknown>>> = subjects.map((s) => [
+    { text: `${effective.has(s.id) ? "✅" : "▫️"} ${s.name}`, callback_data: `est:${s.id}` },
+  ]);
+  rows.push([
+    { text: "✅ Enroll All", callback_data: `esa:${semesterId}` },
+    { text: "🧹 Clear All", callback_data: `esc:${semesterId}` },
+  ]);
+  rows.push([
+    { text: "🔙 Change Semester", callback_data: "en" },
+    { text: "✔️ Done", callback_data: "edn" },
+  ]);
+  const kb: Kb = { inline_keyboard: rows };
+  await editMessage(
     chatId,
-    `📖 <b>Subjects</b>\n\n${lines.join("\n")}\n\nToggle with <code>/enroll &lt;n&gt;</code>, or /enrollall.`,
+    messageId,
+    "📚 <b>Toggle your subjects</b>\n\nTap a subject to enroll/unenroll.",
+    kb,
   );
 }
 
-async function cmdEnrollToggle(chatId: number, arg: string) {
+async function toggleEnrollSubject(chatId: number, messageId: number, subjectId: string) {
   const sub = await getSubscriber(chatId);
-  if (!sub?.selected_semester_id) {
-    // No semester selected → show enrollment start
-    return cmdEnrollStart(chatId);
-  }
-  const n = Number(arg);
-  const subjects = await listSubjectsBySemester(sub.selected_semester_id);
-  if (!Number.isInteger(n) || n < 1 || n > subjects.length) {
-    if (!arg) return cmdEnrollStart(chatId);
-    return sendMessage(chatId, "Usage: /enroll <number> — see /subjects for the list.");
-  }
-  const s = subjects[n - 1];
+  if (!sub?.selected_semester_id) return showEnrollSemesters(chatId, messageId);
   const current = new Set(((sub as any).subject_ids as string[] | null) ?? []);
-  let removed = false;
-  if (current.has(s.id)) { current.delete(s.id); removed = true; } else current.add(s.id);
+  if (current.has(subjectId)) current.delete(subjectId);
+  else current.add(subjectId);
   await sb()
     .from("telegram_subscribers")
     .update({ subject_ids: Array.from(current) } as any)
     .eq("chat_id", chatId);
-  await sendMessage(
-    chatId,
-    removed
-      ? `➖ Unenrolled from <b>${escape(s.name)}</b>.`
-      : `➕ Enrolled in <b>${escape(s.name)}</b>. Use /my_subjects to review.`,
-  );
+  return showEnrollSubjects(chatId, messageId, sub.selected_semester_id);
 }
 
-async function cmdEnrollAll(chatId: number) {
-  const sub = await getSubscriber(chatId);
-  if (!sub?.selected_semester_id) return sendMessage(chatId, "Pick a semester first with /semesters.");
-  const subjects = await listSubjectsBySemester(sub.selected_semester_id);
-  if (subjects.length === 0) return sendMessage(chatId, "No subjects to enroll in.");
+async function enrollAllInSemester(chatId: number, messageId: number, semesterId: string) {
+  const subjects = await listSubjectsBySemester(semesterId);
   await sb()
     .from("telegram_subscribers")
-    .update({ subject_ids: subjects.map((s) => s.id) } as any)
+    .update({ selected_semester_id: semesterId, subject_ids: subjects.map((s) => s.id) } as any)
     .eq("chat_id", chatId);
-  await sendMessage(chatId, `✅ Enrolled in all <b>${subjects.length}</b> subjects.`);
+  return showEnrollSubjects(chatId, messageId, semesterId);
 }
 
-async function cmdEnrollStart(chatId: number) {
-  const sub = await getSubscriber(chatId);
-  if (sub?.selected_semester_id) {
-    await sendMessage(
-      chatId,
-      "📚 <b>Enrollment</b>\n\nSend /subjects to see subjects in your semester, then use <code>/enroll &lt;n&gt;</code> to toggle each one, or /enrollall.\n\nTo pick a different semester, send /semesters.",
-    );
-  } else {
-    await sendMessage(
-      chatId,
-      "📚 <b>Enrollment</b>\n\nStep 1: send /semesters and pick your semester with <code>/semester &lt;n&gt;</code>.\nStep 2: send /subjects and toggle each subject with <code>/enroll &lt;n&gt;</code>, or /enrollall.",
-    );
-  }
+async function clearEnrolledInSemester(chatId: number, messageId: number, semesterId: string) {
+  await sb()
+    .from("telegram_subscribers")
+    .update({ selected_semester_id: semesterId, subject_ids: [] } as any)
+    .eq("chat_id", chatId);
+  return showEnrollSubjects(chatId, messageId, semesterId);
 }
 
-async function cmdChangeSubjects(chatId: number) {
-  await sendMessage(
-    chatId,
-    "🔄 <b>Change subjects</b>\n\nSend /subjects to see your semester's subjects and toggle them with <code>/enroll &lt;n&gt;</code>.\n\nTo switch semester, send /semesters and pick with <code>/semester &lt;n&gt;</code> (this clears your subject list).",
-  );
+async function enrollDone(chatId: number, messageId: number) {
+  const subjects = await getEnrolledSubjects(chatId);
+  const text =
+    subjects.length === 0
+      ? "You have not selected any subjects. Send /enroll to try again."
+      : `✅ <b>Enrollment saved</b>\n\n${subjects.map((s: any) => `• ${escape(s.name)}`).join("\n")}\n\nUse /download to grab materials.`;
+  return editMessage(chatId, messageId, text);
 }
 
 async function cmdMySubjects(chatId: number) {
@@ -578,6 +562,7 @@ async function cmdMySubjects(chatId: number) {
   const lines = subjects.map((s: any) => `✅ ${escape(s.code ?? "")} — ${escape(s.name)}`);
   await sendMessage(chatId, `🎓 <b>Your subjects</b>\n\n${lines.join("\n")}`);
 }
+
 
 async function cmdDeadlines(chatId: number) {
   const subjects = await getEnrolledSubjects(chatId);
@@ -630,24 +615,13 @@ async function handleMessage(msg: any) {
     case "/materials":
       return showDownloadSubjects(chatId);
     case "/enroll":
-      if (arg) return cmdEnrollToggle(chatId, arg);
-      return cmdEnrollStart(chatId);
+      return showEnrollSemesters(chatId, undefined, "enroll");
     case "/change_subjects":
-      return cmdChangeSubjects(chatId);
+      return showEnrollSemesters(chatId, undefined, "change");
     case "/my_subjects":
-    case "/mysubjects":
-    case "/myenrollments":
       return cmdMySubjects(chatId);
     case "/deadlines":
       return cmdDeadlines(chatId);
-    case "/semesters":
-      return cmdSemesters(chatId);
-    case "/semester":
-      return cmdSemesterPick(chatId, arg);
-    case "/subjects":
-      return cmdSubjectsList(chatId);
-    case "/enrollall":
-      return cmdEnrollAll(chatId);
     case "/stop":
       return cmdStop(chatId);
     case "/adminalerts": {
@@ -699,12 +673,25 @@ async function handleCallback(cb: any) {
         return sendMaterial(chatId, parts[0]);
       case "en":
         await answerCallback(cb.id);
-        await cmdEnrollStart(chatId);
-        return;
+        return showEnrollSemesters(chatId, messageId, "enroll");
       case "cs":
         await answerCallback(cb.id);
-        await cmdChangeSubjects(chatId);
-        return;
+        return showEnrollSemesters(chatId, messageId, "change");
+      case "esp":
+        await answerCallback(cb.id);
+        return showEnrollSubjects(chatId, messageId, parts[0]);
+      case "est":
+        await answerCallback(cb.id);
+        return toggleEnrollSubject(chatId, messageId, parts[0]);
+      case "esa":
+        await answerCallback(cb.id, "Enrolled in all");
+        return enrollAllInSemester(chatId, messageId, parts[0]);
+      case "esc":
+        await answerCallback(cb.id, "Cleared");
+        return clearEnrolledInSemester(chatId, messageId, parts[0]);
+      case "edn":
+        await answerCallback(cb.id, "Saved");
+        return enrollDone(chatId, messageId);
       case "ms":
         await answerCallback(cb.id);
         await cmdMySubjects(chatId);
