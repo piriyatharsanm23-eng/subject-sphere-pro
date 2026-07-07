@@ -19,6 +19,7 @@ import {
 import { AdminShell, type AdminContext } from "@/components/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
 import { buildMaterialStoragePath, logActivity } from "@/lib/activity";
+import { notifyDeadlineCreated } from "@/lib/notify-deadline.functions";
 
 export const Route = createFileRoute("/admin/deadlines")({
   head: () => ({ meta: [{ title: "Deadlines — Admin" }] }),
