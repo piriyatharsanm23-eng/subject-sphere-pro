@@ -7,6 +7,22 @@ import type { Database } from "@/integrations/supabase/types";
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/telegram";
 const SITE_URL = "https://subject-sphere-pro.lovable.app";
 const PAGE_SIZE = 8;
+const TIME_ZONE = "Asia/Colombo";
+
+function formatDeadline(iso: string) {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso;
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone: TIME_ZONE,
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  }).format(d);
+}
 
 const MATERIAL_TYPES: { key: string; label: string; emoji: string }[] = [
   { key: "lecture_slide", label: "Lecture Slides", emoji: "📘" },
