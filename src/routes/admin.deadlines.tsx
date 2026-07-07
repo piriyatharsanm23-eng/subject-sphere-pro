@@ -19,6 +19,7 @@ import {
 import { AdminShell, type AdminContext } from "@/components/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
 import { buildMaterialStoragePath, logActivity } from "@/lib/activity";
+import { notifyDeadlineCreated } from "@/lib/notify-deadline.functions";
 
 export const Route = createFileRoute("/admin/deadlines")({
   head: () => ({ meta: [{ title: "Deadlines — Admin" }] }),
@@ -297,6 +298,14 @@ function DeadlineDialog({
           semester_id: ctx.semesterId, subject_id: subjectId,
         });
         toast.success("Deadline created");
+        if (data?.id) {
+          try {
+            const res = await notifyDeadlineCreated({ data: { deadlineId: data.id } });
+            if (res?.sent) toast.success(`Notified ${res.sent} Telegram subscriber${res.sent === 1 ? "" : "s"}`);
+          } catch (err) {
+            console.error("telegram notify failed", err);
+          }
+        }
       }
       onSaved();
     } catch (e) {

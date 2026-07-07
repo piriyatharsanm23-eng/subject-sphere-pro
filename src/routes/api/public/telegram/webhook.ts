@@ -7,6 +7,22 @@ import type { Database } from "@/integrations/supabase/types";
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/telegram";
 const SITE_URL = "https://subject-sphere-pro.lovable.app";
 const PAGE_SIZE = 8;
+const TIME_ZONE = "Asia/Colombo";
+
+function formatDeadline(iso: string) {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso;
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone: TIME_ZONE,
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  }).format(d);
+}
 
 const MATERIAL_TYPES: { key: string; label: string; emoji: string }[] = [
   { key: "lecture_slide", label: "Lecture Slides", emoji: "📘" },
@@ -441,7 +457,7 @@ async function showSubjectDeadlines(chatId: number, messageId: number, subjectId
     const days = Math.floor(diff / DAY);
     const hours = Math.floor((diff % DAY) / (60 * 60 * 1000));
     const remaining = diff < DAY ? `${Math.max(1, Math.floor(diff / (60 * 60 * 1000)))}h left` : `${days}d ${hours}h left`;
-    const when = new Date(d.deadline_at as string).toUTCString();
+    const when = formatDeadline(d.deadline_at as string);
     const line = `• <b>${escape(d.title)}</b>\n  ${when} — ${remaining}${d.description ? `\n  ${escape(d.description)}` : ""}`;
     if (diff < DAY) buckets.today.push(line);
     else if (diff < 2 * DAY) buckets.tomorrow.push(line);
@@ -579,7 +595,7 @@ async function cmdDeadlines(chatId: number) {
     .limit(20);
   if (!data || data.length === 0) return sendMessage(chatId, "🎉 No upcoming deadlines.");
   const lines = data.map(
-    (d: any) => `⏰ <b>${escape(d.title)}</b> — ${escape(d.subjects?.name ?? "")}\n   ${new Date(d.deadline_at).toUTCString()}`,
+    (d: any) => `⏰ <b>${escape(d.title)}</b> — ${escape(d.subjects?.name ?? "")}\n   ${formatDeadline(d.deadline_at)}`,
   );
   await sendMessage(chatId, `📌 <b>Upcoming deadlines</b>\n\n${lines.join("\n\n")}`);
 }
