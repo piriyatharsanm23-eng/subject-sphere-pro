@@ -10,13 +10,13 @@ export const MATERIAL_TYPES = [
 export type MaterialType = typeof MATERIAL_TYPES[number]["value"];
 
 export function materialTypeLabel(t: string) {
-  // legacy "lecture_slide" rows are shown as Tutorials to match the updated catalog
-  if (t === "lecture_slide") return "Tutorial";
-  return MATERIAL_TYPES.find((m) => m.value === t)?.label ?? "Tutorial";
+  // legacy "lecture_slide" rows are shown as Notes in the updated catalog
+  if (t === "lecture_slide") return "Notes";
+  return MATERIAL_TYPES.find((m) => m.value === t)?.label ?? "Notes";
 }
 export function materialTypeBadge(t: string) {
-  if (t === "lecture_slide") return MATERIAL_TYPES[3].badge;
-  return MATERIAL_TYPES.find((m) => m.value === t)?.badge ?? MATERIAL_TYPES[3].badge;
+  if (t === "lecture_slide") return MATERIAL_TYPES[0].badge;
+  return MATERIAL_TYPES.find((m) => m.value === t)?.badge ?? MATERIAL_TYPES[0].badge;
 }
 
 export async function downloadMaterial(material: { id: string; file_url: string; file_name: string | null }) {
