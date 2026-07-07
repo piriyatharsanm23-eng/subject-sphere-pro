@@ -13,6 +13,10 @@ import {
   Clock,
   Layers,
   ShieldCheck,
+  HelpCircle,
+  Send,
+  Search,
+  CheckCircle2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/SiteHeader";
