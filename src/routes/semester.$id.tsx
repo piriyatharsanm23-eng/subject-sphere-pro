@@ -70,6 +70,18 @@ function SemesterPage() {
     },
   });
 
+  const contributorsQ = useQuery({
+    queryKey: ["semester-contributors", id],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("public_contributors")
+        .select("id, full_name, avatar_url")
+        .eq("assigned_semester_id", id);
+      if (error) throw error;
+      return (data ?? []) as { id: string; full_name: string | null; avatar_url: string | null }[];
+    },
+  });
+
   const subjects = subjectsQ.data ?? [];
   const materials = materialsQ.data ?? [];
   const deadlines = deadlinesQ.data ?? [];
