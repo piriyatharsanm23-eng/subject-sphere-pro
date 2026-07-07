@@ -728,6 +728,20 @@ export type Database = {
           id: string | null
           phone: string | null
         }
+        Insert: {
+          avatar_url?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string | null
+          phone?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string | null
+          phone?: string | null
+        }
         Relationships: []
       }
     }
