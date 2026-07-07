@@ -136,13 +136,13 @@ function SubjectPage() {
         </header>
 
         <Tabs defaultValue="note" className="mt-6">
-          <TabsList className="flex-wrap h-auto">
-            <TabsTrigger value="note">Notes ({groups.note.length})</TabsTrigger>
-            <TabsTrigger value="past_paper">Past Papers ({groups.past_paper.length})</TabsTrigger>
-            <TabsTrigger value="assignment">Assignments ({groups.assignment.length})</TabsTrigger>
-            <TabsTrigger value="other">Tutorials ({groups.other.length})</TabsTrigger>
-            <TabsTrigger value="kuppi">Kuppi ({(kuppiQ.data ?? []).length})</TabsTrigger>
-            <TabsTrigger value="deadlines">Deadlines ({(deadlinesQ.data ?? []).length})</TabsTrigger>
+          <TabsList className="grid grid-cols-3 h-auto w-full gap-1 sm:flex sm:flex-wrap sm:w-auto">
+            <TabsTrigger value="note" className="text-xs sm:text-sm">Notes ({groups.note.length})</TabsTrigger>
+            <TabsTrigger value="past_paper" className="text-xs sm:text-sm">Papers ({groups.past_paper.length})</TabsTrigger>
+            <TabsTrigger value="assignment" className="text-xs sm:text-sm">Assign. ({groups.assignment.length})</TabsTrigger>
+            <TabsTrigger value="other" className="text-xs sm:text-sm">Tutorials ({groups.other.length})</TabsTrigger>
+            <TabsTrigger value="kuppi" className="text-xs sm:text-sm">Kuppi ({(kuppiQ.data ?? []).length})</TabsTrigger>
+            <TabsTrigger value="deadlines" className="text-xs sm:text-sm">Deadlines ({(deadlinesQ.data ?? []).length})</TabsTrigger>
           </TabsList>
 
           {(["note","assignment","other"] as const).map((t) => (
