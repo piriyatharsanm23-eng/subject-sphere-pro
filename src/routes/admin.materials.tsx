@@ -30,7 +30,7 @@ type Material = {
   year: string | null; week_or_module: string | null;
   semester_id: string; subject_id: string;
   file_url: string; file_name: string | null;
-  download_count: number; is_archived: boolean; created_at: string;
+  is_archived: boolean; created_at: string;
 };
 
 function AdminMaterialsRoute() {
@@ -65,7 +65,7 @@ function MaterialsPage({ ctx }: { ctx: AdminContext }) {
     queryFn: async () => {
       let qb = supabase
         .from("materials")
-        .select("id,title,description,material_type,year,week_or_module,semester_id,subject_id,file_url,file_name,download_count,is_archived,created_at")
+        .select("id,title,description,material_type,year,week_or_module,semester_id,subject_id,file_url,file_name,is_archived,created_at")
         .eq("semester_id", ctx.semesterId)
         .order("created_at", { ascending: false })
         .limit(500);
@@ -214,7 +214,7 @@ function MaterialsPage({ ctx }: { ctx: AdminContext }) {
                       {materialTypeLabel(m.material_type)}{m.year ? ` · ${m.year}` : ""}
                     </td>
                     <td className="px-4 py-3 text-muted-foreground text-xs">{subById[m.subject_id]?.name ?? "—"}</td>
-                    <td className="px-4 py-3 tabular-nums">{m.download_count}</td>
+                    
                     <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">{format(new Date(m.created_at), "MMM d, yyyy")}</td>
                     <td className="px-4 py-3 text-right whitespace-nowrap">
                       <Button size="sm" variant="ghost" onClick={() => downloadOne(m)} title="Download">

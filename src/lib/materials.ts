@@ -34,9 +34,4 @@ export async function downloadMaterial(material: { id: string; file_url: string;
   document.body.appendChild(a);
   a.click();
   a.remove();
-
-  const { error: insertError } = await supabase.from("downloads").insert({ material_id: material.id });
-  if (insertError) {
-    console.warn("[downloads] failed to record download", insertError);
-  }
 }
