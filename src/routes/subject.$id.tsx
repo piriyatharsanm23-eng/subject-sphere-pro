@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Calendar, Download, ExternalLink, Eye, FileText, Video, X } from "lucide-react";
+import { ArrowLeft, Bot, Calendar, Download, ExternalLink, Eye, FileText, Sparkles, Video, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -16,6 +16,8 @@ import { UploaderBadge, type UploaderInfo } from "@/components/UploaderBadge";
 import { useRealtimeInvalidate } from "@/hooks/useRealtimeInvalidate";
 import { KUPPI_MEDIUMS, mediumLabel, toYoutubeEmbed } from "@/lib/kuppi";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AIExplainDialog, type AIProvider } from "@/components/AIExplainDialog";
+import { useAISettings } from "@/hooks/useAISettings";
 
 export const Route = createFileRoute("/subject/$id")({
   head: () => ({ meta: [{ title: "Subject — StudyHub" }] }),
@@ -215,10 +217,15 @@ function MaterialList({
   uploaders: Record<string, UploaderInfo>;
 }) {
   const [previewing, setPreviewing] = useState<MaterialRow | null>(null);
+  const [aiTarget, setAiTarget] = useState<{ m: MaterialRow; provider: AIProvider } | null>(null);
+  const aiSettings = useAISettings().data;
+  const aiOn = !!aiSettings?.enabled;
+  const showChatGPT = aiOn && aiSettings?.chatgpt_enabled;
+  const showGemini = aiOn && aiSettings?.gemini_enabled;
   if (items.length === 0) return <Empty label="Nothing here yet" />;
   return (
     <>
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {items.map((m) => (
           <div key={m.id} className="rounded-2xl border border-border bg-card p-4 shadow-soft hover:shadow-elevated transition-shadow">
             <div className="flex items-center gap-2 flex-wrap">
@@ -228,36 +235,64 @@ function MaterialList({
             </div>
             <h4 className="mt-2 font-semibold">{m.title}</h4>
             {m.description && <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{m.description}</p>}
-            <div className="mt-3 flex items-center justify-between gap-2 flex-wrap">
-              <div className="flex flex-col gap-1 min-w-0">
-                <UploaderBadge uploader={m.uploaded_by ? uploaders[m.uploaded_by] : null} />
-                <div className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(m.created_at), { addSuffix: true })}</div>
-              </div>
-              <div className="flex gap-2">
-                <Button size="sm" variant="outline" onClick={() => setPreviewing(m)}>
-                  <Eye className="mr-2 h-4 w-4" />Preview
+            <div className="mt-3 min-w-0">
+              <UploaderBadge uploader={m.uploaded_by ? uploaders[m.uploaded_by] : null} />
+              <div className="text-xs text-muted-foreground mt-1">{formatDistanceToNow(new Date(m.created_at), { addSuffix: true })}</div>
+            </div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Button size="sm" variant="outline" onClick={() => setPreviewing(m)}>
+                <Eye className="mr-2 h-4 w-4" />Preview
+              </Button>
+              <Button size="sm" onClick={async () => {
+                const id = toast.loading("Preparing your download…");
+                try {
+                  await downloadMaterial(m);
+                  toast.success("Download started", { id });
+                } catch (err) {
+                  toast.error("Could not download", { id, description: (err as Error)?.message });
+                }
+              }}><Download className="mr-2 h-4 w-4" />Download</Button>
+              {showChatGPT && (
+                <Button size="sm" variant="secondary" onClick={() => setAiTarget({ m, provider: "chatgpt" })}>
+                  <Bot className="mr-2 h-4 w-4 text-emerald-400" />ChatGPT
                 </Button>
-                <Button size="sm" onClick={async () => {
-                  const id = toast.loading("Preparing your download…");
-                  try {
-                    await downloadMaterial(m);
-                    toast.success("Download started", { id });
-                  } catch (err) {
-                    toast.error("Could not download", { id, description: (err as Error)?.message });
-                  }
-                }}><Download className="mr-2 h-4 w-4" />Download</Button>
-              </div>
+              )}
+              {showGemini && (
+                <Button size="sm" variant="secondary" onClick={() => setAiTarget({ m, provider: "gemini" })}>
+                  <Sparkles className="mr-2 h-4 w-4 text-sky-400" />Gemini
+                </Button>
+              )}
             </div>
           </div>
         ))}
       </div>
 
-      <PreviewDialog material={previewing} onClose={() => setPreviewing(null)} />
+      <PreviewDialog material={previewing} onClose={() => setPreviewing(null)} onExplain={(p) => previewing && setAiTarget({ m: previewing, provider: p })} aiOn={aiOn} showChatGPT={!!showChatGPT} showGemini={!!showGemini} />
+      <AIExplainDialog
+        open={!!aiTarget}
+        onClose={() => setAiTarget(null)}
+        target={aiTarget ? { id: aiTarget.m.id, title: aiTarget.m.title, material_type: materialTypeLabel(aiTarget.m.material_type) } : null}
+        initialProvider={aiTarget?.provider ?? "chatgpt"}
+      />
     </>
   );
 }
 
-function PreviewDialog({ material, onClose }: { material: MaterialRow | null; onClose: () => void }) {
+function PreviewDialog({
+  material,
+  onClose,
+  onExplain,
+  aiOn,
+  showChatGPT,
+  showGemini,
+}: {
+  material: MaterialRow | null;
+  onClose: () => void;
+  onExplain?: (p: AIProvider) => void;
+  aiOn?: boolean;
+  showChatGPT?: boolean;
+  showGemini?: boolean;
+}) {
   const [signedUrl, setSignedUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -342,6 +377,28 @@ function PreviewDialog({ material, onClose }: { material: MaterialRow | null; on
             </Button>
           </div>
         </div>
+        {aiOn && (showChatGPT || showGemini) && onExplain && material && (
+          <div className="px-5 py-3 border-t border-border bg-muted/20">
+            <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+              <Sparkles className="h-3.5 w-3.5 text-primary" /> AI Study Helper
+            </div>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Get a complete explanation, formulas, examples, viva questions, and exam revision from this material.
+            </p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {showChatGPT && (
+                <Button size="sm" variant="secondary" onClick={() => onExplain("chatgpt")}>
+                  <Bot className="mr-2 h-4 w-4 text-emerald-400" /> Explain with ChatGPT
+                </Button>
+              )}
+              {showGemini && (
+                <Button size="sm" variant="secondary" onClick={() => onExplain("gemini")}>
+                  <Sparkles className="mr-2 h-4 w-4 text-sky-400" /> Explain with Gemini
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
