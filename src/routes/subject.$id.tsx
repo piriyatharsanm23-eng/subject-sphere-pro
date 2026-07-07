@@ -15,6 +15,7 @@ import { useUploaders } from "@/lib/uploaders";
 import { UploaderBadge, type UploaderInfo } from "@/components/UploaderBadge";
 import { useRealtimeInvalidate } from "@/hooks/useRealtimeInvalidate";
 import { KUPPI_MEDIUMS, mediumLabel, toYoutubeEmbed } from "@/lib/kuppi";
+import { KuppiPlayerDialog } from "@/components/KuppiPlayerDialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export const Route = createFileRoute("/subject/$id")({
@@ -409,38 +410,7 @@ function KuppiSection({ items }: { items: KuppiRow[] }) {
         </div>
       )}
 
-      <Dialog open={!!playing} onOpenChange={(o) => !o && setPlaying(null)}>
-        <DialogContent className="max-w-3xl w-[calc(100vw-2rem)] p-0 gap-0 overflow-hidden">
-          <DialogHeader className="px-5 py-3 border-b border-border">
-            <DialogTitle className="text-base flex items-center gap-2">
-              <Video className="h-4 w-4 text-primary" /> {playing?.title ?? "Kuppi"}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="bg-black aspect-video">
-            {playing && (() => {
-              const embed = toYoutubeEmbed(playing.video_url);
-              if (embed) return <iframe src={embed} title={playing.title} className="w-full h-full" allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen />;
-              return (
-                <div className="h-full grid place-items-center text-center px-6 text-white/80">
-                  <div>
-                    <ExternalLink className="mx-auto h-8 w-8" />
-                    <p className="mt-3 font-semibold">This video hosts outside YouTube.</p>
-                    <p className="mt-1 text-sm">Open it in a new tab to watch.</p>
-                    <Button asChild size="sm" className="mt-3">
-                      <a href={playing.video_url} target="_blank" rel="noopener">
-                        <ExternalLink className="mr-2 h-4 w-4" /> Open link
-                      </a>
-                    </Button>
-                  </div>
-                </div>
-              );
-            })()}
-          </div>
-          <div className="px-5 py-3 border-t border-border text-xs text-muted-foreground">
-            Presented by <b className="text-foreground">{playing?.presenter_name}</b>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <KuppiPlayerDialog item={playing} onClose={() => setPlaying(null)} />
     </>
   );
 }
