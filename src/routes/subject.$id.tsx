@@ -179,43 +179,150 @@ function SubjectPage() {
   );
 }
 
+type MaterialRow = {
+  id: string; title: string; description: string | null; material_type: string;
+  file_url: string; file_name: string | null; file_type?: string | null;
+  year: string | null; week_or_module: string | null;
+  created_at: string; download_count: number; uploaded_by: string | null;
+};
+
 function MaterialList({
   items,
   uploaders,
 }: {
-  items: { id: string; title: string; description: string | null; material_type: string; file_url: string; file_name: string | null; year: string | null; week_or_module: string | null; created_at: string; download_count: number; uploaded_by: string | null }[];
+  items: MaterialRow[];
   uploaders: Record<string, UploaderInfo>;
 }) {
+  const [previewing, setPreviewing] = useState<MaterialRow | null>(null);
   if (items.length === 0) return <Empty label="Nothing here yet" />;
   return (
-    <div className="grid gap-3 sm:grid-cols-2">
-      {items.map((m) => (
-        <div key={m.id} className="rounded-2xl border border-border bg-card p-4 shadow-soft hover:shadow-elevated transition-shadow">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${materialTypeBadge(m.material_type)}`}>{materialTypeLabel(m.material_type)}</span>
-            {m.week_or_module && <span className="text-xs text-muted-foreground">{m.week_or_module}</span>}
-            {m.year && <span className="text-xs text-muted-foreground">{m.year}</span>}
-          </div>
-          <h4 className="mt-2 font-semibold">{m.title}</h4>
-          {m.description && <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{m.description}</p>}
-          <div className="mt-3 flex items-center justify-between gap-2 flex-wrap">
-            <div className="flex flex-col gap-1 min-w-0">
-              <UploaderBadge uploader={m.uploaded_by ? uploaders[m.uploaded_by] : null} />
-              <div className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(m.created_at), { addSuffix: true })} · {m.download_count} downloads</div>
+    <>
+      <div className="grid gap-3 sm:grid-cols-2">
+        {items.map((m) => (
+          <div key={m.id} className="rounded-2xl border border-border bg-card p-4 shadow-soft hover:shadow-elevated transition-shadow">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${materialTypeBadge(m.material_type)}`}>{materialTypeLabel(m.material_type)}</span>
+              {m.week_or_module && <span className="text-xs text-muted-foreground">{m.week_or_module}</span>}
+              {m.year && <span className="text-xs text-muted-foreground">{m.year}</span>}
             </div>
-            <Button size="sm" onClick={async () => {
-              const id = toast.loading("Preparing your download…");
-              try {
-                await downloadMaterial(m);
-                toast.success("Download started", { id });
-              } catch (err) {
-                toast.error("Could not download", { id, description: (err as Error)?.message });
-              }
-            }}><Download className="mr-2 h-4 w-4" />Download</Button>
+            <h4 className="mt-2 font-semibold">{m.title}</h4>
+            {m.description && <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{m.description}</p>}
+            <div className="mt-3 flex items-center justify-between gap-2 flex-wrap">
+              <div className="flex flex-col gap-1 min-w-0">
+                <UploaderBadge uploader={m.uploaded_by ? uploaders[m.uploaded_by] : null} />
+                <div className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(m.created_at), { addSuffix: true })} · {m.download_count} downloads</div>
+              </div>
+              <div className="flex gap-2">
+                <Button size="sm" variant="outline" onClick={() => setPreviewing(m)}>
+                  <Eye className="mr-2 h-4 w-4" />Preview
+                </Button>
+                <Button size="sm" onClick={async () => {
+                  const id = toast.loading("Preparing your download…");
+                  try {
+                    await downloadMaterial(m);
+                    toast.success("Download started", { id });
+                  } catch (err) {
+                    toast.error("Could not download", { id, description: (err as Error)?.message });
+                  }
+                }}><Download className="mr-2 h-4 w-4" />Download</Button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <PreviewDialog material={previewing} onClose={() => setPreviewing(null)} />
+    </>
+  );
+}
+
+function PreviewDialog({ material, onClose }: { material: MaterialRow | null; onClose: () => void }) {
+  const [signedUrl, setSignedUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    setSignedUrl(null);
+    if (!material?.file_url) return;
+    setLoading(true);
+    supabase.storage
+      .from("learning-materials")
+      .createSignedUrl(material.file_url, 60 * 10)
+      .then(({ data }) => {
+        if (cancelled) return;
+        setSignedUrl(data?.signedUrl ?? null);
+        setLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [material?.file_url]);
+
+  const isPdf =
+    !!material &&
+    ((material.file_type ?? "").includes("pdf") ||
+      (material.file_name ?? "").toLowerCase().endsWith(".pdf"));
+  const isImage = !!material && (material.file_type ?? "").startsWith("image/");
+  const canPreview = !!signedUrl && (isPdf || isImage);
+
+  return (
+    <Dialog open={!!material} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-5xl w-[calc(100vw-2rem)] p-0 gap-0 overflow-hidden">
+        <DialogHeader className="px-5 py-3 border-b border-border">
+          <DialogTitle className="text-base truncate pr-8 flex items-center gap-2">
+            <FileText className="h-4 w-4 text-primary" />
+            {material?.title ?? "Preview"}
+          </DialogTitle>
+        </DialogHeader>
+        <div className="bg-muted/40 min-h-[70vh]">
+          {loading || !signedUrl ? (
+            <div className="h-[70vh] grid place-items-center text-sm text-muted-foreground">
+              Loading preview…
+            </div>
+          ) : canPreview ? (
+            isPdf ? (
+              <iframe src={signedUrl} title={material?.title ?? "Preview"} className="w-full h-[75vh] bg-background" />
+            ) : (
+              <img src={signedUrl} alt={material?.title ?? "Preview"} className="w-full max-h-[75vh] object-contain bg-background" />
+            )
+          ) : (
+            <div className="h-[70vh] grid place-items-center text-center px-6">
+              <div>
+                <FileText className="mx-auto h-8 w-8 text-muted-foreground" />
+                <p className="mt-3 font-semibold">Preview not supported</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {material?.file_name ?? "This file"} can't be shown here. Use Download to open it.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="flex items-center justify-between gap-2 px-5 py-3 border-t border-border">
+          <div className="text-xs text-muted-foreground truncate">
+            {material?.file_name}
+          </div>
+          <div className="flex gap-2">
+            {material && (
+              <Button
+                size="sm"
+                onClick={async () => {
+                  const id = toast.loading("Preparing your download…");
+                  try {
+                    await downloadMaterial(material);
+                    toast.success("Download started", { id });
+                  } catch (err) {
+                    toast.error("Could not download", { id, description: (err as Error)?.message });
+                  }
+                }}
+              >
+                <Download className="mr-2 h-4 w-4" /> Download
+              </Button>
+            )}
+            <Button size="sm" variant="ghost" onClick={onClose}>
+              <X className="mr-2 h-4 w-4" /> Close
+            </Button>
           </div>
         </div>
-      ))}
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
