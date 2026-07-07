@@ -270,7 +270,6 @@ function SuperAdminContacts() {
         Super admins can add or update their phone number from their <b>Profile</b> page.
       </p>
     </section>
-    </div>
   );
 }
 
