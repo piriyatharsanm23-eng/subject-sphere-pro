@@ -295,6 +295,72 @@ export type Database = {
           },
         ]
       }
+      module_requests: {
+        Row: {
+          code: string | null
+          created_at: string
+          created_subject_id: string | null
+          description: string | null
+          id: string
+          name: string
+          reason: string | null
+          requested_by: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          reviewer_note: string | null
+          semester_id: string
+          status: Database["public"]["Enums"]["module_request_status"]
+          updated_at: string
+        }
+        Insert: {
+          code?: string | null
+          created_at?: string
+          created_subject_id?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          reason?: string | null
+          requested_by: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_note?: string | null
+          semester_id: string
+          status?: Database["public"]["Enums"]["module_request_status"]
+          updated_at?: string
+        }
+        Update: {
+          code?: string | null
+          created_at?: string
+          created_subject_id?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          reason?: string | null
+          requested_by?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_note?: string | null
+          semester_id?: string
+          status?: Database["public"]["Enums"]["module_request_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "module_requests_created_subject_id_fkey"
+            columns: ["created_subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "module_requests_semester_id_fkey"
+            columns: ["semester_id"]
+            isOneToOne: false
+            referencedRelation: "semesters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_path: string | null
@@ -647,6 +713,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "super_admin"
+      module_request_status: "pending" | "accepted" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -775,6 +842,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "super_admin"],
+      module_request_status: ["pending", "accepted", "rejected"],
     },
   },
 } as const
