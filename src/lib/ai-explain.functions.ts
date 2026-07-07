@@ -43,6 +43,7 @@ Use Markdown formatting: use ## for major headings, ### for subheadings,
 (e.g. \`\`\`\nF = m * a\n\`\`\`).`;
 
 export const explainMaterial = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((data) =>
     z
       .object({
