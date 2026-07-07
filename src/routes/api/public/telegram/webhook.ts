@@ -101,7 +101,7 @@ async function ensureSubscriber(msg: any) {
 async function getSubscriber(chatId: number) {
   const { data } = await sb()
     .from("telegram_subscribers")
-    .select("chat_id,is_subscribed,selected_semester_id")
+    .select("chat_id,is_subscribed,selected_semester_id,subject_ids")
     .eq("chat_id", chatId)
     .maybeSingle();
   return data;
@@ -157,14 +157,8 @@ async function cmdSemesterPick(chatId: number, arg: string) {
   const chosen = sems[n - 1];
   await sb()
     .from("telegram_subscribers")
-    .update({ selected_semester_id: chosen.id })
+    .update({ selected_semester_id: chosen.id, subject_ids: [] })
     .eq("chat_id", chatId);
-  // reset enrollments from other semesters
-  await sb()
-    .from("telegram_subject_enrollments")
-    .delete()
-    .eq("chat_id", chatId)
-    .neq("semester_id", chosen.id);
   await sendMessage(
     chatId,
     `✅ Semester set to <b>${escape(chosen.name)}</b>.\n\nNow send /subjects to see subjects, then <code>/enroll &lt;n&gt;</code> to enroll.`,
@@ -188,10 +182,12 @@ async function cmdSubjects(chatId: number) {
 
 async function getEnrolledIds(chatId: number) {
   const { data } = await sb()
-    .from("telegram_subject_enrollments")
-    .select("subject_id")
-    .eq("chat_id", chatId);
-  return new Set((data ?? []).map((r) => r.subject_id));
+    .from("telegram_subscribers")
+    .select("subject_ids")
+    .eq("chat_id", chatId)
+    .maybeSingle();
+  const arr = (data as any)?.subject_ids as string[] | null;
+  return new Set(arr ?? []);
 }
 
 async function cmdEnroll(chatId: number, arg: string) {
@@ -203,21 +199,17 @@ async function cmdEnroll(chatId: number, arg: string) {
     return sendMessage(chatId, "Usage: /enroll <number> — see /subjects for the list.");
   }
   const s = subjects[n - 1];
-  const enrolled = await getEnrolledIds(chatId);
-  if (enrolled.has(s.id)) {
-    await sb()
-      .from("telegram_subject_enrollments")
-      .delete()
-      .eq("chat_id", chatId)
-      .eq("subject_id", s.id);
-    return sendMessage(chatId, `➖ Unenrolled from <b>${escape(s.name)}</b>.`);
-  }
-  await sb().from("telegram_subject_enrollments").insert({
-    chat_id: chatId,
-    subject_id: s.id,
-    semester_id: sub.selected_semester_id,
-  });
-  await sendMessage(chatId, `➕ Enrolled in <b>${escape(s.name)}</b>. Use /mysubjects to review.`);
+  const current = new Set(((sub as any).subject_ids as string[] | null) ?? []);
+  let removed = false;
+  if (current.has(s.id)) { current.delete(s.id); removed = true; } else current.add(s.id);
+  await sb()
+    .from("telegram_subscribers")
+    .update({ subject_ids: Array.from(current) } as any)
+    .eq("chat_id", chatId);
+  await sendMessage(
+    chatId,
+    removed ? `➖ Unenrolled from <b>${escape(s.name)}</b>.` : `➕ Enrolled in <b>${escape(s.name)}</b>. Use /mysubjects to review.`,
+  );
 }
 
 async function cmdEnrollAll(chatId: number) {
@@ -225,12 +217,10 @@ async function cmdEnrollAll(chatId: number) {
   if (!sub?.selected_semester_id) return sendMessage(chatId, "Pick a semester first with /semesters.");
   const subjects = await listSubjects(sub.selected_semester_id);
   if (subjects.length === 0) return sendMessage(chatId, "No subjects to enroll in.");
-  const rows = subjects.map((s) => ({
-    chat_id: chatId,
-    subject_id: s.id,
-    semester_id: sub.selected_semester_id!,
-  }));
-  await sb().from("telegram_subject_enrollments").upsert(rows, { onConflict: "chat_id,subject_id" });
+  await sb()
+    .from("telegram_subscribers")
+    .update({ subject_ids: subjects.map((s) => s.id) } as any)
+    .eq("chat_id", chatId);
   await sendMessage(chatId, `✅ Enrolled in all <b>${subjects.length}</b> subjects.`);
 }
 
@@ -291,7 +281,6 @@ async function sendMaterial(chatId: number, m: any) {
       parse_mode: "HTML",
     });
     if (res?.ok) {
-      await sb().from("downloads").insert({ material_id: m.id }).then(() => {}, () => {});
       return true;
     }
     // Fallback: send the link if Telegram couldn't fetch the file directly.

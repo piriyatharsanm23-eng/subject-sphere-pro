@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Users, GraduationCap } from "lucide-react";
+import { Users, GraduationCap, Video } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -83,11 +83,105 @@ function ContributorsPage() {
                 No contributors yet.
               </div>
             )}
+            <KuppiPresenters />
           </>
         )}
       </main>
       <SiteFooter />
     </div>
+  );
+}
+
+type KuppiPresenterRow = {
+  presenter_name: string;
+  presenter_photo_url: string | null;
+  semester_id: string;
+  subject_id: string;
+};
+
+function KuppiPresenters() {
+  const { data, isLoading } = useQuery({
+    queryKey: ["kuppi-presenters"],
+    queryFn: async () => {
+      const [{ data: k }, { data: sems }, { data: subs }] = await Promise.all([
+        (supabase as any)
+          .from("kuppi_videos")
+          .select("presenter_name,presenter_photo_url,semester_id,subject_id")
+          .order("presenter_name"),
+        supabase.from("semesters").select("id,name"),
+        supabase.from("subjects").select("id,name,code"),
+      ]);
+      return {
+        rows: (k ?? []) as KuppiPresenterRow[],
+        semById: Object.fromEntries((sems ?? []).map((s: any) => [s.id, s.name])),
+        subById: Object.fromEntries((subs ?? []).map((s: any) => [s.id, s])),
+      };
+    },
+    staleTime: 60_000,
+  });
+
+  const grouped = (() => {
+    const map = new Map<string, { name: string; photo: string | null; total: number; bySemester: Record<string, number>; bySubject: Record<string, number> }>();
+    for (const r of data?.rows ?? []) {
+      const key = r.presenter_name.trim().toLowerCase();
+      const g = map.get(key) ?? { name: r.presenter_name, photo: r.presenter_photo_url, total: 0, bySemester: {}, bySubject: {} };
+      g.total += 1;
+      g.bySemester[r.semester_id] = (g.bySemester[r.semester_id] ?? 0) + 1;
+      g.bySubject[r.subject_id] = (g.bySubject[r.subject_id] ?? 0) + 1;
+      if (!g.photo && r.presenter_photo_url) g.photo = r.presenter_photo_url;
+      map.set(key, g);
+    }
+    return Array.from(map.values()).sort((a, b) => b.total - a.total);
+  })();
+
+  if (isLoading) {
+    return (
+      <div className="mt-10 h-32 rounded-2xl border border-border bg-card animate-pulse" />
+    );
+  }
+  if (grouped.length === 0) return null;
+
+  return (
+    <section className="mt-12">
+      <div className="flex items-center gap-2 mb-4">
+        <div className="grid h-7 w-7 place-items-center rounded-lg bg-primary/10 text-primary"><Video className="h-4 w-4" /></div>
+        <h2 className="font-semibold">Kuppi presenters</h2>
+        <span className="text-xs text-muted-foreground">({grouped.length})</span>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {grouped.map((g) => (
+          <div key={g.name} className="rounded-2xl border border-border bg-card p-5 shadow-soft">
+            <div className="flex items-center gap-3">
+              <Avatar className="h-14 w-14 ring-2 ring-primary/10">
+                {g.photo ? <AvatarImage src={g.photo} alt={g.name} /> : null}
+                <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                  {g.name.slice(0, 2).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="min-w-0 flex-1">
+                <div className="font-semibold truncate">{g.name}</div>
+                <div className="text-xs text-muted-foreground">{g.total} kuppi{g.total === 1 ? "" : "s"}</div>
+              </div>
+            </div>
+            <div className="mt-3 space-y-1 text-xs">
+              {Object.entries(g.bySemester).map(([sid, n]) => (
+                <div key={sid} className="flex justify-between text-muted-foreground">
+                  <span className="truncate">{data?.semById[sid] ?? "—"}</span>
+                  <span className="tabular-nums">{n}</span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-3 flex flex-wrap gap-1">
+              {Object.entries(g.bySubject).slice(0, 4).map(([sid, n]) => (
+                <Badge key={sid} variant="outline" className="text-[10px]">
+                  {data?.subById[sid]?.code ?? data?.subById[sid]?.name ?? "—"} · {n}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 

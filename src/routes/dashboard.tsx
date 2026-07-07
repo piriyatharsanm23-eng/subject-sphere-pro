@@ -69,7 +69,7 @@ function DashboardContent({ sel }: { sel: Selection }) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("materials")
-        .select("id,title,description,material_type,file_url,file_name,file_type,year,week_or_module,created_at,subject_id,download_count,uploaded_by")
+        .select("id,title,description,material_type,file_url,file_name,file_type,year,week_or_module,created_at,subject_id,uploaded_by")
         .in("subject_id", sel.subjectIds)
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -256,7 +256,7 @@ function DashboardContent({ sel }: { sel: Selection }) {
                         <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
                           <UploaderBadge uploader={m.uploaded_by ? uploadersQ.data?.[m.uploaded_by] : null} />
                           <span>· {formatDistanceToNow(new Date(m.created_at), { addSuffix: true })}</span>
-                          <span>· {m.download_count} downloads</span>
+                          
                         </div>
                       </div>
                       <Button size="sm" onClick={async () => {

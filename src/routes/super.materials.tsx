@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { Archive, ArchiveRestore, Download, FileText, Loader2, Search, Trash2 } from "lucide-react";
+import { Archive, ArchiveRestore, FileText, Loader2, Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,7 +19,7 @@ export const Route = createFileRoute("/super/materials")({
 type Material = {
   id: string; title: string; material_type: string; year: string | null;
   semester_id: string; subject_id: string; file_url: string;
-  download_count: number; is_archived: boolean; created_at: string;
+  is_archived: boolean; created_at: string;
 };
 
 function MaterialsPage() {
@@ -43,7 +43,7 @@ function MaterialsPage() {
     queryFn: async () => {
       let qb = supabase
         .from("materials")
-        .select("id,title,material_type,year,semester_id,subject_id,file_url,download_count,is_archived,created_at")
+        .select("id,title,material_type,year,semester_id,subject_id,file_url,is_archived,created_at")
         .order("created_at", { ascending: false })
         .limit(500);
       if (sem !== "all") qb = qb.eq("semester_id", sem);
@@ -143,8 +143,7 @@ function MaterialsPage() {
                   <th className="text-left font-medium px-4 py-3">Title</th>
                   <th className="text-left font-medium px-4 py-3">Type</th>
                   <th className="text-left font-medium px-4 py-3">Semester / Subject</th>
-                  <th className="text-left font-medium px-4 py-3"><Download className="inline h-3.5 w-3.5" /></th>
-                  <th className="text-left font-medium px-4 py-3">Uploaded</th>
+                  <th className="text-left font-medium px-4 py-3">Created</th>
                   <th className="text-right font-medium px-4 py-3">Actions</th>
                 </tr>
               </thead>
@@ -163,7 +162,6 @@ function MaterialsPage() {
                       <div>{semById[m.semester_id]?.name ?? "—"}</div>
                       <div className="text-foreground/80">{subById[m.subject_id]?.name ?? "—"}</div>
                     </td>
-                    <td className="px-4 py-3 tabular-nums">{m.download_count}</td>
                     <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">{format(new Date(m.created_at), "MMM d, yyyy")}</td>
                     <td className="px-4 py-3 text-right whitespace-nowrap">
                       <Button size="sm" variant="ghost" onClick={() => toggleArchive(m)}>

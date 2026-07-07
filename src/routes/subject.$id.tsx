@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Calendar, Download, Eye, FileText, X } from "lucide-react";
+import { ArrowLeft, Calendar, Download, ExternalLink, Eye, FileText, Video, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -14,6 +14,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useUploaders } from "@/lib/uploaders";
 import { UploaderBadge, type UploaderInfo } from "@/components/UploaderBadge";
 import { useRealtimeInvalidate } from "@/hooks/useRealtimeInvalidate";
+import { KUPPI_MEDIUMS, mediumLabel, toYoutubeEmbed } from "@/lib/kuppi";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export const Route = createFileRoute("/subject/$id")({
   head: () => ({ meta: [{ title: "Subject — StudyHub" }] }),
@@ -37,7 +39,7 @@ function SubjectPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("materials")
-        .select("id,title,description,material_type,file_url,file_name,file_type,year,week_or_module,created_at,download_count,uploaded_by")
+        .select("id,title,description,material_type,file_url,file_name,file_type,year,week_or_module,created_at,uploaded_by")
         .eq("subject_id", id)
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -56,6 +58,19 @@ function SubjectPage() {
         .order("deadline_at", { ascending: true });
       if (error) throw error;
       return data ?? [];
+    },
+  });
+
+  const kuppiQ = useQuery({
+    queryKey: ["subject-kuppi", id],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("kuppi_videos")
+        .select("id,title,description,sections_covered,medium,video_url,presenter_name,presenter_photo_url,created_at")
+        .eq("subject_id", id)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as KuppiRow[];
     },
   });
 
@@ -126,6 +141,7 @@ function SubjectPage() {
             <TabsTrigger value="past_paper">Past Papers ({groups.past_paper.length})</TabsTrigger>
             <TabsTrigger value="assignment">Assignments ({groups.assignment.length})</TabsTrigger>
             <TabsTrigger value="other">Tutorials ({groups.other.length})</TabsTrigger>
+            <TabsTrigger value="kuppi">Kuppi ({(kuppiQ.data ?? []).length})</TabsTrigger>
             <TabsTrigger value="deadlines">Deadlines ({(deadlinesQ.data ?? []).length})</TabsTrigger>
           </TabsList>
 
@@ -134,6 +150,11 @@ function SubjectPage() {
               {materialsQ.isLoading ? <MaterialSkeleton /> : <MaterialList items={groups[t]} uploaders={uploadersQ.data ?? {}} />}
             </TabsContent>
           ))}
+
+          <TabsContent value="kuppi" className="mt-4">
+            {kuppiQ.isLoading ? <MaterialSkeleton /> : <KuppiSection items={kuppiQ.data ?? []} />}
+          </TabsContent>
+
 
 
           <TabsContent value="past_paper" className="mt-4 space-y-6">
@@ -183,7 +204,7 @@ type MaterialRow = {
   id: string; title: string; description: string | null; material_type: string;
   file_url: string; file_name: string | null; file_type?: string | null;
   year: string | null; week_or_module: string | null;
-  created_at: string; download_count: number; uploaded_by: string | null;
+  created_at: string; uploaded_by: string | null;
 };
 
 function MaterialList({
@@ -210,7 +231,7 @@ function MaterialList({
             <div className="mt-3 flex items-center justify-between gap-2 flex-wrap">
               <div className="flex flex-col gap-1 min-w-0">
                 <UploaderBadge uploader={m.uploaded_by ? uploaders[m.uploaded_by] : null} />
-                <div className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(m.created_at), { addSuffix: true })} · {m.download_count} downloads</div>
+                <div className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(m.created_at), { addSuffix: true })}</div>
               </div>
               <div className="flex gap-2">
                 <Button size="sm" variant="outline" onClick={() => setPreviewing(m)}>
@@ -342,3 +363,128 @@ function MaterialSkeleton() {
     </div>
   );
 }
+
+type KuppiRow = {
+  id: string;
+  title: string;
+  description: string | null;
+  sections_covered: string | null;
+  medium: string;
+  video_url: string;
+  presenter_name: string;
+  presenter_photo_url: string | null;
+  created_at: string;
+};
+
+function KuppiSection({ items }: { items: KuppiRow[] }) {
+  const [med, setMed] = useState<string>("all");
+  const [playing, setPlaying] = useState<KuppiRow | null>(null);
+
+  const filtered = med === "all" ? items : items.filter((k) => k.medium === med);
+
+  if (items.length === 0) return <Empty label="No Kuppi videos yet — ask an admin to add one." />;
+
+  return (
+    <>
+      <div className="flex items-center gap-2 mb-3 flex-wrap">
+        <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Medium:</span>
+        <div className="inline-flex rounded-full border border-border bg-card p-0.5">
+          <MediumChip active={med === "all"} onClick={() => setMed("all")}>All</MediumChip>
+          {KUPPI_MEDIUMS.map((m) => (
+            <MediumChip key={m.value} active={med === m.value} onClick={() => setMed(m.value)}>
+              {m.short}
+            </MediumChip>
+          ))}
+        </div>
+        <span className="ml-auto text-xs text-muted-foreground">{filtered.length} video{filtered.length === 1 ? "" : "s"}</span>
+      </div>
+
+      {filtered.length === 0 ? (
+        <Empty label="No Kuppi in this medium." />
+      ) : (
+        <div className="grid gap-3 sm:grid-cols-2">
+          {filtered.map((k) => (
+            <div key={k.id} className="rounded-2xl border border-border bg-card p-4 shadow-soft">
+              <div className="flex items-start gap-3">
+                {k.presenter_photo_url ? (
+                  <img src={k.presenter_photo_url} alt={k.presenter_name} className="h-12 w-12 rounded-full object-cover ring-1 ring-border" />
+                ) : (
+                  <div className="h-12 w-12 rounded-full bg-primary/10 text-primary grid place-items-center font-semibold">
+                    {k.presenter_name.slice(0, 2).toUpperCase()}
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium bg-primary/10 text-primary">
+                    {mediumLabel(k.medium)}
+                  </span>
+                  <h4 className="mt-1 font-semibold">{k.title}</h4>
+                  <div className="text-xs text-muted-foreground">by {k.presenter_name} · {formatDistanceToNow(new Date(k.created_at), { addSuffix: true })}</div>
+                  {k.sections_covered && <p className="mt-1 text-xs text-muted-foreground"><b>Covered:</b> {k.sections_covered}</p>}
+                  {k.description && <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{k.description}</p>}
+                </div>
+              </div>
+              <div className="mt-3 flex gap-2">
+                <Button size="sm" onClick={() => setPlaying(k)}>
+                  <Video className="mr-2 h-4 w-4" /> Watch
+                </Button>
+                <Button asChild size="sm" variant="outline">
+                  <a href={k.video_url} target="_blank" rel="noopener">
+                    <ExternalLink className="mr-2 h-4 w-4" /> Open
+                  </a>
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <Dialog open={!!playing} onOpenChange={(o) => !o && setPlaying(null)}>
+        <DialogContent className="max-w-3xl w-[calc(100vw-2rem)] p-0 gap-0 overflow-hidden">
+          <DialogHeader className="px-5 py-3 border-b border-border">
+            <DialogTitle className="text-base flex items-center gap-2">
+              <Video className="h-4 w-4 text-primary" /> {playing?.title ?? "Kuppi"}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="bg-black aspect-video">
+            {playing && (() => {
+              const embed = toYoutubeEmbed(playing.video_url);
+              if (embed) return <iframe src={embed} title={playing.title} className="w-full h-full" allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen />;
+              return (
+                <div className="h-full grid place-items-center text-center px-6 text-white/80">
+                  <div>
+                    <ExternalLink className="mx-auto h-8 w-8" />
+                    <p className="mt-3 font-semibold">This video hosts outside YouTube.</p>
+                    <p className="mt-1 text-sm">Open it in a new tab to watch.</p>
+                    <Button asChild size="sm" className="mt-3">
+                      <a href={playing.video_url} target="_blank" rel="noopener">
+                        <ExternalLink className="mr-2 h-4 w-4" /> Open link
+                      </a>
+                    </Button>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+          <div className="px-5 py-3 border-t border-border text-xs text-muted-foreground">
+            Presented by <b className="text-foreground">{playing?.presenter_name}</b>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
+function MediumChip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+        active ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+

@@ -145,32 +145,6 @@ export type Database = {
           },
         ]
       }
-      downloads: {
-        Row: {
-          downloaded_at: string
-          id: string
-          material_id: string | null
-        }
-        Insert: {
-          downloaded_at?: string
-          id?: string
-          material_id?: string | null
-        }
-        Update: {
-          downloaded_at?: string
-          id?: string
-          material_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "downloads_material_id_fkey"
-            columns: ["material_id"]
-            isOneToOne: false
-            referencedRelation: "materials"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       feedback: {
         Row: {
           created_at: string
@@ -213,11 +187,73 @@ export type Database = {
           },
         ]
       }
+      kuppi_videos: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          medium: string
+          presenter_name: string
+          presenter_photo_url: string | null
+          sections_covered: string | null
+          semester_id: string
+          subject_id: string
+          title: string
+          updated_at: string
+          uploaded_by: string | null
+          video_url: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          medium: string
+          presenter_name: string
+          presenter_photo_url?: string | null
+          sections_covered?: string | null
+          semester_id: string
+          subject_id: string
+          title: string
+          updated_at?: string
+          uploaded_by?: string | null
+          video_url: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          medium?: string
+          presenter_name?: string
+          presenter_photo_url?: string | null
+          sections_covered?: string | null
+          semester_id?: string
+          subject_id?: string
+          title?: string
+          updated_at?: string
+          uploaded_by?: string | null
+          video_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kuppi_videos_semester_id_fkey"
+            columns: ["semester_id"]
+            isOneToOne: false
+            referencedRelation: "semesters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kuppi_videos_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       materials: {
         Row: {
           created_at: string
           description: string | null
-          download_count: number
           file_name: string | null
           file_type: string | null
           file_url: string
@@ -236,7 +272,6 @@ export type Database = {
         Insert: {
           created_at?: string
           description?: string | null
-          download_count?: number
           file_name?: string | null
           file_type?: string | null
           file_url: string
@@ -255,7 +290,6 @@ export type Database = {
         Update: {
           created_at?: string
           description?: string | null
-          download_count?: number
           file_name?: string | null
           file_type?: string | null
           file_url?: string
@@ -360,6 +394,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          kind: string
+          link: string | null
+          read_at: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          kind: string
+          link?: string | null
+          read_at?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          link?: string | null
+          read_at?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -522,75 +589,6 @@ export type Database = {
           },
         ]
       }
-      telegram_health_logs: {
-        Row: {
-          checked_at: string
-          id: string
-          last_error_at: string | null
-          last_error_message: string | null
-          pending_update_count: number | null
-          raw: Json | null
-          status: string
-          webhook_url: string | null
-        }
-        Insert: {
-          checked_at?: string
-          id?: string
-          last_error_at?: string | null
-          last_error_message?: string | null
-          pending_update_count?: number | null
-          raw?: Json | null
-          status: string
-          webhook_url?: string | null
-        }
-        Update: {
-          checked_at?: string
-          id?: string
-          last_error_at?: string | null
-          last_error_message?: string | null
-          pending_update_count?: number | null
-          raw?: Json | null
-          status?: string
-          webhook_url?: string | null
-        }
-        Relationships: []
-      }
-      telegram_subject_enrollments: {
-        Row: {
-          chat_id: number
-          created_at: string
-          semester_id: string
-          subject_id: string
-        }
-        Insert: {
-          chat_id: number
-          created_at?: string
-          semester_id: string
-          subject_id: string
-        }
-        Update: {
-          chat_id?: number
-          created_at?: string
-          semester_id?: string
-          subject_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "telegram_subject_enrollments_semester_id_fkey"
-            columns: ["semester_id"]
-            isOneToOne: false
-            referencedRelation: "semesters"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "telegram_subject_enrollments_subject_id_fkey"
-            columns: ["subject_id"]
-            isOneToOne: false
-            referencedRelation: "subjects"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       telegram_subscribers: {
         Row: {
           chat_id: number
@@ -600,6 +598,7 @@ export type Database = {
           receive_admin_alerts: boolean
           selected_semester_id: string | null
           selected_subject_id: string | null
+          subject_ids: string[]
           updated_at: string
           username: string | null
         }
@@ -611,6 +610,7 @@ export type Database = {
           receive_admin_alerts?: boolean
           selected_semester_id?: string | null
           selected_subject_id?: string | null
+          subject_ids?: string[]
           updated_at?: string
           username?: string | null
         }
@@ -622,6 +622,7 @@ export type Database = {
           receive_admin_alerts?: boolean
           selected_semester_id?: string | null
           selected_subject_id?: string | null
+          subject_ids?: string[]
           updated_at?: string
           username?: string | null
         }
