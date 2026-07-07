@@ -590,6 +590,8 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          issue_type: string | null
+          material_id: string | null
           request_text: string
           semester_id: string | null
           status: string
@@ -599,6 +601,8 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          issue_type?: string | null
+          material_id?: string | null
           request_text: string
           semester_id?: string | null
           status?: string
@@ -608,6 +612,8 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          issue_type?: string | null
+          material_id?: string | null
           request_text?: string
           semester_id?: string | null
           status?: string
@@ -615,6 +621,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "student_requests_material_id_fkey"
+            columns: ["material_id"]
+            isOneToOne: false
+            referencedRelation: "materials"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "student_requests_semester_id_fkey"
             columns: ["semester_id"]

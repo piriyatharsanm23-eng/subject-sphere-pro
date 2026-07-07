@@ -26,7 +26,7 @@ function initials(name: string | null | undefined, email: string | null | undefi
   return parts.map((p) => p[0]?.toUpperCase() ?? "").join("") || "?";
 }
 
-function ProfileForm({ userId }: { userId: string }) {
+export function ProfileForm({ userId }: { userId: string }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);

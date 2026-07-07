@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { downloadMaterial, materialTypeBadge, materialTypeLabel } from "@/lib/materials";
 import { useUploaders } from "@/lib/uploaders";
 import { UploaderBadge } from "@/components/UploaderBadge";
+import { ReportMaterialButton } from "@/components/ReportMaterialButton";
 
 export const Route = createFileRoute("/material/$id")({
   head: () => ({ meta: [{ title: "Material — StudyHub" }] }),
@@ -156,6 +157,12 @@ function MaterialPage() {
                   >
                     <Download className="mr-2 h-4 w-4" />Download
                   </Button>
+                  <ReportMaterialButton
+                    materialId={m.id}
+                    materialTitle={m.title}
+                    semesterId={m.semester_id}
+                    subjectId={m.subject_id}
+                  />
                 </div>
               </div>
             </header>

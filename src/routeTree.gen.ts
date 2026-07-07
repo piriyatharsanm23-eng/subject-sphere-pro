@@ -23,6 +23,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as SuperSubjectsRouteImport } from './routes/super.subjects'
 import { Route as SuperSemestersRouteImport } from './routes/super.semesters'
 import { Route as SuperRequestsRouteImport } from './routes/super.requests'
+import { Route as SuperProfileRouteImport } from './routes/super.profile'
 import { Route as SuperModulesRouteImport } from './routes/super.modules'
 import { Route as SuperMaterialsRouteImport } from './routes/super.materials'
 import { Route as SuperFeedbackRouteImport } from './routes/super.feedback'
@@ -116,6 +117,11 @@ const SuperSemestersRoute = SuperSemestersRouteImport.update({
 const SuperRequestsRoute = SuperRequestsRouteImport.update({
   id: '/requests',
   path: '/requests',
+  getParentRoute: () => SuperRoute,
+} as any)
+const SuperProfileRoute = SuperProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => SuperRoute,
 } as any)
 const SuperModulesRoute = SuperModulesRouteImport.update({
@@ -272,6 +278,7 @@ export interface FileRoutesByFullPath {
   '/super/feedback': typeof SuperFeedbackRoute
   '/super/materials': typeof SuperMaterialsRoute
   '/super/modules': typeof SuperModulesRoute
+  '/super/profile': typeof SuperProfileRoute
   '/super/requests': typeof SuperRequestsRoute
   '/super/semesters': typeof SuperSemestersRoute
   '/super/subjects': typeof SuperSubjectsRoute
@@ -310,6 +317,7 @@ export interface FileRoutesByTo {
   '/super/feedback': typeof SuperFeedbackRoute
   '/super/materials': typeof SuperMaterialsRoute
   '/super/modules': typeof SuperModulesRoute
+  '/super/profile': typeof SuperProfileRoute
   '/super/requests': typeof SuperRequestsRoute
   '/super/semesters': typeof SuperSemestersRoute
   '/super/subjects': typeof SuperSubjectsRoute
@@ -351,6 +359,7 @@ export interface FileRoutesById {
   '/super/feedback': typeof SuperFeedbackRoute
   '/super/materials': typeof SuperMaterialsRoute
   '/super/modules': typeof SuperModulesRoute
+  '/super/profile': typeof SuperProfileRoute
   '/super/requests': typeof SuperRequestsRoute
   '/super/semesters': typeof SuperSemestersRoute
   '/super/subjects': typeof SuperSubjectsRoute
@@ -393,6 +402,7 @@ export interface FileRouteTypes {
     | '/super/feedback'
     | '/super/materials'
     | '/super/modules'
+    | '/super/profile'
     | '/super/requests'
     | '/super/semesters'
     | '/super/subjects'
@@ -431,6 +441,7 @@ export interface FileRouteTypes {
     | '/super/feedback'
     | '/super/materials'
     | '/super/modules'
+    | '/super/profile'
     | '/super/requests'
     | '/super/semesters'
     | '/super/subjects'
@@ -471,6 +482,7 @@ export interface FileRouteTypes {
     | '/super/feedback'
     | '/super/materials'
     | '/super/modules'
+    | '/super/profile'
     | '/super/requests'
     | '/super/semesters'
     | '/super/subjects'
@@ -599,6 +611,13 @@ declare module '@tanstack/react-router' {
       path: '/requests'
       fullPath: '/super/requests'
       preLoaderRoute: typeof SuperRequestsRouteImport
+      parentRoute: typeof SuperRoute
+    }
+    '/super/profile': {
+      id: '/super/profile'
+      path: '/profile'
+      fullPath: '/super/profile'
+      preLoaderRoute: typeof SuperProfileRouteImport
       parentRoute: typeof SuperRoute
     }
     '/super/modules': {
@@ -807,6 +826,7 @@ interface SuperRouteChildren {
   SuperFeedbackRoute: typeof SuperFeedbackRoute
   SuperMaterialsRoute: typeof SuperMaterialsRoute
   SuperModulesRoute: typeof SuperModulesRoute
+  SuperProfileRoute: typeof SuperProfileRoute
   SuperRequestsRoute: typeof SuperRequestsRoute
   SuperSemestersRoute: typeof SuperSemestersRoute
   SuperSubjectsRoute: typeof SuperSubjectsRoute
@@ -822,6 +842,7 @@ const SuperRouteChildren: SuperRouteChildren = {
   SuperFeedbackRoute: SuperFeedbackRoute,
   SuperMaterialsRoute: SuperMaterialsRoute,
   SuperModulesRoute: SuperModulesRoute,
+  SuperProfileRoute: SuperProfileRoute,
   SuperRequestsRoute: SuperRequestsRoute,
   SuperSemestersRoute: SuperSemestersRoute,
   SuperSubjectsRoute: SuperSubjectsRoute,
