@@ -28,6 +28,8 @@ import { Route as SuperAnalyticsRouteImport } from './routes/super.analytics'
 import { Route as SuperAdminsRouteImport } from './routes/super.admins'
 import { Route as SuperActivityRouteImport } from './routes/super.activity'
 import { Route as SubjectIdRouteImport } from './routes/subject.$id'
+import { Route as SemesterIdRouteImport } from './routes/semester.$id'
+import { Route as MaterialIdRouteImport } from './routes/material.$id'
 import { Route as ContributorsIdRouteImport } from './routes/contributors_.$id'
 import { Route as AdminRequestsRouteImport } from './routes/admin.requests'
 import { Route as AdminProfileRouteImport } from './routes/admin.profile'
@@ -133,6 +135,16 @@ const SubjectIdRoute = SubjectIdRouteImport.update({
   path: '/subject/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SemesterIdRoute = SemesterIdRouteImport.update({
+  id: '/semester/$id',
+  path: '/semester/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MaterialIdRoute = MaterialIdRouteImport.update({
+  id: '/material/$id',
+  path: '/material/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContributorsIdRoute = ContributorsIdRouteImport.update({
   id: '/contributors_/$id',
   path: '/contributors/$id',
@@ -195,6 +207,8 @@ export interface FileRoutesByFullPath {
   '/admin/profile': typeof AdminProfileRoute
   '/admin/requests': typeof AdminRequestsRoute
   '/contributors/$id': typeof ContributorsIdRoute
+  '/material/$id': typeof MaterialIdRoute
+  '/semester/$id': typeof SemesterIdRoute
   '/subject/$id': typeof SubjectIdRoute
   '/super/activity': typeof SuperActivityRoute
   '/super/admins': typeof SuperAdminsRoute
@@ -223,6 +237,8 @@ export interface FileRoutesByTo {
   '/admin/profile': typeof AdminProfileRoute
   '/admin/requests': typeof AdminRequestsRoute
   '/contributors/$id': typeof ContributorsIdRoute
+  '/material/$id': typeof MaterialIdRoute
+  '/semester/$id': typeof SemesterIdRoute
   '/subject/$id': typeof SubjectIdRoute
   '/super/activity': typeof SuperActivityRoute
   '/super/admins': typeof SuperAdminsRoute
@@ -254,6 +270,8 @@ export interface FileRoutesById {
   '/admin/profile': typeof AdminProfileRoute
   '/admin/requests': typeof AdminRequestsRoute
   '/contributors_/$id': typeof ContributorsIdRoute
+  '/material/$id': typeof MaterialIdRoute
+  '/semester/$id': typeof SemesterIdRoute
   '/subject/$id': typeof SubjectIdRoute
   '/super/activity': typeof SuperActivityRoute
   '/super/admins': typeof SuperAdminsRoute
@@ -286,6 +304,8 @@ export interface FileRouteTypes {
     | '/admin/profile'
     | '/admin/requests'
     | '/contributors/$id'
+    | '/material/$id'
+    | '/semester/$id'
     | '/subject/$id'
     | '/super/activity'
     | '/super/admins'
@@ -314,6 +334,8 @@ export interface FileRouteTypes {
     | '/admin/profile'
     | '/admin/requests'
     | '/contributors/$id'
+    | '/material/$id'
+    | '/semester/$id'
     | '/subject/$id'
     | '/super/activity'
     | '/super/admins'
@@ -344,6 +366,8 @@ export interface FileRouteTypes {
     | '/admin/profile'
     | '/admin/requests'
     | '/contributors_/$id'
+    | '/material/$id'
+    | '/semester/$id'
     | '/subject/$id'
     | '/super/activity'
     | '/super/admins'
@@ -370,6 +394,8 @@ export interface RootRouteChildren {
   SelectRoute: typeof SelectRoute
   SuperRoute: typeof SuperRouteWithChildren
   ContributorsIdRoute: typeof ContributorsIdRoute
+  MaterialIdRoute: typeof MaterialIdRoute
+  SemesterIdRoute: typeof SemesterIdRoute
   SubjectIdRoute: typeof SubjectIdRoute
   ApiPublicTelegramHealthRoute: typeof ApiPublicTelegramHealthRoute
   ApiPublicTelegramNotifyMaterialsRoute: typeof ApiPublicTelegramNotifyMaterialsRoute
@@ -511,6 +537,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SubjectIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/semester/$id': {
+      id: '/semester/$id'
+      path: '/semester/$id'
+      fullPath: '/semester/$id'
+      preLoaderRoute: typeof SemesterIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/material/$id': {
+      id: '/material/$id'
+      path: '/material/$id'
+      fullPath: '/material/$id'
+      preLoaderRoute: typeof MaterialIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contributors_/$id': {
       id: '/contributors_/$id'
       path: '/contributors/$id'
@@ -634,6 +674,8 @@ const rootRouteChildren: RootRouteChildren = {
   SelectRoute: SelectRoute,
   SuperRoute: SuperRouteWithChildren,
   ContributorsIdRoute: ContributorsIdRoute,
+  MaterialIdRoute: MaterialIdRoute,
+  SemesterIdRoute: SemesterIdRoute,
   SubjectIdRoute: SubjectIdRoute,
   ApiPublicTelegramHealthRoute: ApiPublicTelegramHealthRoute,
   ApiPublicTelegramNotifyMaterialsRoute: ApiPublicTelegramNotifyMaterialsRoute,
@@ -642,13 +684,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
