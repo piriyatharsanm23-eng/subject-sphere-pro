@@ -466,3 +466,102 @@ function RecentUploads() {
   );
 }
 
+
+function HelpBar() {
+  return (
+    <section className="container mx-auto px-4 sm:px-6 mt-16 sm:mt-24">
+      <div className="relative overflow-hidden rounded-3xl border border-border bg-card-soft p-6 sm:p-10 shadow-soft">
+        <div className="pointer-events-none absolute -top-16 -right-16 h-56 w-56 rounded-full bg-primary/10 blur-3xl" />
+        <div className="relative grid gap-8 lg:grid-cols-[1.1fr_1fr] items-start">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 text-primary px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider">
+              <HelpCircle className="h-3 w-3" /> Quick guide
+            </div>
+            <h2 className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight">
+              New here? Enroll in 4 steps
+            </h2>
+            <p className="mt-1 text-muted-foreground text-sm max-w-lg">
+              Set your semester and subjects once — your dashboard then shows only what matters
+              to you. No account, no sign-up.
+            </p>
+
+            <ol className="mt-6 space-y-3">
+              {[
+                { t: "Open the Dashboard", d: "Tap Dashboard in the top menu." },
+                { t: "Choose your semester", d: "Pick the semester you're studying now." },
+                { t: "Select your subjects", d: "Tick the subjects you take this semester." },
+                { t: "Save & explore", d: "Your dashboard updates instantly — start browsing." },
+              ].map((s, i) => (
+                <li key={i} className="flex gap-3">
+                  <div className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary/10 text-primary text-xs font-bold tabular-nums">
+                    {i + 1}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="font-medium text-sm">{s.t}</div>
+                    <div className="text-xs text-muted-foreground">{s.d}</div>
+                  </div>
+                </li>
+              ))}
+            </ol>
+
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Button asChild size="sm">
+                <Link to="/select">
+                  Set preferences <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+              <Button asChild size="sm" variant="outline">
+                <Link to="/help">
+                  <HelpCircle className="mr-2 h-4 w-4" /> Full help & guide
+                </Link>
+              </Button>
+            </div>
+          </div>
+
+          <div className="grid gap-3">
+            <a
+              href="https://t.me/StudyHub_Materials_Bot"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex items-start gap-3 rounded-2xl border border-sky-500/30 bg-sky-500/5 p-4 hover:border-sky-500/60 transition-colors"
+            >
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-sky-500/15 text-sky-500">
+                <Send className="h-5 w-5" />
+              </div>
+              <div className="min-w-0">
+                <div className="text-[11px] uppercase tracking-wider font-semibold text-sky-600 dark:text-sky-300">
+                  Telegram bot
+                </div>
+                <div className="font-semibold group-hover:text-sky-500 transition-colors">
+                  Download materials to your phone
+                </div>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  Open the bot, pick a subject and get PDFs instantly on Telegram.
+                </p>
+              </div>
+            </a>
+
+            <div className="grid gap-2 sm:grid-cols-2">
+              <QuickTip icon={<Search className="h-4 w-4" />} title="Press ⌘K" desc="Search anything, anywhere." />
+              <QuickTip icon={<Clock className="h-4 w-4" />} title="Urgent deadlines" desc="Red badges = due in 24h." />
+              <QuickTip icon={<Download className="h-4 w-4" />} title="Save offline" desc="Grab PDFs before class." />
+              <QuickTip icon={<CheckCircle2 className="h-4 w-4" />} title="No login" desc="Browse anonymously." />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function QuickTip({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
+  return (
+    <div className="rounded-xl border border-border bg-card p-3">
+      <div className="flex items-center gap-2 text-sm font-medium">
+        <span className="text-primary">{icon}</span>
+        {title}
+      </div>
+      <div className="mt-0.5 text-xs text-muted-foreground">{desc}</div>
+    </div>
+  );
+}
