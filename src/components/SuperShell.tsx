@@ -3,7 +3,7 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Activity, BarChart3, BookOpen, CalendarClock, FileText,
   LayoutDashboard, Library, Loader2, MessageSquare, ShieldAlert,
-  Star, Users, BookPlus,
+  Star, User, Users, BookPlus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/SiteHeader";
