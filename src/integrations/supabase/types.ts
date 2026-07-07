@@ -85,6 +85,35 @@ export type Database = {
           },
         ]
       }
+      ai_explanations: {
+        Row: {
+          created_at: string
+          explanation: string
+          material_id: string
+          provider: string
+        }
+        Insert: {
+          created_at?: string
+          explanation: string
+          material_id: string
+          provider: string
+        }
+        Update: {
+          created_at?: string
+          explanation?: string
+          material_id?: string
+          provider?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_explanations_material_id_fkey"
+            columns: ["material_id"]
+            isOneToOne: false
+            referencedRelation: "materials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_settings: {
         Row: {
           chatgpt_enabled: boolean
