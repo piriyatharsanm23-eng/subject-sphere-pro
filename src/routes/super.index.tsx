@@ -48,6 +48,7 @@ const CARDS = [
   { to: "/super/feedback", icon: Star, title: "Feedback", desc: "Read student feedback and ratings." },
   { to: "/super/analytics", icon: BarChart3, title: "Analytics", desc: "Downloads, popular materials, engagement." },
   { to: "/super/activity", icon: Activity, title: "Activity Log", desc: "Audit every important admin action." },
+  { to: "/super/ai-settings", icon: Sparkles, title: "AI Study Helper", desc: "Turn ChatGPT / Gemini explanations on or off." },
 ];
 
 function Stats() {
