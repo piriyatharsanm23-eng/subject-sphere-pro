@@ -1,15 +1,16 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Calendar, Download, FileText } from "lucide-react";
+import { ArrowLeft, Calendar, Download, Eye, FileText, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { materialTypeBadge, materialTypeLabel, downloadMaterial } from "@/lib/materials";
 import { format, formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useUploaders } from "@/lib/uploaders";
 import { UploaderBadge, type UploaderInfo } from "@/components/UploaderBadge";
 import { useRealtimeInvalidate } from "@/hooks/useRealtimeInvalidate";
