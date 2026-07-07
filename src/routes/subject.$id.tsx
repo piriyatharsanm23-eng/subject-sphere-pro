@@ -244,11 +244,13 @@ function MaterialList({
   const showGemini = aiOn && aiSettings?.gemini_enabled;
   const openAI = (m: MaterialRow, provider: AIProvider) =>
     openExternalAIExplain(provider, {
+      id: m.id,
       title: m.title,
       material_type: materialTypeLabel(m.material_type),
       subject: subjectName ?? null,
       semester: semesterName ?? null,
       file_name: m.file_name,
+      file_url: m.file_url,
     });
   if (items.length === 0) return <Empty label="Nothing here yet" />;
   return (
