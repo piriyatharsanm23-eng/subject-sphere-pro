@@ -20,6 +20,7 @@ const NAV: NavItem[] = [
   { to: "/super/materials", label: "Materials", icon: FileText },
   { to: "/super/deadlines", label: "Deadlines", icon: CalendarClock },
   { to: "/super/requests", label: "Requests", icon: MessageSquare },
+  { to: "/super/pending", label: "Pending changes", icon: ClipboardCheck },
   { to: "/super/feedback", label: "Feedback", icon: Star },
   { to: "/super/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/super/activity", label: "Activity Log", icon: Activity },
