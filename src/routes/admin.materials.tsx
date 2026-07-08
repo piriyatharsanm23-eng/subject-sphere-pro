@@ -308,7 +308,7 @@ function MaterialDialog({
 
       setProgress("Saving…");
       if (editing) {
-        const { error } = await supabase.from("materials").update({
+        const proposed: Record<string, unknown> = {
           title: title.trim(),
           description: description.trim() || null,
           subject_id: subjectId,
@@ -316,15 +316,17 @@ function MaterialDialog({
           year: year.trim() || null,
           week_or_module: weekOrModule.trim() || null,
           ...(file ? { file_url, file_name, file_type } : {}),
-        }).eq("id", editing.id);
-        if (error) throw error;
+        };
+        const res = await requestUpdateFn({ data: { entityType: "material", entityId: editing.id, proposedData: proposed } });
         await logActivity({
           action_type: "edit",
-          description: `Edited material "${title.trim()}"`,
+          description: res.queued
+            ? `Requested edit for material "${title.trim()}"`
+            : `Edited material "${title.trim()}"`,
           target_type: "material", target_id: editing.id,
           semester_id: ctx.semesterId, subject_id: subjectId,
         });
-        toast.success("Material updated");
+        toast.success(res.queued ? "Edit sent to super admin for approval" : "Material updated");
       } else {
         const { data, error } = await supabase.from("materials").insert({
           semester_id: ctx.semesterId,
@@ -347,6 +349,13 @@ function MaterialDialog({
           semester_id: ctx.semesterId, subject_id: subjectId,
         });
         toast.success("Material uploaded");
+        // Reset the create form so the next upload starts clean.
+        setTitle("");
+        setDescription("");
+        setYear("");
+        setWeekOrModule("");
+        setFile(null);
+        if (inputRef.current) inputRef.current.value = "";
       }
       onSaved();
     } catch (e) {
