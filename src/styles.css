@@ -282,7 +282,15 @@
   }
 }
 
-@utility bg-hero { background: var(--gradient-hero); }
+@utility bg-hero {
+  /* Hero panels are designed with white text on a dark purple canvas.
+     Keep the dark gradient in both themes so text stays readable. */
+  background:
+    radial-gradient(1200px 600px at 15% 10%, rgba(124, 58, 237, 0.45), transparent 60%),
+    radial-gradient(900px 500px at 85% 90%, rgba(168, 85, 247, 0.35), transparent 60%),
+    linear-gradient(135deg, #0B0618 0%, #151028 60%, #1B1040 100%);
+  color: #ffffff;
+}
 @utility bg-card-soft { background: var(--gradient-card); }
 @utility bg-primary-gradient { background: var(--gradient-primary); }
 @utility bg-accent-gradient { background: var(--gradient-accent); }
@@ -326,7 +334,7 @@
 }
 
 @utility text-gradient {
-  background: linear-gradient(135deg, #C084FC 0%, #A855F7 50%, #7C3AED 100%);
+  background: linear-gradient(135deg, #A855F7 0%, #7C3AED 50%, #6D28D9 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
