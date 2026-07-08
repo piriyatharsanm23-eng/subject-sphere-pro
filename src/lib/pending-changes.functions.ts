@@ -52,7 +52,14 @@ export const requestUpdate = createServerFn({ method: "POST" })
       return { queued: false };
     }
 
-    // Semester admin: queue for approval, live row untouched.
+    // Semester admin: apply the new version immediately so students see it,
+    // but snapshot the old row so super admin can approve (discard old) or
+    // reject (restore the old version and roll back).
+    const { error: upErr } = await (supabase.from(table) as any)
+      .update(data.proposedData)
+      .eq("id", data.entityId);
+    if (upErr) throw new Error(upErr.message);
+
     const { error: qErr } = await supabase.from("pending_changes").insert({
       entity_type: data.entityType,
       entity_id: data.entityId,
@@ -65,6 +72,7 @@ export const requestUpdate = createServerFn({ method: "POST" })
     if (qErr) throw new Error(qErr.message);
     return { queued: true };
   });
+
 
 /**
  * Admin proposes deletion. Live row is hidden immediately from students via
