@@ -273,11 +273,15 @@ function KuppiDialog({
       presenter_photo_url: presenterPhoto.trim() || null,
     };
     if (editing) {
-      const { error } = await (supabase as any).from("kuppi_videos").update(payload).eq("id", editing.id);
-      setSaving(false);
-      if (error) return toast.error("Couldn't save", { description: error.message });
-      toast.success("Kuppi updated");
-      onSaved();
+      try {
+        const res = await requestUpdateFn({ data: { entityType: "kuppi", entityId: editing.id, proposedData: payload } });
+        setSaving(false);
+        toast.success(res.queued ? "Edit sent to super admin for approval" : "Kuppi updated");
+        onSaved();
+      } catch (e) {
+        setSaving(false);
+        toast.error("Couldn't save", { description: e instanceof Error ? e.message : "Failed" });
+      }
     } else {
       const { data: sess } = await supabase.auth.getSession();
       const uid = sess.session?.user.id;
@@ -285,6 +289,13 @@ function KuppiDialog({
       setSaving(false);
       if (error) return toast.error("Couldn't save", { description: error.message });
       toast.success("Kuppi added");
+      // Reset form fields so the next entry starts empty.
+      setTitle("");
+      setVideoUrl("");
+      setPresenterName("");
+      setPresenterPhoto("");
+      setSections("");
+      setDescription("");
       onSaved();
     }
   };
