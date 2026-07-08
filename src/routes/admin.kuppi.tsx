@@ -48,6 +48,8 @@ export const Route = createFileRoute("/admin/kuppi")({
 
 function Body({ ctx }: { ctx: AdminContext }) {
   const qc = useQueryClient();
+  const doRequestDelete = useServerFn(requestDelete);
+  const doRequestUpdate = useServerFn(requestUpdate);
   const [q, setQ] = useState("");
   const [med, setMed] = useState<string>("all");
   const [editing, setEditing] = useState<Kuppi | null>(null);
