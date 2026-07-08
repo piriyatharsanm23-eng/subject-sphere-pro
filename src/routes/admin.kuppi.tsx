@@ -135,6 +135,7 @@ function Body({ ctx }: { ctx: AdminContext }) {
               ctx={ctx}
               editing={editing}
               subjects={subjectsQ.data ?? []}
+              requestUpdateFn={doRequestUpdate}
               onSaved={() => { setOpen(false); setEditing(null); qc.invalidateQueries({ queryKey: ["admin-kuppi"] }); }}
             />
           </Dialog>
