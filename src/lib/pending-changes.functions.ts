@@ -174,10 +174,17 @@ export const rejectChange = createServerFn({ method: "POST" })
     if (error || !p) throw new Error("Pending change not found");
     if ((p as any).status !== "pending") throw new Error("Already reviewed");
 
+    const table = TABLE_BY_ENTITY[(p as any).entity_type as Entity];
     if ((p as any).action === "delete") {
-      const table = TABLE_BY_ENTITY[(p as any).entity_type as Entity];
+      // Restore visibility — the live row was hidden but not deleted.
       await supabase.from(table).update({ pending_delete: false }).eq("id", (p as any).entity_id);
+    } else {
+      // Update was applied live at request time; roll back to the snapshot.
+      const snap = (p as any).snapshot ?? {};
+      const { id: _omitId, created_at: _omitCreated, ...restore } = snap;
+      await (supabase.from(table) as any).update(restore).eq("id", (p as any).entity_id);
     }
+
 
     await supabase
       .from("pending_changes")
