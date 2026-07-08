@@ -45,6 +45,8 @@ function AdminDeadlinesRoute() {
 
 function DeadlinesPage({ ctx }: { ctx: AdminContext }) {
   const qc = useQueryClient();
+  const doRequestDelete = useServerFn(requestDelete);
+  const doRequestUpdate = useServerFn(requestUpdate);
   const [q, setQ] = useState("");
   const [subject, setSubject] = useState("all");
   const [showArchived, setShowArchived] = useState(false);
