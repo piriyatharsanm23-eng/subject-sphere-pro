@@ -150,6 +150,7 @@ export type Database = {
           description: string | null
           id: string
           is_archived: boolean
+          pending_delete: boolean
           semester_id: string
           status: string
           subject_id: string
@@ -164,6 +165,7 @@ export type Database = {
           description?: string | null
           id?: string
           is_archived?: boolean
+          pending_delete?: boolean
           semester_id: string
           status?: string
           subject_id: string
@@ -178,6 +180,7 @@ export type Database = {
           description?: string | null
           id?: string
           is_archived?: boolean
+          pending_delete?: boolean
           semester_id?: string
           status?: string
           subject_id?: string
@@ -263,6 +266,7 @@ export type Database = {
           description: string | null
           id: string
           medium: string
+          pending_delete: boolean
           presenter_name: string
           presenter_photo_url: string | null
           sections_covered: string | null
@@ -278,6 +282,7 @@ export type Database = {
           description?: string | null
           id?: string
           medium: string
+          pending_delete?: boolean
           presenter_name: string
           presenter_photo_url?: string | null
           sections_covered?: string | null
@@ -293,6 +298,7 @@ export type Database = {
           description?: string | null
           id?: string
           medium?: string
+          pending_delete?: boolean
           presenter_name?: string
           presenter_photo_url?: string | null
           sections_covered?: string | null
@@ -330,6 +336,7 @@ export type Database = {
           id: string
           is_archived: boolean
           material_type: string
+          pending_delete: boolean
           semester_id: string
           subject_id: string
           telegram_notified_at: string | null
@@ -348,6 +355,7 @@ export type Database = {
           id?: string
           is_archived?: boolean
           material_type: string
+          pending_delete?: boolean
           semester_id: string
           subject_id: string
           telegram_notified_at?: string | null
@@ -366,6 +374,7 @@ export type Database = {
           id?: string
           is_archived?: boolean
           material_type?: string
+          pending_delete?: boolean
           semester_id?: string
           subject_id?: string
           telegram_notified_at?: string | null
@@ -504,6 +513,90 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      pending_changes: {
+        Row: {
+          action: string
+          created_at: string
+          entity_id: string
+          entity_type: string
+          id: string
+          proposed_data: Json | null
+          reject_reason: string | null
+          requested_by: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          semester_id: string | null
+          snapshot: Json
+          status: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          id?: string
+          proposed_data?: Json | null
+          reject_reason?: string | null
+          requested_by?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          semester_id?: string | null
+          snapshot: Json
+          status?: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          proposed_data?: Json | null
+          reject_reason?: string | null
+          requested_by?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          semester_id?: string | null
+          snapshot?: Json
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pending_changes_requested_by_fkey"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pending_changes_requested_by_fkey"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "super_admin_contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pending_changes_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pending_changes_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "super_admin_contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pending_changes_semester_id_fkey"
+            columns: ["semester_id"]
+            isOneToOne: false
+            referencedRelation: "semesters"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
