@@ -70,6 +70,18 @@ function SemesterPage() {
     },
   });
 
+  const kuppiQ = useQuery({
+    queryKey: ["semester-kuppi-counts", id],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("kuppi_videos")
+        .select("id,subject_id").eq("pending_delete", false)
+        .eq("semester_id", id);
+      if (error) throw error;
+      return (data ?? []) as { id: string; subject_id: string }[];
+    },
+  });
+
   const contributorsQ = useQuery({
     queryKey: ["semester-contributors", id],
     queryFn: async () => {
@@ -85,6 +97,7 @@ function SemesterPage() {
   const subjects = subjectsQ.data ?? [];
   const materials = materialsQ.data ?? [];
   const deadlines = deadlinesQ.data ?? [];
+  const kuppis = kuppiQ.data ?? [];
 
   const perSubject = subjects.map((s) => {
     const mine = materials.filter((m) => m.subject_id === s.id);
@@ -95,6 +108,7 @@ function SemesterPage() {
       notes: mine.filter((m) => m.material_type === "note" || m.material_type === "lecture_slide").length,
       papers: mine.filter((m) => m.material_type === "past_paper").length,
       deadlines: deadlines.filter((d) => d.subject_id === s.id).length,
+      kuppis: kuppis.filter((k) => k.subject_id === s.id).length,
       latest,
     };
   }).sort((a, b) => {
