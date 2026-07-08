@@ -223,6 +223,7 @@ function SemesterPage() {
                     <MiniStat icon={NotebookPen} label="Notes" value={s.notes} tone="text-emerald-500" />
                     <MiniStat icon={Layers} label="Papers" value={s.papers} tone="text-amber-500" />
                     <MiniStat icon={CalendarClock} label="Deadlines" value={s.deadlines} tone="text-rose-500" />
+                    <MiniStat icon={Video} label="Kuppi" value={s.kuppis} tone="text-sky-500" />
                   </div>
                   <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
                     <span>{s.latest ? `Updated ${formatDistanceToNow(new Date(s.latest), { addSuffix: true })}` : "No uploads yet"}</span>
