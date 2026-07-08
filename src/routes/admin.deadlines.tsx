@@ -285,15 +285,16 @@ function DeadlineDialog({
       };
 
       if (editing) {
-        const { error } = await supabase.from("deadlines").update(payload).eq("id", editing.id);
-        if (error) throw error;
+        const res = await requestUpdateFn({ data: { entityType: "deadline", entityId: editing.id, proposedData: payload } });
         await logActivity({
           action_type: "deadline_edit",
-          description: `Edited deadline "${title.trim()}"`,
+          description: res.queued
+            ? `Requested edit for deadline "${title.trim()}"`
+            : `Edited deadline "${title.trim()}"`,
           target_type: "deadline", target_id: editing.id,
           semester_id: ctx.semesterId, subject_id: subjectId,
         });
-        toast.success("Deadline updated");
+        toast.success(res.queued ? "Edit sent to super admin for approval" : "Deadline updated");
       } else {
         const { data, error } = await supabase.from("deadlines").insert({
           ...payload,
@@ -317,6 +318,12 @@ function DeadlineDialog({
             console.error("telegram notify failed", err);
           }
         }
+        // Reset form so the next deadline starts empty.
+        setTitle("");
+        setDescription("");
+        setWhen("");
+        setFile(null);
+        if (inputRef.current) inputRef.current.value = "";
       }
       onSaved();
     } catch (e) {
