@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { KUPPI_MEDIUMS, mediumLabel } from "@/lib/kuppi";
+import { requestDelete, requestUpdate } from "@/lib/pending-changes.functions";
+import { useServerFn } from "@tanstack/react-start";
 
 type Kuppi = {
   id: string;
