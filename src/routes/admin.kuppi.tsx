@@ -210,11 +210,13 @@ function KuppiDialog({
   editing,
   subjects,
   onSaved,
+  requestUpdateFn,
 }: {
   ctx: AdminContext;
   editing: Kuppi | null;
   subjects: { id: string; name: string; code: string | null }[];
   onSaved: () => void;
+  requestUpdateFn: (opts: { data: { entityType: "kuppi"; entityId: string; proposedData: Record<string, unknown> } }) => Promise<{ queued: boolean }>;
 }) {
   const [subjectId, setSubjectId] = useState(editing?.subject_id ?? subjects[0]?.id ?? "");
   const [title, setTitle] = useState(editing?.title ?? "");
