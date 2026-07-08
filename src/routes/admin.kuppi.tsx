@@ -100,14 +100,14 @@ function Body({ ctx }: { ctx: AdminContext }) {
 
   const del = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await (supabase as any).from("kuppi_videos").delete().eq("id", id);
-      if (error) throw error;
+      const res = await doRequestDelete({ data: { entityType: "kuppi", entityId: id } });
+      return res;
     },
-    onSuccess: () => {
-      toast.success("Kuppi deleted");
+    onSuccess: (res) => {
+      toast.success(res.queued ? "Removal request sent to super admin" : "Kuppi deleted");
       qc.invalidateQueries({ queryKey: ["admin-kuppi"] });
     },
-    onError: (e: Error) => toast.error("Couldn't delete", { description: e.message }),
+    onError: (e: Error) => toast.error("Couldn't submit removal", { description: e.message }),
   });
 
   return (
