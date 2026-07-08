@@ -52,7 +52,14 @@ export const requestUpdate = createServerFn({ method: "POST" })
       return { queued: false };
     }
 
-    // Semester admin: queue for approval, live row untouched.
+    // Semester admin: apply the new version immediately so students see it,
+    // but snapshot the old row so super admin can approve (discard old) or
+    // reject (restore the old version and roll back).
+    const { error: upErr } = await (supabase.from(table) as any)
+      .update(data.proposedData)
+      .eq("id", data.entityId);
+    if (upErr) throw new Error(upErr.message);
+
     const { error: qErr } = await supabase.from("pending_changes").insert({
       entity_type: data.entityType,
       entity_id: data.entityId,
@@ -65,6 +72,7 @@ export const requestUpdate = createServerFn({ method: "POST" })
     if (qErr) throw new Error(qErr.message);
     return { queued: true };
   });
+
 
 /**
  * Admin proposes deletion. Live row is hidden immediately from students via
@@ -130,14 +138,13 @@ export const approveChange = createServerFn({ method: "POST" })
     const table = TABLE_BY_ENTITY[(p as any).entity_type as Entity];
 
     if ((p as any).action === "update") {
-      const { error: upErr } = await (supabase.from(table) as any)
-        .update((p as any).proposed_data ?? {})
-        .eq("id", (p as any).entity_id);
-      if (upErr) throw new Error(upErr.message);
+      // The live row was already updated at request time; approval just
+      // discards the snapshot (nothing to write to the live row).
     } else {
       const { error: delErr } = await supabase.from(table).delete().eq("id", (p as any).entity_id);
       if (delErr) throw new Error(delErr.message);
     }
+
 
     await supabase
       .from("pending_changes")
@@ -167,10 +174,17 @@ export const rejectChange = createServerFn({ method: "POST" })
     if (error || !p) throw new Error("Pending change not found");
     if ((p as any).status !== "pending") throw new Error("Already reviewed");
 
+    const table = TABLE_BY_ENTITY[(p as any).entity_type as Entity];
     if ((p as any).action === "delete") {
-      const table = TABLE_BY_ENTITY[(p as any).entity_type as Entity];
+      // Restore visibility — the live row was hidden but not deleted.
       await supabase.from(table).update({ pending_delete: false }).eq("id", (p as any).entity_id);
+    } else {
+      // Update was applied live at request time; roll back to the snapshot.
+      const snap = (p as any).snapshot ?? {};
+      const { id: _omitId, created_at: _omitCreated, ...restore } = snap;
+      await (supabase.from(table) as any).update(restore).eq("id", (p as any).entity_id);
     }
+
 
     await supabase
       .from("pending_changes")
