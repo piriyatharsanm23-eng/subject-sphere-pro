@@ -105,7 +105,7 @@ function KuppiPresenters() {
     queryFn: async () => {
       const [{ data: k }, { data: sems }, { data: subs }] = await Promise.all([
         (supabase as any)
-          .from("kuppi_videos")
+          .from("kuppi_videos").eq("pending_delete", false)
           .select("presenter_name,presenter_photo_url,semester_id,subject_id")
           .order("presenter_name"),
         supabase.from("semesters").select("id,name"),

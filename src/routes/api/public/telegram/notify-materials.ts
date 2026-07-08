@@ -43,7 +43,7 @@ export const Route = createFileRoute("/api/public/telegram/notify-materials")({
         }
 
         const { data: materials, error } = await sb()
-          .from("materials")
+          .from("materials").eq("pending_delete", false)
           .select("id,title,material_type,subject_id,subjects(name,code)")
           .is("telegram_notified_at", null)
           .eq("is_archived", false)
@@ -94,7 +94,7 @@ export const Route = createFileRoute("/api/public/telegram/notify-materials")({
 
         if (notifiedIds.length > 0) {
           await sb()
-            .from("materials")
+            .from("materials").eq("pending_delete", false)
             .update({ telegram_notified_at: new Date().toISOString() })
             .in("id", notifiedIds);
         }

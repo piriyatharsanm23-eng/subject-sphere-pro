@@ -70,7 +70,7 @@ function DashboardContent({ sel }: { sel: Selection }) {
     queryKey: ["materials", sel.subjectIds.join(",")],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("materials")
+        .from("materials").eq("pending_delete", false)
         .select("id,title,description,material_type,file_url,file_name,file_type,year,week_or_module,created_at,subject_id,uploaded_by")
         .in("subject_id", sel.subjectIds)
         .order("created_at", { ascending: false });
@@ -85,7 +85,7 @@ function DashboardContent({ sel }: { sel: Selection }) {
     queryKey: ["deadlines", sel.subjectIds.join(",")],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("deadlines")
+        .from("deadlines").eq("pending_delete", false)
         .select("id,title,description,deadline_at,subject_id,status,is_archived")
         .in("subject_id", sel.subjectIds)
         .eq("status", "active")

@@ -304,7 +304,7 @@ async function showMaterialList(
   const from = page * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
   const { data: materials, count } = await sb()
-    .from("materials")
+    .from("materials").eq("pending_delete", false)
     .select("id,title,material_type", { count: "exact" })
     .eq("subject_id", subjectId)
     .eq("material_type", type)
@@ -348,7 +348,7 @@ async function showMaterialList(
 
 async function sendMaterial(chatId: number, materialId: string) {
   const { data: m } = await sb()
-    .from("materials")
+    .from("materials").eq("pending_delete", false)
     .select("id,title,material_type,file_url,file_name,created_at,subject_id,semester_id,subjects(name),semesters(name)")
     .eq("id", materialId)
     .maybeSingle();
@@ -423,7 +423,7 @@ async function showSubjectDeadlines(chatId: number, messageId: number, subjectId
     .eq("id", subjectId)
     .maybeSingle();
   const { data } = await sb()
-    .from("deadlines")
+    .from("deadlines").eq("pending_delete", false)
     .select("title,description,deadline_at")
     .eq("subject_id", subjectId)
     .eq("is_archived", false)
@@ -585,7 +585,7 @@ async function cmdDeadlines(chatId: number) {
   if (subjects.length === 0) return sendMessage(chatId, "Enroll in subjects first — /enroll.");
   const ids = subjects.map((s: any) => s.id);
   const { data } = await sb()
-    .from("deadlines")
+    .from("deadlines").eq("pending_delete", false)
     .select("title,deadline_at,subjects(name)")
     .in("subject_id", ids)
     .eq("is_archived", false)

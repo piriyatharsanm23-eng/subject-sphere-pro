@@ -65,14 +65,14 @@ function Landing() {
       const [subjectsRes, materialsRes, deadlinesRes] = await Promise.all([
         supabase.from("subjects").select("id", { count: "exact", head: true }).eq("semester_id", semesterId),
         supabase
-          .from("materials")
+          .from("materials").eq("pending_delete", false)
           .select("id, title, material_type, subject:subjects(name)", { count: "exact" })
           .eq("is_archived", false)
           .eq("semester_id", semesterId)
           .order("created_at", { ascending: false })
           .limit(3),
         supabase
-          .from("deadlines")
+          .from("deadlines").eq("pending_delete", false)
           .select("id, title, deadline_at, subject:subjects(name)", { count: "exact" })
           .eq("is_archived", false)
           .eq("semester_id", semesterId)
@@ -324,8 +324,8 @@ function SemesterCards({ semesters }: { semesters: { id: string; name: string; d
     enabled: ids.length > 0,
     queryFn: async () => {
       const [mat, dead] = await Promise.all([
-        supabase.from("materials").select("semester_id,material_type").in("semester_id", ids).eq("is_archived", false),
-        supabase.from("deadlines").select("semester_id").in("semester_id", ids).eq("is_archived", false).eq("status", "active").gte("deadline_at", new Date().toISOString()),
+        supabase.from("materials").eq("pending_delete", false).select("semester_id,material_type").in("semester_id", ids).eq("is_archived", false),
+        supabase.from("deadlines").eq("pending_delete", false).select("semester_id").in("semester_id", ids).eq("is_archived", false).eq("status", "active").gte("deadline_at", new Date().toISOString()),
         // subjects loaded separately below
       ]);
       const subs = await supabase.from("subjects").select("id,semester_id").in("semester_id", ids);
@@ -407,7 +407,7 @@ function RecentUploads() {
     queryKey: ["home-recent-uploads"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("materials")
+        .from("materials").eq("pending_delete", false)
         .select("id,title,material_type,created_at,subject_id,semester_id,subject:subjects(name),semester:semesters(name)")
         .eq("is_archived", false)
         .order("created_at", { ascending: false })

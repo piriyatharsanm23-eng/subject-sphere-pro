@@ -25,7 +25,7 @@ function MaterialPage() {
     queryKey: ["material", id],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("materials")
+        .from("materials").eq("pending_delete", false)
         .select("id,title,description,material_type,file_url,file_name,file_type,year,week_or_module,created_at,subject_id,semester_id,uploaded_by")
         .eq("id", id)
         .maybeSingle();
@@ -61,7 +61,7 @@ function MaterialPage() {
     enabled: !!m?.subject_id,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("materials")
+        .from("materials").eq("pending_delete", false)
         .select("id,title,material_type,created_at")
         .eq("subject_id", m!.subject_id)
         .eq("is_archived", false)

@@ -77,7 +77,7 @@ function ContributorProfile() {
     queryKey: ["contributor-materials", id],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("materials")
+        .from("materials").eq("pending_delete", false)
         .select("id,title,material_type,week_or_module,created_at,subject:subjects(id,name,code)")
         .eq("uploaded_by", id)
         .eq("is_archived", false)
@@ -93,7 +93,7 @@ function ContributorProfile() {
     queryKey: ["contributor-deadlines", id],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("deadlines")
+        .from("deadlines").eq("pending_delete", false)
         .select("id,title,deadline_at,status,created_at,subject:subjects(id,name,code)")
         .eq("created_by", id)
         .eq("is_archived", false)
