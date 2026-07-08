@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
-  Activity, BarChart3, BookOpen, CalendarClock, FileText,
+  Activity, BarChart3, BookOpen, CalendarClock, ClipboardCheck, FileText,
   LayoutDashboard, Library, Loader2, MessageSquare, ShieldAlert,
   Star, User, Users, BookPlus,
 } from "lucide-react";
