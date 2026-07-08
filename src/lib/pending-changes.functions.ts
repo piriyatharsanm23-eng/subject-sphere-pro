@@ -130,8 +130,7 @@ export const approveChange = createServerFn({ method: "POST" })
     const table = TABLE_BY_ENTITY[(p as any).entity_type as Entity];
 
     if ((p as any).action === "update") {
-      const { error: upErr } = await supabase
-        .from(table)
+      const { error: upErr } = await (supabase.from(table) as any)
         .update((p as any).proposed_data ?? {})
         .eq("id", (p as any).entity_id);
       if (upErr) throw new Error(upErr.message);
