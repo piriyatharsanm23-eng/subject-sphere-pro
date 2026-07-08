@@ -252,12 +252,13 @@ function MaterialsPage({ ctx }: { ctx: AdminContext }) {
 }
 
 function MaterialDialog({
-  ctx, editing, subjects, onSaved,
+  ctx, editing, subjects, onSaved, requestUpdateFn,
 }: {
   ctx: AdminContext;
   editing: Material | null;
   subjects: { id: string; name: string; code: string | null }[];
   onSaved: () => void;
+  requestUpdateFn: (opts: { data: { entityType: "material"; entityId: string; proposedData: Record<string, unknown> } }) => Promise<{ queued: boolean }>;
 }) {
   const [title, setTitle] = useState(editing?.title ?? "");
   const [description, setDescription] = useState(editing?.description ?? "");
