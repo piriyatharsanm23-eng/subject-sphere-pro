@@ -104,17 +104,22 @@ function DeadlinesPage({ ctx }: { ctx: AdminContext }) {
   };
 
   const remove = async (d: Deadline) => {
-    if (!confirm(`Delete deadline "${d.title}"?`)) return;
-    if (d.attachment_url) await supabase.storage.from("learning-materials").remove([d.attachment_url]);
-    const { error } = await supabase.from("deadlines").delete().eq("id", d.id);
-    if (error) return toast.error(error.message);
-    await logActivity({
-      action_type: "deadline_delete", description: `Deleted deadline "${d.title}"`,
-      target_type: "deadline", target_id: d.id,
-      semester_id: d.semester_id, subject_id: d.subject_id,
-    });
-    toast.success("Deleted");
-    refresh();
+    if (!confirm(`Request removal of deadline "${d.title}"?\nA super admin must approve before it is permanently deleted.`)) return;
+    try {
+      const res = await doRequestDelete({ data: { entityType: "deadline", entityId: d.id } });
+      await logActivity({
+        action_type: "deadline_delete",
+        description: res.queued
+          ? `Requested deletion of deadline "${d.title}"`
+          : `Deleted deadline "${d.title}"`,
+        target_type: "deadline", target_id: d.id,
+        semester_id: d.semester_id, subject_id: d.subject_id,
+      });
+      toast.success(res.queued ? "Removal request sent to super admin" : "Deleted");
+      refresh();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to submit request");
+    }
   };
 
   const noSubjects = (subjectsQ.data ?? []).length === 0 && !subjectsQ.isLoading;
