@@ -101,7 +101,7 @@ export const requestDelete = createServerFn({ method: "POST" })
       entity_id: data.entityId,
       action: "delete",
       proposed_data: null,
-      snapshot: row,
+      snapshot: row as any,
       requested_by: userId,
       semester_id: (row as any).semester_id,
     });
