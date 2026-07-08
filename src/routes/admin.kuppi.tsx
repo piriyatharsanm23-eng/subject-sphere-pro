@@ -69,8 +69,8 @@ function Body({ ctx }: { ctx: AdminContext }) {
     queryKey: ["admin-kuppi", ctx.semesterId],
     queryFn: async () => {
       const { data, error } = await (supabase as any)
-        .from("kuppi_videos").eq("pending_delete", false)
-        .select("*")
+        .from("kuppi_videos")
+        .select("*").eq("pending_delete", false)
         .eq("semester_id", ctx.semesterId)
         .order("created_at", { ascending: false });
       if (error) throw error;

@@ -63,8 +63,8 @@ function DeadlinesPage({ ctx }: { ctx: AdminContext }) {
     queryKey: ["admin-deadlines", ctx.semesterId, subject, showArchived],
     queryFn: async () => {
       let qb = supabase
-        .from("deadlines").eq("pending_delete", false)
-        .select("id,title,description,deadline_at,attachment_url,semester_id,subject_id,status,is_archived")
+        .from("deadlines")
+        .select("id,title,description,deadline_at,attachment_url,semester_id,subject_id,status,is_archived").eq("pending_delete", false)
         .eq("semester_id", ctx.semesterId)
         .order("deadline_at", { ascending: true })
         .limit(500);
@@ -301,7 +301,7 @@ function DeadlineDialog({
           semester_id: ctx.semesterId,
           created_by: ctx.userId,
           status: "active",
-        }).select("id").maybeSingle();
+        }).select("id").eq("pending_delete", false).maybeSingle();
         if (error) throw error;
         await logActivity({
           action_type: "deadline_create",

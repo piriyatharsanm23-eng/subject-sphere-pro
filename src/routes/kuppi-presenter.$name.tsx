@@ -47,8 +47,8 @@ function PresenterPage() {
     queryFn: async () => {
       const [{ data: k }, { data: sems }, { data: subs }] = await Promise.all([
         (supabase as any)
-          .from("kuppi_videos").eq("pending_delete", false)
-          .select("id,title,description,sections_covered,medium,video_url,presenter_name,presenter_photo_url,semester_id,subject_id,created_at")
+          .from("kuppi_videos")
+          .select("id,title,description,sections_covered,medium,video_url,presenter_name,presenter_photo_url,semester_id,subject_id,created_at").eq("pending_delete", false)
           .ilike("presenter_name", decoded)
           .order("created_at", { ascending: false }),
         supabase.from("semesters").select("id,name"),
