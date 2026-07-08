@@ -342,7 +342,26 @@ function KuppiDialog({
           </div>
           <div className="grid gap-1.5">
             <Label>Presenter name*</Label>
-            <Input value={presenterName} onChange={(e) => setPresenterName(e.target.value)} placeholder="e.g. Kavindu Perera" />
+            <Input
+              list="kuppi-presenter-names"
+              value={presenterName}
+              onChange={(e) => {
+                const v = e.target.value;
+                setPresenterName(v);
+                // If matches an existing presenter and no photo yet, auto-fill photo.
+                const match = existingPresenters.find((n) => n.toLowerCase() === v.trim().toLowerCase());
+                if (match && !presenterPhoto && presenterPhotos[match]) {
+                  setPresenterPhoto(presenterPhotos[match]);
+                }
+              }}
+              placeholder="Pick from list or type a new name"
+            />
+            <datalist id="kuppi-presenter-names">
+              {existingPresenters.map((n) => <option key={n} value={n} />)}
+            </datalist>
+            <p className="text-[11px] text-muted-foreground">
+              {existingPresenters.length > 0 ? `${existingPresenters.length} existing presenter${existingPresenters.length === 1 ? "" : "s"} — start typing to reuse, or add a new name.` : "First kuppi in this semester — add the presenter's name."}
+            </p>
           </div>
         </div>
         <div className="grid gap-1.5">
