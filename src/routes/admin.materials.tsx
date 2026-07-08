@@ -19,6 +19,8 @@ import { AdminShell, type AdminContext } from "@/components/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
 import { MATERIAL_TYPES, materialTypeLabel } from "@/lib/materials";
 import { buildMaterialStoragePath, logActivity } from "@/lib/activity";
+import { requestDelete, requestUpdate } from "@/lib/pending-changes.functions";
+import { useServerFn } from "@tanstack/react-start";
 
 export const Route = createFileRoute("/admin/materials")({
   head: () => ({ meta: [{ title: "Materials — Admin" }] }),
