@@ -24,6 +24,7 @@ import { Route as SuperSubjectsRouteImport } from './routes/super.subjects'
 import { Route as SuperSemestersRouteImport } from './routes/super.semesters'
 import { Route as SuperRequestsRouteImport } from './routes/super.requests'
 import { Route as SuperProfileRouteImport } from './routes/super.profile'
+import { Route as SuperPendingRouteImport } from './routes/super.pending'
 import { Route as SuperModulesRouteImport } from './routes/super.modules'
 import { Route as SuperMaterialsRouteImport } from './routes/super.materials'
 import { Route as SuperFeedbackRouteImport } from './routes/super.feedback'
@@ -122,6 +123,11 @@ const SuperRequestsRoute = SuperRequestsRouteImport.update({
 const SuperProfileRoute = SuperProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => SuperRoute,
+} as any)
+const SuperPendingRoute = SuperPendingRouteImport.update({
+  id: '/pending',
+  path: '/pending',
   getParentRoute: () => SuperRoute,
 } as any)
 const SuperModulesRoute = SuperModulesRouteImport.update({
@@ -278,6 +284,7 @@ export interface FileRoutesByFullPath {
   '/super/feedback': typeof SuperFeedbackRoute
   '/super/materials': typeof SuperMaterialsRoute
   '/super/modules': typeof SuperModulesRoute
+  '/super/pending': typeof SuperPendingRoute
   '/super/profile': typeof SuperProfileRoute
   '/super/requests': typeof SuperRequestsRoute
   '/super/semesters': typeof SuperSemestersRoute
@@ -317,6 +324,7 @@ export interface FileRoutesByTo {
   '/super/feedback': typeof SuperFeedbackRoute
   '/super/materials': typeof SuperMaterialsRoute
   '/super/modules': typeof SuperModulesRoute
+  '/super/pending': typeof SuperPendingRoute
   '/super/profile': typeof SuperProfileRoute
   '/super/requests': typeof SuperRequestsRoute
   '/super/semesters': typeof SuperSemestersRoute
@@ -359,6 +367,7 @@ export interface FileRoutesById {
   '/super/feedback': typeof SuperFeedbackRoute
   '/super/materials': typeof SuperMaterialsRoute
   '/super/modules': typeof SuperModulesRoute
+  '/super/pending': typeof SuperPendingRoute
   '/super/profile': typeof SuperProfileRoute
   '/super/requests': typeof SuperRequestsRoute
   '/super/semesters': typeof SuperSemestersRoute
@@ -402,6 +411,7 @@ export interface FileRouteTypes {
     | '/super/feedback'
     | '/super/materials'
     | '/super/modules'
+    | '/super/pending'
     | '/super/profile'
     | '/super/requests'
     | '/super/semesters'
@@ -441,6 +451,7 @@ export interface FileRouteTypes {
     | '/super/feedback'
     | '/super/materials'
     | '/super/modules'
+    | '/super/pending'
     | '/super/profile'
     | '/super/requests'
     | '/super/semesters'
@@ -482,6 +493,7 @@ export interface FileRouteTypes {
     | '/super/feedback'
     | '/super/materials'
     | '/super/modules'
+    | '/super/pending'
     | '/super/profile'
     | '/super/requests'
     | '/super/semesters'
@@ -618,6 +630,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/super/profile'
       preLoaderRoute: typeof SuperProfileRouteImport
+      parentRoute: typeof SuperRoute
+    }
+    '/super/pending': {
+      id: '/super/pending'
+      path: '/pending'
+      fullPath: '/super/pending'
+      preLoaderRoute: typeof SuperPendingRouteImport
       parentRoute: typeof SuperRoute
     }
     '/super/modules': {
@@ -826,6 +845,7 @@ interface SuperRouteChildren {
   SuperFeedbackRoute: typeof SuperFeedbackRoute
   SuperMaterialsRoute: typeof SuperMaterialsRoute
   SuperModulesRoute: typeof SuperModulesRoute
+  SuperPendingRoute: typeof SuperPendingRoute
   SuperProfileRoute: typeof SuperProfileRoute
   SuperRequestsRoute: typeof SuperRequestsRoute
   SuperSemestersRoute: typeof SuperSemestersRoute
@@ -842,6 +862,7 @@ const SuperRouteChildren: SuperRouteChildren = {
   SuperFeedbackRoute: SuperFeedbackRoute,
   SuperMaterialsRoute: SuperMaterialsRoute,
   SuperModulesRoute: SuperModulesRoute,
+  SuperPendingRoute: SuperPendingRoute,
   SuperProfileRoute: SuperProfileRoute,
   SuperRequestsRoute: SuperRequestsRoute,
   SuperSemestersRoute: SuperSemestersRoute,
