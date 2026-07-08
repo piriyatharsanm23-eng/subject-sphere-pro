@@ -135,6 +135,8 @@ function Body({ ctx }: { ctx: AdminContext }) {
               ctx={ctx}
               editing={editing}
               subjects={subjectsQ.data ?? []}
+              existingPresenters={Array.from(new Set((kuppiQ.data ?? []).map((k) => k.presenter_name).filter(Boolean))).sort()}
+              presenterPhotos={Object.fromEntries((kuppiQ.data ?? []).filter((k) => k.presenter_photo_url).map((k) => [k.presenter_name, k.presenter_photo_url as string]))}
               requestUpdateFn={doRequestUpdate}
               onSaved={() => { setOpen(false); setEditing(null); qc.invalidateQueries({ queryKey: ["admin-kuppi"] }); }}
             />
