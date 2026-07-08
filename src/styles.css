@@ -334,7 +334,7 @@
 }
 
 @utility text-gradient {
-  background: linear-gradient(135deg, #C084FC 0%, #A855F7 50%, #7C3AED 100%);
+  background: linear-gradient(135deg, #A855F7 0%, #7C3AED 50%, #6D28D9 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
