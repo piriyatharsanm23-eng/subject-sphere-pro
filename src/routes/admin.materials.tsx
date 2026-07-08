@@ -68,7 +68,7 @@ function MaterialsPage({ ctx }: { ctx: AdminContext }) {
     queryKey: ["admin-materials", ctx.semesterId, subject, type, showArchived],
     queryFn: async () => {
       let qb = supabase
-        .from("materials")
+        .from("materials").eq("pending_delete", false)
         .select("id,title,description,material_type,year,week_or_module,semester_id,subject_id,file_url,file_name,is_archived,created_at")
         .eq("semester_id", ctx.semesterId)
         .order("created_at", { ascending: false })
