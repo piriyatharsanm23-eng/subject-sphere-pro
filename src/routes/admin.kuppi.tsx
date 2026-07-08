@@ -135,6 +135,8 @@ function Body({ ctx }: { ctx: AdminContext }) {
               ctx={ctx}
               editing={editing}
               subjects={subjectsQ.data ?? []}
+              existingPresenters={Array.from(new Set((kuppiQ.data ?? []).map((k) => k.presenter_name).filter(Boolean))).sort()}
+              presenterPhotos={Object.fromEntries((kuppiQ.data ?? []).filter((k) => k.presenter_photo_url).map((k) => [k.presenter_name, k.presenter_photo_url as string]))}
               requestUpdateFn={doRequestUpdate}
               onSaved={() => { setOpen(false); setEditing(null); qc.invalidateQueries({ queryKey: ["admin-kuppi"] }); }}
             />
@@ -212,12 +214,16 @@ function KuppiDialog({
   subjects,
   onSaved,
   requestUpdateFn,
+  existingPresenters,
+  presenterPhotos,
 }: {
   ctx: AdminContext;
   editing: Kuppi | null;
   subjects: { id: string; name: string; code: string | null }[];
   onSaved: () => void;
   requestUpdateFn: (opts: { data: { entityType: "kuppi"; entityId: string; proposedData: Record<string, unknown> } }) => Promise<{ queued: boolean }>;
+  existingPresenters: string[];
+  presenterPhotos: Record<string, string>;
 }) {
   const [subjectId, setSubjectId] = useState(editing?.subject_id ?? subjects[0]?.id ?? "");
   const [title, setTitle] = useState(editing?.title ?? "");
@@ -336,7 +342,26 @@ function KuppiDialog({
           </div>
           <div className="grid gap-1.5">
             <Label>Presenter name*</Label>
-            <Input value={presenterName} onChange={(e) => setPresenterName(e.target.value)} placeholder="e.g. Kavindu Perera" />
+            <Input
+              list="kuppi-presenter-names"
+              value={presenterName}
+              onChange={(e) => {
+                const v = e.target.value;
+                setPresenterName(v);
+                // If matches an existing presenter and no photo yet, auto-fill photo.
+                const match = existingPresenters.find((n) => n.toLowerCase() === v.trim().toLowerCase());
+                if (match && !presenterPhoto && presenterPhotos[match]) {
+                  setPresenterPhoto(presenterPhotos[match]);
+                }
+              }}
+              placeholder="Pick from list or type a new name"
+            />
+            <datalist id="kuppi-presenter-names">
+              {existingPresenters.map((n) => <option key={n} value={n} />)}
+            </datalist>
+            <p className="text-[11px] text-muted-foreground">
+              {existingPresenters.length > 0 ? `${existingPresenters.length} existing presenter${existingPresenters.length === 1 ? "" : "s"} — start typing to reuse, or add a new name.` : "First kuppi in this semester — add the presenter's name."}
+            </p>
           </div>
         </div>
         <div className="grid gap-1.5">
