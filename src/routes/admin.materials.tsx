@@ -110,17 +110,22 @@ function MaterialsPage({ ctx }: { ctx: AdminContext }) {
   };
 
   const remove = async (m: Material) => {
-    if (!confirm(`Permanently delete "${m.title}"?`)) return;
-    if (m.file_url) await supabase.storage.from("learning-materials").remove([m.file_url]);
-    const { error } = await supabase.from("materials").delete().eq("id", m.id);
-    if (error) return toast.error(error.message);
-    await logActivity({
-      action_type: "delete", description: `Deleted material "${m.title}"`,
-      target_type: "material", target_id: m.id,
-      semester_id: m.semester_id, subject_id: m.subject_id,
-    });
-    toast.success("Material deleted");
-    refresh();
+    if (!confirm(`Request removal of "${m.title}"?\nA super admin must approve before it is permanently deleted.`)) return;
+    try {
+      const res = await doRequestDelete({ data: { entityType: "material", entityId: m.id } });
+      await logActivity({
+        action_type: "delete",
+        description: res.queued
+          ? `Requested deletion of material "${m.title}"`
+          : `Deleted material "${m.title}"`,
+        target_type: "material", target_id: m.id,
+        semester_id: m.semester_id, subject_id: m.subject_id,
+      });
+      toast.success(res.queued ? "Removal request sent to super admin" : "Material deleted");
+      refresh();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to submit request");
+    }
   };
 
   const downloadOne = async (m: Material) => {
