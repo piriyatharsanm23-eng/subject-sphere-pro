@@ -150,6 +150,7 @@ function MaterialsPage({ ctx }: { ctx: AdminContext }) {
             ctx={ctx}
             editing={editing}
             subjects={subjectsQ.data ?? []}
+            requestUpdateFn={doRequestUpdate}
             onSaved={() => { setOpen(false); setEditing(null); refresh(); }}
           />
         </Dialog>
