@@ -20,6 +20,8 @@ import { AdminShell, type AdminContext } from "@/components/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
 import { buildMaterialStoragePath, logActivity } from "@/lib/activity";
 import { notifyDeadlineCreated } from "@/lib/notify-deadline.functions";
+import { requestDelete, requestUpdate } from "@/lib/pending-changes.functions";
+import { useServerFn } from "@tanstack/react-start";
 
 export const Route = createFileRoute("/admin/deadlines")({
   head: () => ({ meta: [{ title: "Deadlines — Admin" }] }),
