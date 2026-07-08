@@ -47,7 +47,7 @@ export const requestUpdate = createServerFn({ method: "POST" })
 
     // Super admin applies immediately.
     if (isSuper) {
-      const { error: upErr } = await supabase.from(table).update(data.proposedData).eq("id", data.entityId);
+      const { error: upErr } = await (supabase.from(table) as any).update(data.proposedData).eq("id", data.entityId);
       if (upErr) throw new Error(upErr.message);
       return { queued: false };
     }
@@ -57,8 +57,8 @@ export const requestUpdate = createServerFn({ method: "POST" })
       entity_type: data.entityType,
       entity_id: data.entityId,
       action: "update",
-      proposed_data: data.proposedData,
-      snapshot: row,
+      proposed_data: data.proposedData as any,
+      snapshot: row as any,
       requested_by: userId,
       semester_id: (row as any).semester_id,
     });
