@@ -233,12 +233,13 @@ function toLocalInput(iso: string | null) {
 }
 
 function DeadlineDialog({
-  ctx, editing, subjects, onSaved,
+  ctx, editing, subjects, onSaved, requestUpdateFn,
 }: {
   ctx: AdminContext;
   editing: Deadline | null;
   subjects: { id: string; name: string; code: string | null }[];
   onSaved: () => void;
+  requestUpdateFn: (opts: { data: { entityType: "deadline"; entityId: string; proposedData: Record<string, unknown> } }) => Promise<{ queued: boolean }>;
 }) {
   const [title, setTitle] = useState(editing?.title ?? "");
   const [description, setDescription] = useState(editing?.description ?? "");
