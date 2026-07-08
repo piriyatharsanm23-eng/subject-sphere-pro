@@ -66,14 +66,14 @@ function Landing() {
         supabase.from("subjects").select("id", { count: "exact", head: true }).eq("semester_id", semesterId),
         supabase
           .from("materials")
-          .select("id, title, material_type, subject:subjects(name)", { count: "exact" })
+          .select("id, title, material_type, subject:subjects(name)", { count: "exact" }).eq("pending_delete", false)
           .eq("is_archived", false)
           .eq("semester_id", semesterId)
           .order("created_at", { ascending: false })
           .limit(3),
         supabase
           .from("deadlines")
-          .select("id, title, deadline_at, subject:subjects(name)", { count: "exact" })
+          .select("id, title, deadline_at, subject:subjects(name)", { count: "exact" }).eq("pending_delete", false)
           .eq("is_archived", false)
           .eq("semester_id", semesterId)
           .gte("deadline_at", new Date().toISOString())
@@ -324,8 +324,8 @@ function SemesterCards({ semesters }: { semesters: { id: string; name: string; d
     enabled: ids.length > 0,
     queryFn: async () => {
       const [mat, dead] = await Promise.all([
-        supabase.from("materials").select("semester_id,material_type").in("semester_id", ids).eq("is_archived", false),
-        supabase.from("deadlines").select("semester_id").in("semester_id", ids).eq("is_archived", false).eq("status", "active").gte("deadline_at", new Date().toISOString()),
+        supabase.from("materials").select("semester_id,material_type").eq("pending_delete", false).in("semester_id", ids).eq("is_archived", false),
+        supabase.from("deadlines").select("semester_id").eq("pending_delete", false).in("semester_id", ids).eq("is_archived", false).eq("status", "active").gte("deadline_at", new Date().toISOString()),
         // subjects loaded separately below
       ]);
       const subs = await supabase.from("subjects").select("id,semester_id").in("semester_id", ids);
@@ -408,7 +408,7 @@ function RecentUploads() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("materials")
-        .select("id,title,material_type,created_at,subject_id,semester_id,subject:subjects(name),semester:semesters(name)")
+        .select("id,title,material_type,created_at,subject_id,semester_id,subject:subjects(name),semester:semesters(name)").eq("pending_delete", false)
         .eq("is_archived", false)
         .order("created_at", { ascending: false })
         .limit(6);

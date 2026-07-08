@@ -43,14 +43,14 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean; onOpenChan
         supabase.from("subjects").select("id,name,code").or(`name.ilike.${like},code.ilike.${like}`).limit(8),
         supabase
           .from("materials")
-          .select("id,title,material_type,year,subject_id,semester_id")
+          .select("id,title,material_type,year,subject_id,semester_id").eq("pending_delete", false)
           .eq("is_archived", false)
           .or(`title.ilike.${like},year.ilike.${like}`)
           .order("created_at", { ascending: false })
           .limit(10),
         supabase
           .from("deadlines")
-          .select("id,title,subject_id,semester_id,deadline_at")
+          .select("id,title,subject_id,semester_id,deadline_at").eq("pending_delete", false)
           .eq("is_archived", false)
           .eq("status", "active")
           .ilike("title", like)

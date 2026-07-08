@@ -305,7 +305,7 @@ async function showMaterialList(
   const to = from + PAGE_SIZE - 1;
   const { data: materials, count } = await sb()
     .from("materials")
-    .select("id,title,material_type", { count: "exact" })
+    .select("id,title,material_type", { count: "exact" }).eq("pending_delete", false)
     .eq("subject_id", subjectId)
     .eq("material_type", type)
     .eq("is_archived", false)
@@ -349,7 +349,7 @@ async function showMaterialList(
 async function sendMaterial(chatId: number, materialId: string) {
   const { data: m } = await sb()
     .from("materials")
-    .select("id,title,material_type,file_url,file_name,created_at,subject_id,semester_id,subjects(name),semesters(name)")
+    .select("id,title,material_type,file_url,file_name,created_at,subject_id,semester_id,subjects(name),semesters(name)").eq("pending_delete", false)
     .eq("id", materialId)
     .maybeSingle();
 
@@ -424,7 +424,7 @@ async function showSubjectDeadlines(chatId: number, messageId: number, subjectId
     .maybeSingle();
   const { data } = await sb()
     .from("deadlines")
-    .select("title,description,deadline_at")
+    .select("title,description,deadline_at").eq("pending_delete", false)
     .eq("subject_id", subjectId)
     .eq("is_archived", false)
     .eq("status", "active")
@@ -586,7 +586,7 @@ async function cmdDeadlines(chatId: number) {
   const ids = subjects.map((s: any) => s.id);
   const { data } = await sb()
     .from("deadlines")
-    .select("title,deadline_at,subjects(name)")
+    .select("title,deadline_at,subjects(name)").eq("pending_delete", false)
     .in("subject_id", ids)
     .eq("is_archived", false)
     .eq("status", "active")

@@ -46,7 +46,7 @@ function SubjectPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("materials")
-        .select("id,title,description,material_type,file_url,file_name,file_type,year,week_or_module,created_at,uploaded_by")
+        .select("id,title,description,material_type,file_url,file_name,file_type,year,week_or_module,created_at,uploaded_by").eq("pending_delete", false)
         .eq("subject_id", id)
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -60,7 +60,7 @@ function SubjectPage() {
     queryKey: ["subject-deadlines", id],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("deadlines").select("id,title,description,deadline_at,status")
+        .from("deadlines").select("id,title,description,deadline_at,status").eq("pending_delete", false)
         .eq("subject_id", id).eq("status", "active").gte("deadline_at", new Date().toISOString())
         .order("deadline_at", { ascending: true });
       if (error) throw error;
@@ -73,7 +73,7 @@ function SubjectPage() {
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from("kuppi_videos")
-        .select("id,title,description,sections_covered,medium,video_url,presenter_name,presenter_photo_url,created_at")
+        .select("id,title,description,sections_covered,medium,video_url,presenter_name,presenter_photo_url,created_at").eq("pending_delete", false)
         .eq("subject_id", id)
         .order("created_at", { ascending: false });
       if (error) throw error;

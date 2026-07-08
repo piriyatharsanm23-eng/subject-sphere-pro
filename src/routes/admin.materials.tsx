@@ -19,6 +19,8 @@ import { AdminShell, type AdminContext } from "@/components/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
 import { MATERIAL_TYPES, materialTypeLabel } from "@/lib/materials";
 import { buildMaterialStoragePath, logActivity } from "@/lib/activity";
+import { requestDelete, requestUpdate } from "@/lib/pending-changes.functions";
+import { useServerFn } from "@tanstack/react-start";
 
 export const Route = createFileRoute("/admin/materials")({
   head: () => ({ meta: [{ title: "Materials — Admin" }] }),
@@ -43,6 +45,8 @@ function AdminMaterialsRoute() {
 
 function MaterialsPage({ ctx }: { ctx: AdminContext }) {
   const qc = useQueryClient();
+  const doRequestDelete = useServerFn(requestDelete);
+  const doRequestUpdate = useServerFn(requestUpdate);
   const [q, setQ] = useState("");
   const [subject, setSubject] = useState("all");
   const [type, setType] = useState("all");
@@ -65,7 +69,7 @@ function MaterialsPage({ ctx }: { ctx: AdminContext }) {
     queryFn: async () => {
       let qb = supabase
         .from("materials")
-        .select("id,title,description,material_type,year,week_or_module,semester_id,subject_id,file_url,file_name,is_archived,created_at")
+        .select("id,title,description,material_type,year,week_or_module,semester_id,subject_id,file_url,file_name,is_archived,created_at").eq("pending_delete", false)
         .eq("semester_id", ctx.semesterId)
         .order("created_at", { ascending: false })
         .limit(500);
@@ -106,17 +110,22 @@ function MaterialsPage({ ctx }: { ctx: AdminContext }) {
   };
 
   const remove = async (m: Material) => {
-    if (!confirm(`Permanently delete "${m.title}"?`)) return;
-    if (m.file_url) await supabase.storage.from("learning-materials").remove([m.file_url]);
-    const { error } = await supabase.from("materials").delete().eq("id", m.id);
-    if (error) return toast.error(error.message);
-    await logActivity({
-      action_type: "delete", description: `Deleted material "${m.title}"`,
-      target_type: "material", target_id: m.id,
-      semester_id: m.semester_id, subject_id: m.subject_id,
-    });
-    toast.success("Material deleted");
-    refresh();
+    if (!confirm(`Request removal of "${m.title}"?\nA super admin must approve before it is permanently deleted.`)) return;
+    try {
+      const res = await doRequestDelete({ data: { entityType: "material", entityId: m.id } });
+      await logActivity({
+        action_type: "delete",
+        description: res.queued
+          ? `Requested deletion of material "${m.title}"`
+          : `Deleted material "${m.title}"`,
+        target_type: "material", target_id: m.id,
+        semester_id: m.semester_id, subject_id: m.subject_id,
+      });
+      toast.success(res.queued ? "Removal request sent to super admin" : "Material deleted");
+      refresh();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to submit request");
+    }
   };
 
   const downloadOne = async (m: Material) => {
@@ -141,6 +150,7 @@ function MaterialsPage({ ctx }: { ctx: AdminContext }) {
             ctx={ctx}
             editing={editing}
             subjects={subjectsQ.data ?? []}
+            requestUpdateFn={doRequestUpdate}
             onSaved={() => { setOpen(false); setEditing(null); refresh(); }}
           />
         </Dialog>
@@ -242,12 +252,13 @@ function MaterialsPage({ ctx }: { ctx: AdminContext }) {
 }
 
 function MaterialDialog({
-  ctx, editing, subjects, onSaved,
+  ctx, editing, subjects, onSaved, requestUpdateFn,
 }: {
   ctx: AdminContext;
   editing: Material | null;
   subjects: { id: string; name: string; code: string | null }[];
   onSaved: () => void;
+  requestUpdateFn: (opts: { data: { entityType: "material"; entityId: string; proposedData: Record<string, unknown> } }) => Promise<{ queued: boolean }>;
 }) {
   const [title, setTitle] = useState(editing?.title ?? "");
   const [description, setDescription] = useState(editing?.description ?? "");
@@ -297,7 +308,7 @@ function MaterialDialog({
 
       setProgress("Saving…");
       if (editing) {
-        const { error } = await supabase.from("materials").update({
+        const proposed: Record<string, unknown> = {
           title: title.trim(),
           description: description.trim() || null,
           subject_id: subjectId,
@@ -305,15 +316,17 @@ function MaterialDialog({
           year: year.trim() || null,
           week_or_module: weekOrModule.trim() || null,
           ...(file ? { file_url, file_name, file_type } : {}),
-        }).eq("id", editing.id);
-        if (error) throw error;
+        };
+        const res = await requestUpdateFn({ data: { entityType: "material", entityId: editing.id, proposedData: proposed } });
         await logActivity({
           action_type: "edit",
-          description: `Edited material "${title.trim()}"`,
+          description: res.queued
+            ? `Requested edit for material "${title.trim()}"`
+            : `Edited material "${title.trim()}"`,
           target_type: "material", target_id: editing.id,
           semester_id: ctx.semesterId, subject_id: subjectId,
         });
-        toast.success("Material updated");
+        toast.success(res.queued ? "Edit sent to super admin for approval" : "Material updated");
       } else {
         const { data, error } = await supabase.from("materials").insert({
           semester_id: ctx.semesterId,
@@ -336,6 +349,13 @@ function MaterialDialog({
           semester_id: ctx.semesterId, subject_id: subjectId,
         });
         toast.success("Material uploaded");
+        // Reset the create form so the next upload starts clean.
+        setTitle("");
+        setDescription("");
+        setYear("");
+        setWeekOrModule("");
+        setFile(null);
+        if (inputRef.current) inputRef.current.value = "";
       }
       onSaved();
     } catch (e) {

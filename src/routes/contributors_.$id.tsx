@@ -78,7 +78,7 @@ function ContributorProfile() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("materials")
-        .select("id,title,material_type,week_or_module,created_at,subject:subjects(id,name,code)")
+        .select("id,title,material_type,week_or_module,created_at,subject:subjects(id,name,code)").eq("pending_delete", false)
         .eq("uploaded_by", id)
         .eq("is_archived", false)
         .order("created_at", { ascending: false })
@@ -94,7 +94,7 @@ function ContributorProfile() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("deadlines")
-        .select("id,title,deadline_at,status,created_at,subject:subjects(id,name,code)")
+        .select("id,title,deadline_at,status,created_at,subject:subjects(id,name,code)").eq("pending_delete", false)
         .eq("created_by", id)
         .eq("is_archived", false)
         .order("created_at", { ascending: false })

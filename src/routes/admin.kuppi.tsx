@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { KUPPI_MEDIUMS, mediumLabel } from "@/lib/kuppi";
+import { requestDelete, requestUpdate } from "@/lib/pending-changes.functions";
+import { useServerFn } from "@tanstack/react-start";
 
 type Kuppi = {
   id: string;
@@ -46,6 +48,8 @@ export const Route = createFileRoute("/admin/kuppi")({
 
 function Body({ ctx }: { ctx: AdminContext }) {
   const qc = useQueryClient();
+  const doRequestDelete = useServerFn(requestDelete);
+  const doRequestUpdate = useServerFn(requestUpdate);
   const [q, setQ] = useState("");
   const [med, setMed] = useState<string>("all");
   const [editing, setEditing] = useState<Kuppi | null>(null);
@@ -66,7 +70,7 @@ function Body({ ctx }: { ctx: AdminContext }) {
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from("kuppi_videos")
-        .select("*")
+        .select("*").eq("pending_delete", false)
         .eq("semester_id", ctx.semesterId)
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -96,14 +100,14 @@ function Body({ ctx }: { ctx: AdminContext }) {
 
   const del = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await (supabase as any).from("kuppi_videos").delete().eq("id", id);
-      if (error) throw error;
+      const res = await doRequestDelete({ data: { entityType: "kuppi", entityId: id } });
+      return res;
     },
-    onSuccess: () => {
-      toast.success("Kuppi deleted");
+    onSuccess: (res) => {
+      toast.success(res.queued ? "Removal request sent to super admin" : "Kuppi deleted");
       qc.invalidateQueries({ queryKey: ["admin-kuppi"] });
     },
-    onError: (e: Error) => toast.error("Couldn't delete", { description: e.message }),
+    onError: (e: Error) => toast.error("Couldn't submit removal", { description: e.message }),
   });
 
   return (
@@ -131,6 +135,7 @@ function Body({ ctx }: { ctx: AdminContext }) {
               ctx={ctx}
               editing={editing}
               subjects={subjectsQ.data ?? []}
+              requestUpdateFn={doRequestUpdate}
               onSaved={() => { setOpen(false); setEditing(null); qc.invalidateQueries({ queryKey: ["admin-kuppi"] }); }}
             />
           </Dialog>
@@ -206,11 +211,13 @@ function KuppiDialog({
   editing,
   subjects,
   onSaved,
+  requestUpdateFn,
 }: {
   ctx: AdminContext;
   editing: Kuppi | null;
   subjects: { id: string; name: string; code: string | null }[];
   onSaved: () => void;
+  requestUpdateFn: (opts: { data: { entityType: "kuppi"; entityId: string; proposedData: Record<string, unknown> } }) => Promise<{ queued: boolean }>;
 }) {
   const [subjectId, setSubjectId] = useState(editing?.subject_id ?? subjects[0]?.id ?? "");
   const [title, setTitle] = useState(editing?.title ?? "");
@@ -266,11 +273,15 @@ function KuppiDialog({
       presenter_photo_url: presenterPhoto.trim() || null,
     };
     if (editing) {
-      const { error } = await (supabase as any).from("kuppi_videos").update(payload).eq("id", editing.id);
-      setSaving(false);
-      if (error) return toast.error("Couldn't save", { description: error.message });
-      toast.success("Kuppi updated");
-      onSaved();
+      try {
+        const res = await requestUpdateFn({ data: { entityType: "kuppi", entityId: editing.id, proposedData: payload } });
+        setSaving(false);
+        toast.success(res.queued ? "Edit sent to super admin for approval" : "Kuppi updated");
+        onSaved();
+      } catch (e) {
+        setSaving(false);
+        toast.error("Couldn't save", { description: e instanceof Error ? e.message : "Failed" });
+      }
     } else {
       const { data: sess } = await supabase.auth.getSession();
       const uid = sess.session?.user.id;
@@ -278,6 +289,13 @@ function KuppiDialog({
       setSaving(false);
       if (error) return toast.error("Couldn't save", { description: error.message });
       toast.success("Kuppi added");
+      // Reset form fields so the next entry starts empty.
+      setTitle("");
+      setVideoUrl("");
+      setPresenterName("");
+      setPresenterPhoto("");
+      setSections("");
+      setDescription("");
       onSaved();
     }
   };

@@ -47,7 +47,7 @@ function SemesterPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("materials")
-        .select("id,subject_id,material_type,created_at")
+        .select("id,subject_id,material_type,created_at").eq("pending_delete", false)
         .eq("semester_id", id)
         .eq("is_archived", false);
       if (error) throw error;
@@ -60,7 +60,7 @@ function SemesterPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("deadlines")
-        .select("id,subject_id")
+        .select("id,subject_id").eq("pending_delete", false)
         .eq("semester_id", id)
         .eq("status", "active")
         .eq("is_archived", false)

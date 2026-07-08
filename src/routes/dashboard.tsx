@@ -71,7 +71,7 @@ function DashboardContent({ sel }: { sel: Selection }) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("materials")
-        .select("id,title,description,material_type,file_url,file_name,file_type,year,week_or_module,created_at,subject_id,uploaded_by")
+        .select("id,title,description,material_type,file_url,file_name,file_type,year,week_or_module,created_at,subject_id,uploaded_by").eq("pending_delete", false)
         .in("subject_id", sel.subjectIds)
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -86,7 +86,7 @@ function DashboardContent({ sel }: { sel: Selection }) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("deadlines")
-        .select("id,title,description,deadline_at,subject_id,status,is_archived")
+        .select("id,title,description,deadline_at,subject_id,status,is_archived").eq("pending_delete", false)
         .in("subject_id", sel.subjectIds)
         .eq("status", "active")
         .eq("is_archived", false)

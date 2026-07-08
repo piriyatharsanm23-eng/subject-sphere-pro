@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
-  Activity, BarChart3, BookOpen, CalendarClock, FileText,
+  Activity, BarChart3, BookOpen, CalendarClock, ClipboardCheck, FileText,
   LayoutDashboard, Library, Loader2, MessageSquare, ShieldAlert,
   Star, User, Users, BookPlus,
 } from "lucide-react";
@@ -20,6 +20,7 @@ const NAV: NavItem[] = [
   { to: "/super/materials", label: "Materials", icon: FileText },
   { to: "/super/deadlines", label: "Deadlines", icon: CalendarClock },
   { to: "/super/requests", label: "Requests", icon: MessageSquare },
+  { to: "/super/pending", label: "Pending changes", icon: ClipboardCheck },
   { to: "/super/feedback", label: "Feedback", icon: Star },
   { to: "/super/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/super/activity", label: "Activity Log", icon: Activity },

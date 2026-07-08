@@ -20,6 +20,8 @@ import { AdminShell, type AdminContext } from "@/components/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
 import { buildMaterialStoragePath, logActivity } from "@/lib/activity";
 import { notifyDeadlineCreated } from "@/lib/notify-deadline.functions";
+import { requestDelete, requestUpdate } from "@/lib/pending-changes.functions";
+import { useServerFn } from "@tanstack/react-start";
 
 export const Route = createFileRoute("/admin/deadlines")({
   head: () => ({ meta: [{ title: "Deadlines — Admin" }] }),
@@ -43,6 +45,8 @@ function AdminDeadlinesRoute() {
 
 function DeadlinesPage({ ctx }: { ctx: AdminContext }) {
   const qc = useQueryClient();
+  const doRequestDelete = useServerFn(requestDelete);
+  const doRequestUpdate = useServerFn(requestUpdate);
   const [q, setQ] = useState("");
   const [subject, setSubject] = useState("all");
   const [showArchived, setShowArchived] = useState(false);
@@ -60,7 +64,7 @@ function DeadlinesPage({ ctx }: { ctx: AdminContext }) {
     queryFn: async () => {
       let qb = supabase
         .from("deadlines")
-        .select("id,title,description,deadline_at,attachment_url,semester_id,subject_id,status,is_archived")
+        .select("id,title,description,deadline_at,attachment_url,semester_id,subject_id,status,is_archived").eq("pending_delete", false)
         .eq("semester_id", ctx.semesterId)
         .order("deadline_at", { ascending: true })
         .limit(500);
@@ -100,17 +104,22 @@ function DeadlinesPage({ ctx }: { ctx: AdminContext }) {
   };
 
   const remove = async (d: Deadline) => {
-    if (!confirm(`Delete deadline "${d.title}"?`)) return;
-    if (d.attachment_url) await supabase.storage.from("learning-materials").remove([d.attachment_url]);
-    const { error } = await supabase.from("deadlines").delete().eq("id", d.id);
-    if (error) return toast.error(error.message);
-    await logActivity({
-      action_type: "deadline_delete", description: `Deleted deadline "${d.title}"`,
-      target_type: "deadline", target_id: d.id,
-      semester_id: d.semester_id, subject_id: d.subject_id,
-    });
-    toast.success("Deleted");
-    refresh();
+    if (!confirm(`Request removal of deadline "${d.title}"?\nA super admin must approve before it is permanently deleted.`)) return;
+    try {
+      const res = await doRequestDelete({ data: { entityType: "deadline", entityId: d.id } });
+      await logActivity({
+        action_type: "deadline_delete",
+        description: res.queued
+          ? `Requested deletion of deadline "${d.title}"`
+          : `Deleted deadline "${d.title}"`,
+        target_type: "deadline", target_id: d.id,
+        semester_id: d.semester_id, subject_id: d.subject_id,
+      });
+      toast.success(res.queued ? "Removal request sent to super admin" : "Deleted");
+      refresh();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to submit request");
+    }
   };
 
   const noSubjects = (subjectsQ.data ?? []).length === 0 && !subjectsQ.isLoading;
@@ -128,6 +137,7 @@ function DeadlinesPage({ ctx }: { ctx: AdminContext }) {
             ctx={ctx}
             editing={editing}
             subjects={subjectsQ.data ?? []}
+            requestUpdateFn={doRequestUpdate}
             onSaved={() => { setOpen(false); setEditing(null); refresh(); }}
           />
         </Dialog>
@@ -223,12 +233,13 @@ function toLocalInput(iso: string | null) {
 }
 
 function DeadlineDialog({
-  ctx, editing, subjects, onSaved,
+  ctx, editing, subjects, onSaved, requestUpdateFn,
 }: {
   ctx: AdminContext;
   editing: Deadline | null;
   subjects: { id: string; name: string; code: string | null }[];
   onSaved: () => void;
+  requestUpdateFn: (opts: { data: { entityType: "deadline"; entityId: string; proposedData: Record<string, unknown> } }) => Promise<{ queued: boolean }>;
 }) {
   const [title, setTitle] = useState(editing?.title ?? "");
   const [description, setDescription] = useState(editing?.description ?? "");
@@ -274,22 +285,23 @@ function DeadlineDialog({
       };
 
       if (editing) {
-        const { error } = await supabase.from("deadlines").update(payload).eq("id", editing.id);
-        if (error) throw error;
+        const res = await requestUpdateFn({ data: { entityType: "deadline", entityId: editing.id, proposedData: payload } });
         await logActivity({
           action_type: "deadline_edit",
-          description: `Edited deadline "${title.trim()}"`,
+          description: res.queued
+            ? `Requested edit for deadline "${title.trim()}"`
+            : `Edited deadline "${title.trim()}"`,
           target_type: "deadline", target_id: editing.id,
           semester_id: ctx.semesterId, subject_id: subjectId,
         });
-        toast.success("Deadline updated");
+        toast.success(res.queued ? "Edit sent to super admin for approval" : "Deadline updated");
       } else {
         const { data, error } = await supabase.from("deadlines").insert({
           ...payload,
           semester_id: ctx.semesterId,
           created_by: ctx.userId,
           status: "active",
-        }).select("id").maybeSingle();
+        }).select("id").eq("pending_delete", false).maybeSingle();
         if (error) throw error;
         await logActivity({
           action_type: "deadline_create",
@@ -306,6 +318,12 @@ function DeadlineDialog({
             console.error("telegram notify failed", err);
           }
         }
+        // Reset form so the next deadline starts empty.
+        setTitle("");
+        setDescription("");
+        setWhen("");
+        setFile(null);
+        if (inputRef.current) inputRef.current.value = "";
       }
       onSaved();
     } catch (e) {

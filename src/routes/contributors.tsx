@@ -106,7 +106,7 @@ function KuppiPresenters() {
       const [{ data: k }, { data: sems }, { data: subs }] = await Promise.all([
         (supabase as any)
           .from("kuppi_videos")
-          .select("presenter_name,presenter_photo_url,semester_id,subject_id")
+          .select("presenter_name,presenter_photo_url,semester_id,subject_id").eq("pending_delete", false)
           .order("presenter_name"),
         supabase.from("semesters").select("id,name"),
         supabase.from("subjects").select("id,name,code"),
