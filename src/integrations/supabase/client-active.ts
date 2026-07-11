@@ -39,7 +39,7 @@ function createExternalClient() {
     process.env.EXTERNAL_SUPABASE_ANON_KEY;
   if (!url || !key) {
     throw new Error(
-      "VITE_BACKEND=external but VITE_EXTERNAL_SUPABASE_URL / VITE_EXTERNAL_SUPABASE_PUBLISHABLE_KEY are missing in .env.local",
+      "VITE_BACKEND=external but VITE_EXTERNAL_SUPABASE_URL / VITE_EXTERNAL_SUPABASE_PUBLISHABLE_KEY are missing in .env",
     );
   }
   return createClient<Database>(url, key, {
