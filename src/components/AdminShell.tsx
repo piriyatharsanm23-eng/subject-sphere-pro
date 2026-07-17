@@ -166,19 +166,12 @@ export function AdminShell({
   }
 
   if (state === "denied") {
+    if (typeof window !== "undefined") {
+      navigate({ to: "/pending" });
+    }
     return (
-      <div className="min-h-screen grid place-items-center p-6 text-center">
-        <div>
-          <ShieldAlert className="mx-auto h-10 w-10 text-rose-400" />
-          <h1 className="mt-4 text-xl font-semibold">Admin access required</h1>
-          <p className="mt-1 text-sm text-muted-foreground max-w-sm">
-            Signed in. An administrator must assign you a role and semester before you can access this workspace.
-          </p>
-          <div className="mt-6 flex gap-2 justify-center">
-            <Button asChild variant="outline"><Link to="/">Back home</Link></Button>
-            <Button variant="ghost" onClick={signOut}>Sign out</Button>
-          </div>
-        </div>
+      <div className="min-h-screen grid place-items-center">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
