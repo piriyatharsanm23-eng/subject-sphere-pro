@@ -73,6 +73,15 @@ function ResetPasswordPage() {
               <Input id="pw2" type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} required minLength={6} autoComplete="new-password" />
             </div>
             <Button type="submit" className="w-full" disabled={busy}>{busy ? "Please wait…" : "Update password"}</Button>
+            <Button
+              type="button"
+              variant="ghost"
+              className="w-full"
+              disabled={busy}
+              onClick={() => navigate({ to: "/" })}
+            >
+              Skip for now
+            </Button>
           </form>
         )}
       </div>
