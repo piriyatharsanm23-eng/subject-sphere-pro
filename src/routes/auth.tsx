@@ -28,6 +28,7 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [busy, setBusy] = useState(false);
+  const [googleEnabled, setGoogleEnabled] = useState(true);
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
@@ -37,6 +38,9 @@ function AuthPage() {
     });
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) routeToRole();
+    });
+    supabase.from("app_settings").select("value").eq("key", "google_auth_enabled").maybeSingle().then(({ data }) => {
+      if (data) setGoogleEnabled(data.value === true || (data.value as unknown) === "true");
     });
     return () => sub.subscription.unsubscribe();
   }, []);
@@ -159,12 +163,16 @@ function AuthPage() {
             <Button type="submit" className="w-full" disabled={busy}>{busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}</Button>
           </form>
 
-          <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
-            <div className="h-px flex-1 bg-border" /> OR <div className="h-px flex-1 bg-border" />
-          </div>
-          <Button type="button" variant="outline" className="w-full" onClick={signInWithGoogle} disabled={busy}>
-            <GoogleIcon className="mr-2 h-4 w-4" /> Continue with Google
-          </Button>
+          {googleEnabled && (
+            <>
+              <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
+                <div className="h-px flex-1 bg-border" /> OR <div className="h-px flex-1 bg-border" />
+              </div>
+              <Button type="button" variant="outline" className="w-full" onClick={signInWithGoogle} disabled={busy}>
+                <GoogleIcon className="mr-2 h-4 w-4" /> Continue with Google
+              </Button>
+            </>
+          )}
 
           <p className="mt-4 text-center text-sm text-muted-foreground">
             {mode === "signin" ? "Don't have an account?" : "Already have an account?"}{" "}
