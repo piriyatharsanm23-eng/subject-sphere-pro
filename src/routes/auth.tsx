@@ -80,7 +80,7 @@ function AuthPage() {
   const signInWithGoogle = async () => {
     setBusy(true);
     try {
-      const res = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/auth" });
+      const res = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
       if ((res as { error?: Error }).error) throw (res as { error: Error }).error;
       // On successful token exchange without redirect
       if (!(res as { redirected?: boolean }).redirected) await routeToRole();
