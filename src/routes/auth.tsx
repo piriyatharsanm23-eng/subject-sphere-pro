@@ -97,7 +97,7 @@ function AuthPage() {
     setBusy(true);
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: window.location.origin + "/reset-password",
+        redirectTo: "https://learn-trical.vercel.app/reset-password",
       });
       if (error) throw error;
       toast.success("Password reset link sent. Check your email.");
