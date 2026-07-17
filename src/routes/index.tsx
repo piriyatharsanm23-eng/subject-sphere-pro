@@ -23,6 +23,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { supabase } from "@/integrations/supabase/client";
 import { getSelection } from "@/lib/selection";
+import { useRealtimeInvalidate } from "@/hooks/useRealtimeInvalidate";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -41,6 +42,13 @@ function Landing() {
   useEffect(() => {
     setHasSelection(!!getSelection());
   }, []);
+
+  useRealtimeInvalidate("landing-preview", [
+    { table: "materials", keys: [["landing-preview"], ["semesters", "active"]] },
+    { table: "deadlines", keys: [["landing-preview"]] },
+    { table: "subjects", keys: [["landing-preview"]] },
+    { table: "semesters", keys: [["semesters", "active"], ["landing-preview"]] },
+  ]);
 
   const { data: semesters } = useQuery({
     queryKey: ["semesters", "active"],
