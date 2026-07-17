@@ -202,7 +202,7 @@ function Landing() {
                       <GraduationCap className="h-4 w-4" />
                     </div>
                     <div className="text-sm font-semibold">
-                      {featuredSemester ? `${featuredSemester.name} · Today` : "Today"}
+                      {(semesters?.length ?? 0) > 1 ? "Latest updates · Today" : featuredSemester ? `${featuredSemester.name} · Today` : "Today"}
                     </div>
                   </div>
                   <span className="rounded-full bg-emerald-400/20 text-emerald-100 text-[10px] font-semibold uppercase tracking-wider px-2 py-1 border border-emerald-300/30">Live</span>
