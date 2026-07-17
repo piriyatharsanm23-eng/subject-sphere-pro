@@ -103,12 +103,20 @@ function AdminsPage() {
       .eq("id", r.id);
     if (error) return toast.error(error.message);
     const p = profileById[r.user_id];
+    const semName = semById[newSemester]?.name ?? "a semester";
+    await supabase.from("notifications").insert({
+      user_id: r.user_id,
+      kind: "role_assigned",
+      title: "Your semester has been assigned",
+      body: `A super admin has assigned you to ${semName}. Your admin workspace is now unlocked.`,
+      link: "/admin",
+    });
     await logActivity({
       action_type: "admin_assign",
-      description: `Reassigned admin ${p?.email ?? r.user_id} to ${semById[newSemester]?.name ?? "semester"}`,
+      description: `Reassigned admin ${p?.email ?? r.user_id} to ${semName}`,
       target_type: "user_role", target_id: r.id, semester_id: newSemester,
     });
-    toast.success("Semester reassigned");
+    toast.success("Semester reassigned — user notified");
     refresh();
   };
 
@@ -243,16 +251,27 @@ function AssignDialog({
     }
     setSaving(false);
 
+    const semNames = semesterIds.map((id) => semesters.find((s) => s.id === id)?.name).filter(Boolean).join(", ");
+    await supabase.from("notifications").insert({
+      user_id: target.id,
+      kind: "role_assigned",
+      title: role === "super_admin" ? "You are now a Super Admin" : "Your semester has been assigned",
+      body: role === "super_admin"
+        ? "A super admin has granted you full super-admin access. Your workspace is now unlocked."
+        : `A super admin has assigned you as admin of ${semNames || "a semester"}. Your admin workspace is now unlocked.`,
+      link: role === "super_admin" ? "/super" : "/admin",
+    });
+
     await logActivity({
       action_type: "admin_assign",
       description:
         role === "super_admin"
           ? `Assigned super_admin to ${target.email}`
-          : `Assigned admin to ${target.email} for ${semesterIds.map((id) => semesters.find((s) => s.id === id)?.name).filter(Boolean).join(", ")}`,
+          : `Assigned admin to ${target.email} for ${semNames}`,
       target_type: "user_role", target_id: target.id,
       semester_id: role === "admin" ? semesterIds[0] : null,
     });
-    toast.success("Role assigned");
+    toast.success("Role assigned — user notified");
     onSaved();
   };
 

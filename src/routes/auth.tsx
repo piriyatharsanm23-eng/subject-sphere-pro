@@ -49,7 +49,7 @@ function AuthPage() {
     const isAdmin = roles?.some((r) => r.role === "admin");
     if (isSuper) navigate({ to: "/super" });
     else if (isAdmin) navigate({ to: "/admin" });
-    else { toast.info("Signed in. An administrator must assign you a role."); navigate({ to: "/" }); }
+    else { navigate({ to: "/pending" }); }
   };
 
   const submit = async (e: React.FormEvent) => {
