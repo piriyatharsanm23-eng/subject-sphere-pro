@@ -17,6 +17,7 @@ const NAV: NavItem[] = [
   { to: "/super/subjects", label: "Subjects", icon: Library },
   { to: "/super/modules", label: "Module requests", icon: BookPlus },
   { to: "/super/admins", label: "Admins", icon: Users },
+  { to: "/super/users", label: "All accounts", icon: Users },
   { to: "/super/materials", label: "Materials", icon: FileText },
   { to: "/super/deadlines", label: "Deadlines", icon: CalendarClock },
   { to: "/super/requests", label: "Requests", icon: MessageSquare },

@@ -30,9 +30,15 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session && (event === "SIGNED_IN" || event === "INITIAL_SESSION" || event === "TOKEN_REFRESHED")) {
+        routeToRole();
+      }
+    });
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) routeToRole();
     });
+    return () => sub.subscription.unsubscribe();
   }, []);
 
   const routeToRole = async () => {
@@ -74,7 +80,7 @@ function AuthPage() {
   const signInWithGoogle = async () => {
     setBusy(true);
     try {
-      const res = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/auth" });
+      const res = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
       if ((res as { error?: Error }).error) throw (res as { error: Error }).error;
       // On successful token exchange without redirect
       if (!(res as { redirected?: boolean }).redirected) await routeToRole();
