@@ -103,12 +103,20 @@ function AdminsPage() {
       .eq("id", r.id);
     if (error) return toast.error(error.message);
     const p = profileById[r.user_id];
+    const semName = semById[newSemester]?.name ?? "a semester";
+    await supabase.from("notifications").insert({
+      user_id: r.user_id,
+      kind: "role_assigned",
+      title: "Your semester has been assigned",
+      body: `A super admin has assigned you to ${semName}. Your admin workspace is now unlocked.`,
+      link: "/admin",
+    });
     await logActivity({
       action_type: "admin_assign",
-      description: `Reassigned admin ${p?.email ?? r.user_id} to ${semById[newSemester]?.name ?? "semester"}`,
+      description: `Reassigned admin ${p?.email ?? r.user_id} to ${semName}`,
       target_type: "user_role", target_id: r.id, semester_id: newSemester,
     });
-    toast.success("Semester reassigned");
+    toast.success("Semester reassigned — user notified");
     refresh();
   };
 
