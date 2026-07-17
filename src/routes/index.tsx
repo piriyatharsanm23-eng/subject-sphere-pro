@@ -63,30 +63,32 @@ function Landing() {
     },
   });
 
+  const semesterIds = (semesters ?? []).map((s) => s.id);
   const featuredSemester = semesters?.[0];
 
   const { data: preview } = useQuery({
-    queryKey: ["landing-preview", featuredSemester?.id],
-    enabled: !!featuredSemester?.id,
+    queryKey: ["landing-preview", semesterIds.join(",")],
+    enabled: semesterIds.length > 0,
     queryFn: async () => {
-      const semesterId = featuredSemester!.id;
       const [subjectsRes, materialsRes, deadlinesRes] = await Promise.all([
-        supabase.from("subjects").select("id", { count: "exact", head: true }).eq("semester_id", semesterId),
+        supabase.from("subjects").select("id", { count: "exact", head: true }).in("semester_id", semesterIds),
         supabase
           .from("materials")
-          .select("id, title, material_type, subject:subjects(name)", { count: "exact" }).eq("pending_delete", false)
+          .select("id, title, material_type, created_at, subject:subjects(name)", { count: "exact" })
+          .eq("pending_delete", false)
           .eq("is_archived", false)
-          .eq("semester_id", semesterId)
+          .in("semester_id", semesterIds)
           .order("created_at", { ascending: false })
-          .limit(3),
+          .limit(5),
         supabase
           .from("deadlines")
-          .select("id, title, deadline_at, subject:subjects(name)", { count: "exact" }).eq("pending_delete", false)
+          .select("id, title, deadline_at, subject:subjects(name)", { count: "exact" })
+          .eq("pending_delete", false)
           .eq("is_archived", false)
-          .eq("semester_id", semesterId)
+          .in("semester_id", semesterIds)
           .gte("deadline_at", new Date().toISOString())
           .order("deadline_at", { ascending: true })
-          .limit(2),
+          .limit(3),
       ]);
       return {
         subjectCount: subjectsRes.count ?? 0,
