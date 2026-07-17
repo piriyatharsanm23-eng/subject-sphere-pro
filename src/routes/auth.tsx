@@ -30,9 +30,15 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session && (event === "SIGNED_IN" || event === "INITIAL_SESSION" || event === "TOKEN_REFRESHED")) {
+        routeToRole();
+      }
+    });
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) routeToRole();
     });
+    return () => sub.subscription.unsubscribe();
   }, []);
 
   const routeToRole = async () => {
