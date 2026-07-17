@@ -43,6 +43,13 @@ function Landing() {
     setHasSelection(!!getSelection());
   }, []);
 
+  useRealtimeInvalidate("landing-preview", [
+    { table: "materials", keys: [["landing-preview"], ["semesters", "active"]] },
+    { table: "deadlines", keys: [["landing-preview"]] },
+    { table: "subjects", keys: [["landing-preview"]] },
+    { table: "semesters", keys: [["semesters", "active"], ["landing-preview"]] },
+  ]);
+
   const { data: semesters } = useQuery({
     queryKey: ["semesters", "active"],
     queryFn: async () => {
