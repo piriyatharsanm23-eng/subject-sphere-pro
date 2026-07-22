@@ -35,19 +35,67 @@ export function SuperShell({
   const navigate = useNavigate();
   const path = useRouterState({ select: (s) => s.location.pathname });
   const [state, setState] = useState<"checking" | "denied" | "ok">("checking");
+  const [uid, setUid] = useState<string | null>(null);
+  const [unread, setUnread] = useState<Record<string, number>>({});
 
   useEffect(() => {
     let mounted = true;
     (async () => {
       const { data: sess } = await supabase.auth.getSession();
-      const uid = sess.session?.user.id;
-      if (!uid) { navigate({ to: "/auth" }); return; }
-      const { data, error } = await supabase.rpc("is_super_admin", { _user_id: uid });
+      const u = sess.session?.user.id;
+      if (!u) { navigate({ to: "/auth" }); return; }
+      const { data, error } = await supabase.rpc("is_super_admin", { _user_id: u });
       if (!mounted) return;
-      if (error || !data) setState("denied"); else setState("ok");
+      if (error || !data) { setState("denied"); return; }
+      setUid(u);
+      setState("ok");
     })();
     return () => { mounted = false; };
   }, [navigate]);
+
+  // Poll unread notifications grouped by kind.
+  useEffect(() => {
+    if (!uid) return;
+    let stopped = false;
+    const load = async () => {
+      const { data } = await (supabase as any)
+        .from("notifications")
+        .select("kind")
+        .eq("user_id", uid)
+        .is("read_at", null);
+      if (stopped) return;
+      const counts: Record<string, number> = {};
+      for (const r of (data ?? []) as { kind: string }[]) {
+        counts[r.kind] = (counts[r.kind] ?? 0) + 1;
+      }
+      setUnread(counts);
+    };
+    load();
+    const iv = setInterval(load, 60_000);
+    return () => { stopped = true; clearInterval(iv); };
+  }, [uid]);
+
+  // Clear a badge when viewing its page.
+  useEffect(() => {
+    if (!uid) return;
+    const map: Record<string, string> = {
+      "/super/requests": "student_request",
+      "/super/feedback": "feedback",
+      "/super/modules": "module_request",
+    };
+    const kind = Object.entries(map).find(([p]) => path.startsWith(p))?.[1];
+    if (!kind) return;
+    (async () => {
+      await (supabase as any)
+        .from("notifications")
+        .update({ read_at: new Date().toISOString() })
+        .eq("user_id", uid)
+        .eq("kind", kind)
+        .is("read_at", null);
+      setUnread((prev) => ({ ...prev, [kind]: 0 }));
+    })();
+  }, [path, uid]);
+
 
   if (state === "checking") {
     return (
