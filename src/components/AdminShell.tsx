@@ -52,40 +52,49 @@ export function AdminShell({
   const [semesterId, setSemesterIdState] = useState<string | null>(null);
   const [semesters, setSemesters] = useState<AdminSemester[]>([]);
   const [meta, setMeta] = useState<{ userId: string; isSuper: boolean } | null>(null);
-  const [unreadRequests, setUnreadRequests] = useState(0);
+  const [unread, setUnread] = useState<Record<string, number>>({});
 
-  // Poll unread student-request notifications every 60s.
+  // Poll unread notifications (grouped by kind) every 60s.
   useEffect(() => {
     if (!meta?.userId) return;
     let stopped = false;
     const load = async () => {
-      const { count } = await (supabase as any)
+      const { data } = await (supabase as any)
         .from("notifications")
-        .select("id", { head: true, count: "exact" })
+        .select("kind")
         .eq("user_id", meta.userId)
-        .eq("kind", "student_request")
         .is("read_at", null);
-      if (!stopped) setUnreadRequests(count ?? 0);
+      if (stopped) return;
+      const counts: Record<string, number> = {};
+      for (const r of (data ?? []) as { kind: string }[]) {
+        counts[r.kind] = (counts[r.kind] ?? 0) + 1;
+      }
+      setUnread(counts);
     };
     load();
     const iv = setInterval(load, 60_000);
     return () => { stopped = true; clearInterval(iv); };
   }, [meta?.userId]);
 
-  // Clear the badge when viewing the requests page.
+  // Clear a badge when viewing its page.
+  const clearKind = async (kind: string) => {
+    if (!meta?.userId) return;
+    await (supabase as any)
+      .from("notifications")
+      .update({ read_at: new Date().toISOString() })
+      .eq("user_id", meta.userId)
+      .eq("kind", kind)
+      .is("read_at", null);
+    setUnread((prev) => ({ ...prev, [kind]: 0 }));
+  };
   useEffect(() => {
     if (!meta?.userId) return;
-    if (!path.startsWith("/admin/requests")) return;
-    (async () => {
-      await (supabase as any)
-        .from("notifications")
-        .update({ read_at: new Date().toISOString() })
-        .eq("user_id", meta.userId)
-        .eq("kind", "student_request")
-        .is("read_at", null);
-      setUnreadRequests(0);
-    })();
+    if (path.startsWith("/admin/requests")) clearKind("student_request");
+    if (path.startsWith("/admin/feedback")) clearKind("feedback");
+    if (path.startsWith("/admin/modules")) clearKind("module_request");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [path, meta?.userId]);
+
 
   useEffect(() => {
     let mounted = true;
