@@ -131,6 +131,11 @@ export function SuperShell({
               <nav className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible scrollbar-thin">
                 {NAV.map((item) => {
                   const active = item.exact ? path === item.to : path.startsWith(item.to);
+                  const badgeKind =
+                    item.to === "/super/requests" ? "student_request" :
+                    item.to === "/super/feedback" ? "feedback" :
+                    item.to === "/super/modules" ? "module_request" : null;
+                  const count = badgeKind ? (unread[badgeKind] ?? 0) : 0;
                   return (
                     <Link
                       key={item.to}
@@ -143,6 +148,11 @@ export function SuperShell({
                     >
                       <item.icon className="h-4 w-4 shrink-0" />
                       <span>{item.label}</span>
+                      {count > 0 && (
+                        <span className="ml-auto rounded-full bg-rose-500 text-white text-[10px] font-semibold px-1.5 min-w-[18px] text-center tabular-nums">
+                          {count > 99 ? "99+" : count}
+                        </span>
+                      )}
                     </Link>
                   );
                 })}
