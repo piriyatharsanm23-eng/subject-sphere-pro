@@ -29,7 +29,7 @@ function useSuperNav(): NavItem[] {
     { to: "/super/feedback", label: t("super.feedback"), icon: Star },
     { to: "/super/analytics", label: t("super.analytics"), icon: BarChart3 },
     { to: "/super/activity", label: t("super.activity"), icon: Activity },
-    { to: "/super/authSettings" as any, label: t("super.authSettings"), icon: KeyRound },
+    { to: "/super/auth-settings", label: t("super.authSettings"), icon: KeyRound },
     { to: "/super/profile", label: t("super.profile"), icon: User },
   ];
 }
