@@ -393,7 +393,7 @@ async function sendMaterial(chatId: number, materialId: string) {
   const buttonsKb: Kb = {
     inline_keyboard: [
       [
-        { text: "⬇️ Download PDF", url: signed },
+        { text: "⬇️ Download PDF", url: downloadUrl },
         { text: "🌐 Open in Website", url: websiteUrl },
       ],
       [
