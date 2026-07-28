@@ -9,26 +9,30 @@ import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { supabase } from "@/integrations/supabase/client";
+import { useT } from "@/lib/i18n";
 
 type NavItem = { to: string; label: string; icon: typeof Activity; exact?: boolean };
-const NAV: NavItem[] = [
-  { to: "/super", label: "Overview", icon: LayoutDashboard, exact: true },
-  { to: "/super/notifications", label: "Notifications", icon: Bell },
-  { to: "/super/semesters", label: "Semesters", icon: BookOpen },
-  { to: "/super/subjects", label: "Subjects", icon: Library },
-  { to: "/super/modules", label: "Module requests", icon: BookPlus },
-  { to: "/super/admins", label: "Admins", icon: Users },
-  { to: "/super/users", label: "All accounts", icon: Users },
-  { to: "/super/materials", label: "Materials", icon: FileText },
-  { to: "/super/deadlines", label: "Deadlines", icon: CalendarClock },
-  { to: "/super/requests", label: "Requests", icon: MessageSquare },
-  { to: "/super/pending", label: "Pending changes", icon: ClipboardCheck },
-  { to: "/super/feedback", label: "Feedback", icon: Star },
-  { to: "/super/analytics", label: "Analytics", icon: BarChart3 },
-  { to: "/super/activity", label: "Activity Log", icon: Activity },
-  { to: "/super/auth-settings", label: "Auth settings", icon: KeyRound },
-  { to: "/super/profile", label: "Your profile", icon: User },
-];
+function useSuperNav(): NavItem[] {
+  const { t } = useT();
+  return [
+    { to: "/super", label: t("super.overview"), icon: LayoutDashboard, exact: true },
+    { to: "/super/notifications", label: t("super.notifications"), icon: Bell },
+    { to: "/super/semesters", label: t("super.semesters"), icon: BookOpen },
+    { to: "/super/subjects", label: t("super.subjects"), icon: Library },
+    { to: "/super/modules", label: t("super.moduleRequests"), icon: BookPlus },
+    { to: "/super/admins", label: t("super.admins"), icon: Users },
+    { to: "/super/users", label: t("super.users"), icon: Users },
+    { to: "/super/materials", label: t("super.materials"), icon: FileText },
+    { to: "/super/deadlines", label: t("super.deadlines"), icon: CalendarClock },
+    { to: "/super/requests", label: t("super.requests"), icon: MessageSquare },
+    { to: "/super/pending", label: t("super.pending"), icon: ClipboardCheck },
+    { to: "/super/feedback", label: t("super.feedback"), icon: Star },
+    { to: "/super/analytics", label: t("super.analytics"), icon: BarChart3 },
+    { to: "/super/activity", label: t("super.activity"), icon: Activity },
+    { to: "/super/authSettings" as any, label: t("super.authSettings"), icon: KeyRound },
+    { to: "/super/profile", label: t("super.profile"), icon: User },
+  ];
+}
 
 export function SuperShell({
   title, description, children,
