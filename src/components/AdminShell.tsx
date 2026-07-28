@@ -256,7 +256,7 @@ export function AdminShell({
               </nav>
               <div className="hidden lg:block px-2 pt-2 mt-2 border-t border-border">
                 <Button variant="ghost" size="sm" className="w-full justify-start text-muted-foreground" onClick={signOut}>
-                  <LogOut className="h-4 w-4 mr-2" />Sign out
+                  <LogOut className="h-4 w-4 mr-2" />{t("admin.signOut")}
                 </Button>
               </div>
             </div>
