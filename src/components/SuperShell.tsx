@@ -116,9 +116,9 @@ export function SuperShell({
       <div className="min-h-screen grid place-items-center p-6 text-center">
         <div>
           <ShieldAlert className="mx-auto h-10 w-10 text-rose-400" />
-          <h1 className="mt-4 text-xl font-semibold">Super Admin access required</h1>
-          <p className="mt-1 text-sm text-muted-foreground">You don't have permission to view this page.</p>
-          <Button asChild className="mt-6"><Link to="/">Back home</Link></Button>
+          <h1 className="mt-4 text-xl font-semibold">{t("super.accessRequired")}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{t("super.noPermission")}</p>
+          <Button asChild className="mt-6"><Link to="/">{t("admin.backHome")}</Link></Button>
         </div>
       </div>
     );
