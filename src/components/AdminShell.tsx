@@ -11,6 +11,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useT } from "@/lib/i18n";
 
 
 export type AdminSemester = { id: string; name: string };
@@ -25,17 +26,20 @@ export type AdminContext = {
 
 type NavItem = { to: string; label: string; icon: typeof FileText; exact?: boolean };
 
-const NAV: NavItem[] = [
-  { to: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
-  { to: "/admin/materials", label: "Materials", icon: FileText },
-  { to: "/admin/kuppi", label: "Kuppi videos", icon: Video },
-  { to: "/admin/deadlines", label: "Deadlines", icon: CalendarClock },
-  { to: "/admin/modules", label: "Module requests", icon: BookPlus },
-  { to: "/admin/requests", label: "Student requests", icon: MessageSquare },
-  { to: "/admin/feedback", label: "Feedback", icon: Star },
-  { to: "/admin/guide", label: "Guide", icon: LifeBuoy },
-  { to: "/admin/profile", label: "Profile", icon: UserCircle2 },
-];
+function useAdminNav(): NavItem[] {
+  const { t } = useT();
+  return [
+    { to: "/admin", label: t("admin.overview"), icon: LayoutDashboard, exact: true },
+    { to: "/admin/materials", label: t("admin.materials"), icon: FileText },
+    { to: "/admin/kuppi", label: t("admin.kuppi"), icon: Video },
+    { to: "/admin/deadlines", label: t("admin.deadlines"), icon: CalendarClock },
+    { to: "/admin/modules", label: t("admin.moduleRequests"), icon: BookPlus },
+    { to: "/admin/requests", label: t("admin.studentRequests"), icon: MessageSquare },
+    { to: "/admin/feedback", label: t("admin.feedback"), icon: Star },
+    { to: "/admin/guide", label: t("admin.guide"), icon: LifeBuoy },
+    { to: "/admin/profile", label: t("admin.profile"), icon: UserCircle2 },
+  ];
+}
 
 export function AdminShell({
   title, description, children,
