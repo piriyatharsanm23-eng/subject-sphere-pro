@@ -196,13 +196,13 @@ export function AdminShell({
       <div className="min-h-screen grid place-items-center p-6 text-center">
         <div>
           <ShieldAlert className="mx-auto h-10 w-10 text-amber-400" />
-          <h1 className="mt-4 text-xl font-semibold">No semester assigned</h1>
+          <h1 className="mt-4 text-xl font-semibold">{t("admin.noSemesterTitle")}</h1>
           <p className="mt-1 text-sm text-muted-foreground max-w-sm">
-            You don't have an assigned semester yet. Ask a super admin to assign one.
+            {t("admin.noSemesterBody")}
           </p>
           <div className="mt-6 flex gap-2 justify-center">
-            <Button asChild variant="outline"><Link to="/">Back home</Link></Button>
-            <Button variant="ghost" onClick={signOut}>Sign out</Button>
+            <Button asChild variant="outline"><Link to="/">{t("admin.backHome")}</Link></Button>
+            <Button variant="ghost" onClick={signOut}>{t("admin.signOut")}</Button>
           </div>
         </div>
       </div>
