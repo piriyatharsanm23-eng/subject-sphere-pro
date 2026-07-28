@@ -268,7 +268,7 @@ export function AdminShell({
                 {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
               </div>
               <div className="text-xs text-muted-foreground rounded-full bg-primary/10 text-primary border border-primary/20 px-3 py-1">
-                {ctx.isSuper ? "Super admin" : "Admin"} · {ctx.semesterName}
+                {ctx.isSuper ? t("admin.super") : t("admin.role")} · {ctx.semesterName}
               </div>
             </div>
             {children(ctx)}
