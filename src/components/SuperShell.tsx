@@ -3,7 +3,7 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Activity, BarChart3, BookOpen, CalendarClock, ClipboardCheck, FileText,
   LayoutDashboard, Library, Loader2, MessageSquare, ShieldAlert,
-  Star, User, Users, BookPlus, KeyRound,
+  Star, User, Users, BookPlus, KeyRound, Bell,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 type NavItem = { to: string; label: string; icon: typeof Activity; exact?: boolean };
 const NAV: NavItem[] = [
   { to: "/super", label: "Overview", icon: LayoutDashboard, exact: true },
+  { to: "/super/notifications", label: "Notifications", icon: Bell },
   { to: "/super/semesters", label: "Semesters", icon: BookOpen },
   { to: "/super/subjects", label: "Subjects", icon: Library },
   { to: "/super/modules", label: "Module requests", icon: BookPlus },
