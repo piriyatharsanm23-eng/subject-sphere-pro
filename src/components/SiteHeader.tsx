@@ -5,17 +5,19 @@ import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/co
 import { useState } from "react";
 import { GlobalSearch, SearchTrigger, useGlobalSearch } from "@/components/GlobalSearch";
 import { ThemeToggle } from "@/components/ThemeToggle";
-
-const NAV = [
-  { to: "/dashboard" as const, label: "Dashboard", icon: LayoutDashboard },
-  { to: "/contributors" as const, label: "Contributors", icon: Users },
-  { to: "/help" as const, label: "Help", icon: HelpCircle },
-  { to: "/select" as const, label: "Preferences", icon: Settings },
-];
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useT } from "@/lib/i18n";
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const search = useGlobalSearch();
+  const { t } = useT();
+  const NAV = [
+    { to: "/dashboard" as const, label: t("nav.dashboard"), icon: LayoutDashboard },
+    { to: "/contributors" as const, label: t("nav.contributors"), icon: Users },
+    { to: "/help" as const, label: t("nav.help"), icon: HelpCircle },
+    { to: "/select" as const, label: t("nav.preferences"), icon: Settings },
+  ];
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur-xl">
       <div className="container mx-auto flex h-14 sm:h-16 items-center justify-between gap-3 px-4 sm:px-6">
@@ -42,30 +44,32 @@ export function SiteHeader() {
               </Link>
             </Button>
           ))}
+          <LanguageSwitcher className="h-9 w-9" />
           <ThemeToggle className="h-9 w-9" />
           <Button asChild variant="outline" size="sm">
             <Link to="/auth">
-              <LogIn className="h-4 w-4 mr-1.5" /> Admin
+              <LogIn className="h-4 w-4 mr-1.5" /> {t("nav.admin")}
             </Link>
           </Button>
         </nav>
 
         {/* Mobile actions */}
         <div className="md:hidden flex items-center gap-1">
+          <LanguageSwitcher className="h-9 w-9" />
           <ThemeToggle className="h-9 w-9" />
-          <Button size="icon" variant="ghost" aria-label="Search" className="h-9 w-9" onClick={() => search.setOpen(true)}>
+          <Button size="icon" variant="ghost" aria-label={t("nav.search")} className="h-9 w-9" onClick={() => search.setOpen(true)}>
             <Menu className="hidden" />
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" /></svg>
           </Button>
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-              <Button size="icon" variant="ghost" aria-label="Open menu" className="h-9 w-9">
+              <Button size="icon" variant="ghost" aria-label={t("nav.menu")} className="h-9 w-9">
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-72 p-0 bg-background/95 backdrop-blur-xl border-border/60">
               <SheetHeader className="px-5 pt-5">
-                <SheetTitle className="text-left">Menu</SheetTitle>
+                <SheetTitle className="text-left">{t("nav.menu")}</SheetTitle>
               </SheetHeader>
               <nav className="mt-4 flex flex-col px-3 pb-6">
                 {NAV.map((n) => (
@@ -85,7 +89,7 @@ export function SiteHeader() {
                   className="mt-2 flex items-center gap-3 rounded-xl border border-border px-3 py-3 text-sm font-medium hover:bg-accent/20"
                 >
                   <LogIn className="h-5 w-5 text-primary" />
-                  Admin sign in
+                  {t("nav.adminSignIn")}
                 </Link>
               </nav>
             </SheetContent>

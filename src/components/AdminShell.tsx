@@ -11,6 +11,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useT } from "@/lib/i18n";
 
 
 export type AdminSemester = { id: string; name: string };
@@ -25,17 +26,20 @@ export type AdminContext = {
 
 type NavItem = { to: string; label: string; icon: typeof FileText; exact?: boolean };
 
-const NAV: NavItem[] = [
-  { to: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
-  { to: "/admin/materials", label: "Materials", icon: FileText },
-  { to: "/admin/kuppi", label: "Kuppi videos", icon: Video },
-  { to: "/admin/deadlines", label: "Deadlines", icon: CalendarClock },
-  { to: "/admin/modules", label: "Module requests", icon: BookPlus },
-  { to: "/admin/requests", label: "Student requests", icon: MessageSquare },
-  { to: "/admin/feedback", label: "Feedback", icon: Star },
-  { to: "/admin/guide", label: "Guide", icon: LifeBuoy },
-  { to: "/admin/profile", label: "Profile", icon: UserCircle2 },
-];
+function useAdminNav(): NavItem[] {
+  const { t } = useT();
+  return [
+    { to: "/admin", label: t("admin.overview"), icon: LayoutDashboard, exact: true },
+    { to: "/admin/materials", label: t("admin.materials"), icon: FileText },
+    { to: "/admin/kuppi", label: t("admin.kuppi"), icon: Video },
+    { to: "/admin/deadlines", label: t("admin.deadlines"), icon: CalendarClock },
+    { to: "/admin/modules", label: t("admin.moduleRequests"), icon: BookPlus },
+    { to: "/admin/requests", label: t("admin.studentRequests"), icon: MessageSquare },
+    { to: "/admin/feedback", label: t("admin.feedback"), icon: Star },
+    { to: "/admin/guide", label: t("admin.guide"), icon: LifeBuoy },
+    { to: "/admin/profile", label: t("admin.profile"), icon: UserCircle2 },
+  ];
+}
 
 export function AdminShell({
   title, description, children,
@@ -44,6 +48,8 @@ export function AdminShell({
   description?: string;
   children: (ctx: AdminContext) => ReactNode;
 }) {
+  const NAV = useAdminNav();
+  const { t } = useT();
   const navigate = useNavigate();
   const path = useRouterState({ select: (s) => s.location.pathname });
   const [state, setState] = useState<"checking" | "denied" | "no-semester" | "ok">("checking");
@@ -190,13 +196,13 @@ export function AdminShell({
       <div className="min-h-screen grid place-items-center p-6 text-center">
         <div>
           <ShieldAlert className="mx-auto h-10 w-10 text-amber-400" />
-          <h1 className="mt-4 text-xl font-semibold">No semester assigned</h1>
+          <h1 className="mt-4 text-xl font-semibold">{t("admin.noSemesterTitle")}</h1>
           <p className="mt-1 text-sm text-muted-foreground max-w-sm">
-            You don't have an assigned semester yet. Ask a super admin to assign one.
+            {t("admin.noSemesterBody")}
           </p>
           <div className="mt-6 flex gap-2 justify-center">
-            <Button asChild variant="outline"><Link to="/">Back home</Link></Button>
-            <Button variant="ghost" onClick={signOut}>Sign out</Button>
+            <Button asChild variant="outline"><Link to="/">{t("admin.backHome")}</Link></Button>
+            <Button variant="ghost" onClick={signOut}>{t("admin.signOut")}</Button>
           </div>
         </div>
       </div>
@@ -211,7 +217,7 @@ export function AdminShell({
           <aside className="lg:sticky lg:top-20 lg:self-start min-w-0">
             <div className="rounded-2xl border border-border bg-card p-2 shadow-soft">
               <div className="px-2 py-2">
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold px-1 hidden lg:block">Current semester</div>
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold px-1 hidden lg:block">{t("admin.currentSemester")}</div>
                 <SemesterPicker
                   semesters={ctx.semesters}
                   value={ctx.semesterId}
@@ -250,7 +256,7 @@ export function AdminShell({
               </nav>
               <div className="hidden lg:block px-2 pt-2 mt-2 border-t border-border">
                 <Button variant="ghost" size="sm" className="w-full justify-start text-muted-foreground" onClick={signOut}>
-                  <LogOut className="h-4 w-4 mr-2" />Sign out
+                  <LogOut className="h-4 w-4 mr-2" />{t("admin.signOut")}
                 </Button>
               </div>
             </div>
@@ -262,7 +268,7 @@ export function AdminShell({
                 {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
               </div>
               <div className="text-xs text-muted-foreground rounded-full bg-primary/10 text-primary border border-primary/20 px-3 py-1">
-                {ctx.isSuper ? "Super admin" : "Admin"} · {ctx.semesterName}
+                {ctx.isSuper ? t("admin.super") : t("admin.role")} · {ctx.semesterName}
               </div>
             </div>
             {children(ctx)}

@@ -9,30 +9,36 @@ import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { supabase } from "@/integrations/supabase/client";
+import { useT } from "@/lib/i18n";
 
 type NavItem = { to: string; label: string; icon: typeof Activity; exact?: boolean };
-const NAV: NavItem[] = [
-  { to: "/super", label: "Overview", icon: LayoutDashboard, exact: true },
-  { to: "/super/notifications", label: "Notifications", icon: Bell },
-  { to: "/super/semesters", label: "Semesters", icon: BookOpen },
-  { to: "/super/subjects", label: "Subjects", icon: Library },
-  { to: "/super/modules", label: "Module requests", icon: BookPlus },
-  { to: "/super/admins", label: "Admins", icon: Users },
-  { to: "/super/users", label: "All accounts", icon: Users },
-  { to: "/super/materials", label: "Materials", icon: FileText },
-  { to: "/super/deadlines", label: "Deadlines", icon: CalendarClock },
-  { to: "/super/requests", label: "Requests", icon: MessageSquare },
-  { to: "/super/pending", label: "Pending changes", icon: ClipboardCheck },
-  { to: "/super/feedback", label: "Feedback", icon: Star },
-  { to: "/super/analytics", label: "Analytics", icon: BarChart3 },
-  { to: "/super/activity", label: "Activity Log", icon: Activity },
-  { to: "/super/auth-settings", label: "Auth settings", icon: KeyRound },
-  { to: "/super/profile", label: "Your profile", icon: User },
-];
+function useSuperNav(): NavItem[] {
+  const { t } = useT();
+  return [
+    { to: "/super", label: t("super.overview"), icon: LayoutDashboard, exact: true },
+    { to: "/super/notifications", label: t("super.notifications"), icon: Bell },
+    { to: "/super/semesters", label: t("super.semesters"), icon: BookOpen },
+    { to: "/super/subjects", label: t("super.subjects"), icon: Library },
+    { to: "/super/modules", label: t("super.moduleRequests"), icon: BookPlus },
+    { to: "/super/admins", label: t("super.admins"), icon: Users },
+    { to: "/super/users", label: t("super.users"), icon: Users },
+    { to: "/super/materials", label: t("super.materials"), icon: FileText },
+    { to: "/super/deadlines", label: t("super.deadlines"), icon: CalendarClock },
+    { to: "/super/requests", label: t("super.requests"), icon: MessageSquare },
+    { to: "/super/pending", label: t("super.pending"), icon: ClipboardCheck },
+    { to: "/super/feedback", label: t("super.feedback"), icon: Star },
+    { to: "/super/analytics", label: t("super.analytics"), icon: BarChart3 },
+    { to: "/super/activity", label: t("super.activity"), icon: Activity },
+    { to: "/super/auth-settings", label: t("super.authSettings"), icon: KeyRound },
+    { to: "/super/profile", label: t("super.profile"), icon: User },
+  ];
+}
 
 export function SuperShell({
   title, description, children,
 }: { title: string; description?: string; children: ReactNode }) {
+  const { t } = useT();
+  const NAV = useSuperNav();
   const navigate = useNavigate();
   const path = useRouterState({ select: (s) => s.location.pathname });
   const [state, setState] = useState<"checking" | "denied" | "ok">("checking");
@@ -110,9 +116,9 @@ export function SuperShell({
       <div className="min-h-screen grid place-items-center p-6 text-center">
         <div>
           <ShieldAlert className="mx-auto h-10 w-10 text-rose-400" />
-          <h1 className="mt-4 text-xl font-semibold">Super Admin access required</h1>
-          <p className="mt-1 text-sm text-muted-foreground">You don't have permission to view this page.</p>
-          <Button asChild className="mt-6"><Link to="/">Back home</Link></Button>
+          <h1 className="mt-4 text-xl font-semibold">{t("super.accessRequired")}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{t("super.noPermission")}</p>
+          <Button asChild className="mt-6"><Link to="/">{t("admin.backHome")}</Link></Button>
         </div>
       </div>
     );
@@ -127,7 +133,7 @@ export function SuperShell({
           <aside className="lg:sticky lg:top-20 lg:self-start min-w-0">
             <div className="rounded-2xl border border-border bg-card p-2 shadow-soft">
               <div className="px-3 py-2 hidden lg:block">
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Super Admin</div>
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{t("super.title")}</div>
               </div>
               <nav className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible scrollbar-thin">
                 {NAV.map((item) => {
