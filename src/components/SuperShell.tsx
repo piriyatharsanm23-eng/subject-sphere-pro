@@ -133,7 +133,7 @@ export function SuperShell({
           <aside className="lg:sticky lg:top-20 lg:self-start min-w-0">
             <div className="rounded-2xl border border-border bg-card p-2 shadow-soft">
               <div className="px-3 py-2 hidden lg:block">
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Super Admin</div>
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{t("super.title")}</div>
               </div>
               <nav className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible scrollbar-thin">
                 {NAV.map((item) => {
