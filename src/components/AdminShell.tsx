@@ -48,6 +48,8 @@ export function AdminShell({
   description?: string;
   children: (ctx: AdminContext) => ReactNode;
 }) {
+  const NAV = useAdminNav();
+  const { t } = useT();
   const navigate = useNavigate();
   const path = useRouterState({ select: (s) => s.location.pathname });
   const [state, setState] = useState<"checking" | "denied" | "no-semester" | "ok">("checking");
