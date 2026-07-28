@@ -204,13 +204,14 @@ async function getEnrolledSubjects(chatId: number) {
   return data ?? [];
 }
 
-async function signedUrlFor(path: string) {
+async function signedUrlFor(path: string, downloadName?: string | null) {
   const { data, error } = await sb().storage
     .from("learning-materials")
-    .createSignedUrl(path, 60 * 60 * 4);
+    .createSignedUrl(path, 60 * 60 * 4, downloadName ? { download: downloadName } : undefined);
   if (error || !data) throw error ?? new Error("signed url failed");
   return data.signedUrl;
 }
+
 
 // ---------- Main menu ----------
 const MAIN_MENU_KB: Kb = {
@@ -361,12 +362,17 @@ async function sendMaterial(chatId: number, materialId: string) {
   }
 
   let signed = "";
+  let downloadUrl = "";
   try {
+    const suggested = m.file_name || `${(m.title ?? "material").replace(/[^\w.-]+/g, "_")}.pdf`;
     signed = await signedUrlFor(m.file_url);
+    downloadUrl = await signedUrlFor(m.file_url, suggested);
   } catch (e) {
     console.error("signed url failed", e);
     return sendMessage(chatId, "This material file is not available right now.");
   }
+
+
 
   const uploaded = new Date(m.created_at as string).toISOString().slice(0, 10);
   const caption = [
@@ -387,7 +393,7 @@ async function sendMaterial(chatId: number, materialId: string) {
   const buttonsKb: Kb = {
     inline_keyboard: [
       [
-        { text: "⬇️ Download PDF", url: signed },
+        { text: "⬇️ Download PDF", url: downloadUrl },
         { text: "🌐 Open in Website", url: websiteUrl },
       ],
       [
