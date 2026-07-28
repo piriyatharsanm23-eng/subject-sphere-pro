@@ -217,7 +217,7 @@ export function AdminShell({
           <aside className="lg:sticky lg:top-20 lg:self-start min-w-0">
             <div className="rounded-2xl border border-border bg-card p-2 shadow-soft">
               <div className="px-2 py-2">
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold px-1 hidden lg:block">Current semester</div>
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold px-1 hidden lg:block">{t("admin.currentSemester")}</div>
                 <SemesterPicker
                   semesters={ctx.semesters}
                   value={ctx.semesterId}
