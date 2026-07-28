@@ -204,13 +204,14 @@ async function getEnrolledSubjects(chatId: number) {
   return data ?? [];
 }
 
-async function signedUrlFor(path: string) {
+async function signedUrlFor(path: string, downloadName?: string | null) {
   const { data, error } = await sb().storage
     .from("learning-materials")
-    .createSignedUrl(path, 60 * 60 * 4);
+    .createSignedUrl(path, 60 * 60 * 4, downloadName ? { download: downloadName } : undefined);
   if (error || !data) throw error ?? new Error("signed url failed");
   return data.signedUrl;
 }
+
 
 // ---------- Main menu ----------
 const MAIN_MENU_KB: Kb = {
