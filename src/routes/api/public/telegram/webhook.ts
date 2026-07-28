@@ -362,12 +362,16 @@ async function sendMaterial(chatId: number, materialId: string) {
   }
 
   let signed = "";
+  let inlineUrl = "";
   try {
-    signed = await signedUrlFor(m.file_url);
+    const suggested = m.file_name || `${(m.title ?? "material").replace(/[^\w.-]+/g, "_")}.pdf`;
+    signed = await signedUrlFor(m.file_url, suggested);
+    inlineUrl = await signedUrlFor(m.file_url);
   } catch (e) {
     console.error("signed url failed", e);
     return sendMessage(chatId, "This material file is not available right now.");
   }
+
 
   const uploaded = new Date(m.created_at as string).toISOString().slice(0, 10);
   const caption = [
