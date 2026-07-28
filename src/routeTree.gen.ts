@@ -27,6 +27,7 @@ import { Route as SuperSemestersRouteImport } from './routes/super.semesters'
 import { Route as SuperRequestsRouteImport } from './routes/super.requests'
 import { Route as SuperProfileRouteImport } from './routes/super.profile'
 import { Route as SuperPendingRouteImport } from './routes/super.pending'
+import { Route as SuperNotificationsRouteImport } from './routes/super.notifications'
 import { Route as SuperModulesRouteImport } from './routes/super.modules'
 import { Route as SuperMaterialsRouteImport } from './routes/super.materials'
 import { Route as SuperFeedbackRouteImport } from './routes/super.feedback'
@@ -141,6 +142,11 @@ const SuperProfileRoute = SuperProfileRouteImport.update({
 const SuperPendingRoute = SuperPendingRouteImport.update({
   id: '/pending',
   path: '/pending',
+  getParentRoute: () => SuperRoute,
+} as any)
+const SuperNotificationsRoute = SuperNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
   getParentRoute: () => SuperRoute,
 } as any)
 const SuperModulesRoute = SuperModulesRouteImport.update({
@@ -304,6 +310,7 @@ export interface FileRoutesByFullPath {
   '/super/feedback': typeof SuperFeedbackRoute
   '/super/materials': typeof SuperMaterialsRoute
   '/super/modules': typeof SuperModulesRoute
+  '/super/notifications': typeof SuperNotificationsRoute
   '/super/pending': typeof SuperPendingRoute
   '/super/profile': typeof SuperProfileRoute
   '/super/requests': typeof SuperRequestsRoute
@@ -347,6 +354,7 @@ export interface FileRoutesByTo {
   '/super/feedback': typeof SuperFeedbackRoute
   '/super/materials': typeof SuperMaterialsRoute
   '/super/modules': typeof SuperModulesRoute
+  '/super/notifications': typeof SuperNotificationsRoute
   '/super/pending': typeof SuperPendingRoute
   '/super/profile': typeof SuperProfileRoute
   '/super/requests': typeof SuperRequestsRoute
@@ -393,6 +401,7 @@ export interface FileRoutesById {
   '/super/feedback': typeof SuperFeedbackRoute
   '/super/materials': typeof SuperMaterialsRoute
   '/super/modules': typeof SuperModulesRoute
+  '/super/notifications': typeof SuperNotificationsRoute
   '/super/pending': typeof SuperPendingRoute
   '/super/profile': typeof SuperProfileRoute
   '/super/requests': typeof SuperRequestsRoute
@@ -440,6 +449,7 @@ export interface FileRouteTypes {
     | '/super/feedback'
     | '/super/materials'
     | '/super/modules'
+    | '/super/notifications'
     | '/super/pending'
     | '/super/profile'
     | '/super/requests'
@@ -483,6 +493,7 @@ export interface FileRouteTypes {
     | '/super/feedback'
     | '/super/materials'
     | '/super/modules'
+    | '/super/notifications'
     | '/super/pending'
     | '/super/profile'
     | '/super/requests'
@@ -528,6 +539,7 @@ export interface FileRouteTypes {
     | '/super/feedback'
     | '/super/materials'
     | '/super/modules'
+    | '/super/notifications'
     | '/super/pending'
     | '/super/profile'
     | '/super/requests'
@@ -688,6 +700,13 @@ declare module '@tanstack/react-router' {
       path: '/pending'
       fullPath: '/super/pending'
       preLoaderRoute: typeof SuperPendingRouteImport
+      parentRoute: typeof SuperRoute
+    }
+    '/super/notifications': {
+      id: '/super/notifications'
+      path: '/notifications'
+      fullPath: '/super/notifications'
+      preLoaderRoute: typeof SuperNotificationsRouteImport
       parentRoute: typeof SuperRoute
     }
     '/super/modules': {
@@ -904,6 +923,7 @@ interface SuperRouteChildren {
   SuperFeedbackRoute: typeof SuperFeedbackRoute
   SuperMaterialsRoute: typeof SuperMaterialsRoute
   SuperModulesRoute: typeof SuperModulesRoute
+  SuperNotificationsRoute: typeof SuperNotificationsRoute
   SuperPendingRoute: typeof SuperPendingRoute
   SuperProfileRoute: typeof SuperProfileRoute
   SuperRequestsRoute: typeof SuperRequestsRoute
@@ -923,6 +943,7 @@ const SuperRouteChildren: SuperRouteChildren = {
   SuperFeedbackRoute: SuperFeedbackRoute,
   SuperMaterialsRoute: SuperMaterialsRoute,
   SuperModulesRoute: SuperModulesRoute,
+  SuperNotificationsRoute: SuperNotificationsRoute,
   SuperPendingRoute: SuperPendingRoute,
   SuperProfileRoute: SuperProfileRoute,
   SuperRequestsRoute: SuperRequestsRoute,
