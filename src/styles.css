@@ -52,8 +52,8 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  --font-display: "Manrope", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: "Inter", "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Sora", "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Manrope", "Sora", ui-sans-serif, system-ui, sans-serif;
 }
 
 /* ============================================================
