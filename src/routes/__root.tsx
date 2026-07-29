@@ -59,6 +59,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "theme-color", content: "#0b0b0f" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "apple-mobile-web-app-title", content: "StudyHub" },
+      { name: "mobile-web-app-capable", content: "yes" },
       { title: "StudyHub — Lecture materials, past papers & deadlines" },
       { name: "description", content: "StudyHub gives students instant access to lecture slides, notes, past papers and upcoming deadlines, organised by semester and subject." },
       { property: "og:title", content: "StudyHub — Lecture materials, past papers & deadlines" },
