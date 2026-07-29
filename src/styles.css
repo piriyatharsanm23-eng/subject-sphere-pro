@@ -244,7 +244,7 @@
   }
   h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; font-weight: 700; }
   a { color: inherit; }
-  ::selection { background: rgba(168, 85, 247, 0.4); color: #fff; }
+  ::selection { background: rgba(129, 140, 248, 0.42); color: #fff; }
 }
 
 @keyframes blob-float {
