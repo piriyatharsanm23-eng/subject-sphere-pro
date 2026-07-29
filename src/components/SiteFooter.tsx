@@ -9,7 +9,7 @@ export function SiteFooter() {
       <div className="container mx-auto px-4 sm:px-6 py-12 grid gap-8 md:grid-cols-3">
         <div>
           <div className="flex items-center gap-2">
-            <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary-gradient"><GraduationCap className="h-4 w-4 text-primary-foreground" /></div>
+            <img src="/studyhub-logo.jpg" alt="StudyHub logo" className="h-8 w-8 rounded-lg object-cover ring-1 ring-border/60" />
             <span className="font-bold">StudyHub</span>
           </div>
           <p className="mt-3 text-sm text-muted-foreground max-w-xs">
