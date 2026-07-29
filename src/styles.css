@@ -259,8 +259,8 @@
 }
 
 @keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 30px rgba(124, 58, 237, 0.35); }
-  50%      { box-shadow: 0 0 60px rgba(168, 85, 247, 0.6); }
+  0%, 100% { box-shadow: 0 0 30px rgba(79, 70, 229, 0.35); }
+  50%      { box-shadow: 0 0 60px rgba(129, 140, 248, 0.6); }
 }
 
 @keyframes rise-in {
