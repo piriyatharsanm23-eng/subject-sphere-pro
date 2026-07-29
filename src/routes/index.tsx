@@ -302,7 +302,7 @@ function Landing() {
       {/* CTA */}
       <section className="container mx-auto px-4 sm:px-6 mt-16 sm:mt-24 mb-16 sm:mb-24">
         <div className="relative overflow-hidden rounded-3xl border border-border bg-hero p-8 sm:p-12 text-center">
-          <div className="pointer-events-none absolute -top-24 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-emerald-400/30 blur-3xl" />
+          <div className="pointer-events-none absolute -top-24 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-indigo-400/30 blur-3xl" />
           <div className="relative">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight">
               Ready to organise your study life?
