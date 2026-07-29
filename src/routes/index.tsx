@@ -138,9 +138,9 @@ function Landing() {
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-hero" />
         {/* animated gradient orbs */}
-        <div className="pointer-events-none absolute -top-40 -left-40 h-[480px] w-[480px] rounded-full bg-emerald-400/30 blur-3xl animate-pulse" />
-        <div className="pointer-events-none absolute -bottom-40 -right-32 h-[520px] w-[520px] rounded-full bg-teal-400/25 blur-3xl animate-pulse [animation-delay:1.5s]" />
-        <div className="pointer-events-none absolute top-1/3 left-1/2 h-[320px] w-[320px] -translate-x-1/2 rounded-full bg-sky-400/15 blur-3xl" />
+        <div className="pointer-events-none absolute -top-40 -left-40 h-[480px] w-[480px] rounded-full bg-indigo-500/35 blur-3xl animate-pulse" />
+        <div className="pointer-events-none absolute -bottom-40 -right-32 h-[520px] w-[520px] rounded-full bg-indigo-400/25 blur-3xl animate-pulse [animation-delay:1.5s]" />
+        <div className="pointer-events-none absolute top-1/3 left-1/2 h-[320px] w-[320px] -translate-x-1/2 rounded-full bg-violet-400/15 blur-3xl" />
         {/* grid texture */}
         <div className="pointer-events-none absolute inset-0 opacity-[0.07] [background-image:linear-gradient(to_right,white_1px,transparent_1px),linear-gradient(to_bottom,white_1px,transparent_1px)] [background-size:48px_48px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_75%)]" />
 
@@ -155,10 +155,10 @@ function Landing() {
 
               <h1 className="mt-5 text-[2.25rem] leading-[1.05] sm:text-5xl lg:text-[4rem] font-extrabold tracking-tight text-white">
                 Every lecture slide and past paper,{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-sky-200">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-200 via-violet-200 to-indigo-300">
                   one calm place
                 </span>
-                <span className="text-emerald-300">.</span>
+                <span className="text-indigo-300">.</span>
               </h1>
 
               <p className="mt-5 text-base sm:text-lg text-white/75 max-w-xl leading-relaxed">
@@ -302,7 +302,7 @@ function Landing() {
       {/* CTA */}
       <section className="container mx-auto px-4 sm:px-6 mt-16 sm:mt-24 mb-16 sm:mb-24">
         <div className="relative overflow-hidden rounded-3xl border border-border bg-hero p-8 sm:p-12 text-center">
-          <div className="pointer-events-none absolute -top-24 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-emerald-400/30 blur-3xl" />
+          <div className="pointer-events-none absolute -top-24 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-indigo-400/30 blur-3xl" />
           <div className="relative">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight">
               Ready to organise your study life?
