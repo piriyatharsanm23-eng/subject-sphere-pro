@@ -135,72 +135,72 @@
    DARK THEME
    ============================================================ */
 .dark {
-  --background: #0B0618;
-  --foreground: #FFFFFF;
+  --background: #0A0A1A;
+  --foreground: #F4F5FB;
 
-  --card: rgba(21, 16, 40, 0.72);
-  --card-foreground: #FFFFFF;
-  --popover: #151028;
-  --popover-foreground: #FFFFFF;
+  --card: rgba(20, 20, 50, 0.72);
+  --card-foreground: #F4F5FB;
+  --popover: #141432;
+  --popover-foreground: #F4F5FB;
 
-  --primary: #7C3AED;
+  --primary: #6366F1;
   --primary-foreground: #FFFFFF;
 
-  --secondary: #1B1435;
-  --secondary-foreground: #FFFFFF;
+  --secondary: #1E1E5A;
+  --secondary-foreground: #F4F5FB;
 
-  --muted: #1B1435;
-  --muted-foreground: #C9C4D6;
+  --muted: #141432;
+  --muted-foreground: #B8BCD9;
 
-  --accent: #A855F7;
-  --accent-foreground: #FFFFFF;
+  --accent: #818CF8;
+  --accent-foreground: #0A0A1A;
 
   --destructive: #EF4444;
   --destructive-foreground: #FFFFFF;
 
-  --border: rgba(168, 85, 247, 0.2);
-  --input: rgba(168, 85, 247, 0.24);
-  --ring: #A855F7;
+  --border: rgba(129, 140, 248, 0.22);
+  --input: rgba(129, 140, 248, 0.26);
+  --ring: #818CF8;
 
-  --navy: #151028;
-  --navy-foreground: #FFFFFF;
-  --teal: #A855F7;
-  --emerald: #22C55E;
+  --navy: #141432;
+  --navy-foreground: #F4F5FB;
+  --teal: #818CF8;
+  --emerald: #34D399;
 
-  --badge-lecture: #A855F7;
-  --badge-note: #22C55E;
-  --badge-paper: #C084FC;
+  --badge-lecture: #818CF8;
+  --badge-note: #34D399;
+  --badge-paper: #A5B4FC;
   --badge-assignment: #F59E0B;
-  --badge-other: #C9C4D6;
+  --badge-other: #B8BCD9;
 
-  --gradient-hero: radial-gradient(1200px 600px at 15% 10%, rgba(124, 58, 237, 0.35), transparent 60%),
-                   radial-gradient(900px 500px at 85% 90%, rgba(168, 85, 247, 0.28), transparent 60%),
-                   linear-gradient(135deg, #0B0618 0%, #151028 60%, #1B1040 100%);
-  --gradient-card: linear-gradient(180deg, rgba(30, 22, 60, 0.72) 0%, rgba(21, 16, 40, 0.55) 100%);
-  --gradient-primary: linear-gradient(135deg, #7C3AED 0%, #A855F7 100%);
-  --gradient-accent: linear-gradient(135deg, #A855F7 0%, #C084FC 100%);
+  --gradient-hero: radial-gradient(1200px 600px at 15% 10%, rgba(79, 70, 229, 0.45), transparent 60%),
+                   radial-gradient(900px 500px at 85% 90%, rgba(129, 140, 248, 0.30), transparent 60%),
+                   linear-gradient(135deg, #0A0A1A 0%, #141432 55%, #1E1E5A 100%);
+  --gradient-card: linear-gradient(180deg, rgba(30, 30, 90, 0.72) 0%, rgba(20, 20, 50, 0.55) 100%);
+  --gradient-primary: linear-gradient(135deg, #4F46E5 0%, #818CF8 100%);
+  --gradient-accent: linear-gradient(135deg, #6366F1 0%, #A5B4FC 100%);
 
-  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(124, 58, 237, 0.35);
-  --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.35), 0 24px 48px -20px rgba(124, 58, 237, 0.45);
-  --shadow-glow: 0 0 0 1px rgba(168, 85, 247, 0.35), 0 10px 40px -8px rgba(124, 58, 237, 0.55);
-  --shadow-glow-strong: 0 0 60px rgba(168, 85, 247, 0.55), 0 0 120px rgba(124, 58, 237, 0.35);
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(79, 70, 229, 0.35);
+  --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.35), 0 24px 48px -20px rgba(79, 70, 229, 0.45);
+  --shadow-glow: 0 0 0 1px rgba(129, 140, 248, 0.35), 0 10px 40px -8px rgba(79, 70, 229, 0.55);
+  --shadow-glow-strong: 0 0 60px rgba(129, 140, 248, 0.55), 0 0 120px rgba(79, 70, 229, 0.35);
 
-  --sidebar: #0F0A22;
-  --sidebar-foreground: #FFFFFF;
-  --sidebar-primary: #A855F7;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #1B1435;
-  --sidebar-accent-foreground: #FFFFFF;
-  --sidebar-border: rgba(168, 85, 247, 0.2);
-  --sidebar-ring: #A855F7;
+  --sidebar: #0F0F26;
+  --sidebar-foreground: #F4F5FB;
+  --sidebar-primary: #818CF8;
+  --sidebar-primary-foreground: #0A0A1A;
+  --sidebar-accent: #141432;
+  --sidebar-accent-foreground: #F4F5FB;
+  --sidebar-border: rgba(129, 140, 248, 0.22);
+  --sidebar-ring: #818CF8;
 
   --body-bg:
-    radial-gradient(60rem 40rem at 10% -10%, rgba(124, 58, 237, 0.22), transparent 60%),
-    radial-gradient(50rem 34rem at 110% 20%, rgba(168, 85, 247, 0.18), transparent 60%),
-    radial-gradient(45rem 30rem at 50% 120%, rgba(192, 132, 252, 0.15), transparent 60%),
-    linear-gradient(180deg, #0B0618 0%, #0B0618 100%);
-  --blob-1: radial-gradient(circle, #7C3AED 0%, transparent 70%);
-  --blob-2: radial-gradient(circle, #A855F7 0%, transparent 70%);
+    radial-gradient(60rem 40rem at 10% -10%, rgba(79, 70, 229, 0.28), transparent 60%),
+    radial-gradient(50rem 34rem at 110% 20%, rgba(129, 140, 248, 0.20), transparent 60%),
+    radial-gradient(45rem 30rem at 50% 120%, rgba(99, 102, 241, 0.18), transparent 60%),
+    linear-gradient(180deg, #0A0A1A 0%, #0A0A1A 100%);
+  --blob-1: radial-gradient(circle, #4F46E5 0%, transparent 70%);
+  --blob-2: radial-gradient(circle, #818CF8 0%, transparent 70%);
   --blob-opacity: 0.55;
 }
 
