@@ -138,9 +138,9 @@ function Landing() {
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-hero" />
         {/* animated gradient orbs */}
-        <div className="pointer-events-none absolute -top-40 -left-40 h-[480px] w-[480px] rounded-full bg-emerald-400/30 blur-3xl animate-pulse" />
-        <div className="pointer-events-none absolute -bottom-40 -right-32 h-[520px] w-[520px] rounded-full bg-teal-400/25 blur-3xl animate-pulse [animation-delay:1.5s]" />
-        <div className="pointer-events-none absolute top-1/3 left-1/2 h-[320px] w-[320px] -translate-x-1/2 rounded-full bg-sky-400/15 blur-3xl" />
+        <div className="pointer-events-none absolute -top-40 -left-40 h-[480px] w-[480px] rounded-full bg-indigo-500/35 blur-3xl animate-pulse" />
+        <div className="pointer-events-none absolute -bottom-40 -right-32 h-[520px] w-[520px] rounded-full bg-indigo-400/25 blur-3xl animate-pulse [animation-delay:1.5s]" />
+        <div className="pointer-events-none absolute top-1/3 left-1/2 h-[320px] w-[320px] -translate-x-1/2 rounded-full bg-violet-400/15 blur-3xl" />
         {/* grid texture */}
         <div className="pointer-events-none absolute inset-0 opacity-[0.07] [background-image:linear-gradient(to_right,white_1px,transparent_1px),linear-gradient(to_bottom,white_1px,transparent_1px)] [background-size:48px_48px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_75%)]" />
 
