@@ -327,7 +327,7 @@
   transition: transform 0.2s ease, box-shadow 0.25s ease, filter 0.2s ease;
   &:hover {
     transform: translateY(-1px);
-    box-shadow: 0 10px 30px -8px rgba(168, 85, 247, 0.6), 0 0 24px rgba(124, 58, 237, 0.45);
+    box-shadow: 0 10px 30px -8px rgba(129, 140, 248, 0.6), 0 0 24px rgba(79, 70, 229, 0.45);
     filter: brightness(1.06);
   }
 }
