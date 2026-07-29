@@ -22,9 +22,11 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur-xl">
       <div className="container mx-auto flex h-14 sm:h-16 items-center justify-between gap-3 px-4 sm:px-6">
         <Link to="/" className="flex items-center gap-2 min-w-0 group">
-          <div className="grid h-8 w-8 sm:h-9 sm:w-9 shrink-0 place-items-center rounded-xl bg-primary-gradient shadow-glow">
-            <GraduationCap className="h-4 w-4 sm:h-5 sm:w-5 text-primary-foreground" />
-          </div>
+          <img
+            src="/studyhub-logo.jpg"
+            alt="StudyHub logo"
+            className="h-8 w-8 sm:h-9 sm:w-9 shrink-0 rounded-xl object-cover shadow-glow ring-1 ring-border/60"
+          />
           <span className="text-base sm:text-lg font-bold tracking-tight truncate group-hover:text-primary transition-colors">
             StudyHub
           </span>
