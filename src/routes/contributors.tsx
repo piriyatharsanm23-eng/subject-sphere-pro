@@ -6,6 +6,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
+import { CardGridSkeleton, EmptyState, ErrorState } from "@/components/ui/states";
 
 type Contributor = {
   id: string;
