@@ -141,131 +141,97 @@ function DashboardContent({ sel }: { sel: Selection }) {
   useEffect(() => { if (semesterQ.error) toast.error("Couldn't load semester", { description: (semesterQ.error as Error).message }); }, [semesterQ.error]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-muted/40">
+    <div className="min-h-dvh flex flex-col bg-muted/40">
       <SiteHeader />
-      <main className="container mx-auto px-4 sm:px-6 py-8 flex-1 max-w-7xl w-full">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-end sm:justify-between gap-4 mb-8">
-          <div className="min-w-0">
-            <div className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Semester</div>
-            <h1 className="mt-1 text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight break-words">{semesterQ.data?.name ?? "Your dashboard"}</h1>
-            <p className="mt-1 text-sm text-muted-foreground">{sel.subjectIds.length} subject{sel.subjectIds.length === 1 ? "" : "s"} selected</p>
-          </div>
-          <div className="flex flex-wrap gap-2 [&>*]:flex-1 sm:[&>*]:flex-none">
-            <Button asChild variant="outline"><Link to="/select"><Settings2 className="mr-2 h-4 w-4" />Change preferences</Link></Button>
-            <RequestDialog semesterId={sel.semesterId} subjects={subjectsQ.data ?? []} />
-            <FeedbackDialog semesterId={sel.semesterId} subjects={subjectsQ.data ?? []} />
-          </div>
-        </div>
+      <PageContainer size="wide">
+        <PageHeader
+          breadcrumbs={[{ label: "Home", to: "/" }, { label: "Dashboard" }]}
+          eyebrow="Semester"
+          title={semesterQ.data?.name ?? "Your dashboard"}
+          description={`${sel.subjectIds.length} subject${sel.subjectIds.length === 1 ? "" : "s"} selected · deadlines, materials and past papers in one place.`}
+          actions={
+            <>
+              <Button asChild variant="outline" size="sm"><Link to="/select"><Settings2 className="mr-2 h-4 w-4" aria-hidden="true" />Change preferences</Link></Button>
+              <RequestDialog semesterId={sel.semesterId} subjects={subjectsQ.data ?? []} />
+              <FeedbackDialog semesterId={sel.semesterId} subjects={subjectsQ.data ?? []} />
+            </>
+          }
+        />
 
-        {/* Deadline reminder banner — urgent first */}
-        <div className="mb-10">
+        {/* 1 — Urgent deadlines */}
+        <section className="mb-8" aria-label="Upcoming deadlines">
           {deadlinesQ.isLoading ? (
-            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {[0,1,2].map((i) => <div key={i} className="h-40 rounded-2xl bg-muted animate-pulse" />)}
-            </div>
+            <CardGridSkeleton count={3} height="h-40" className="grid gap-3 md:grid-cols-2 xl:grid-cols-3" />
+          ) : deadlinesQ.isError ? (
+            <ErrorState title="We couldn't load your deadlines" error={deadlinesQ.error} onRetry={() => deadlinesQ.refetch()} />
           ) : (
             <DeadlineBanner deadlines={deadlinesQ.data ?? []} subjectsById={subjectsById} />
           )}
-        </div>
-
-        {/* Subject cards */}
-        <section>
-          <h2 className="text-lg font-semibold mb-3">Your subjects</h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {subjectsQ.isLoading ? (
-              [0,1,2].map((i) => <div key={i} className="h-28 rounded-2xl bg-muted animate-pulse" />)
-            ) : (subjectsQ.data ?? []).length === 0 ? (
-              <div className="sm:col-span-2 lg:col-span-3">
-                <EmptyState icon={Inbox} title="No subjects selected" description="Head back to preferences to pick your subjects for this semester." />
-              </div>
-            ) : (
-              (subjectsQ.data ?? []).map((s) => {
-                const meta = subjectMaterialCounts[s.id];
-                return (
-                  <Link key={s.id} to="/subject/$id" params={{ id: s.id }} className="group rounded-2xl border border-border bg-card-soft p-5 shadow-soft hover:shadow-elevated hover:-translate-y-0.5 transition-all">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <div className="font-semibold group-hover:text-primary transition-colors">{s.name}</div>
-                        {s.code && <div className="text-xs text-muted-foreground">{s.code}</div>}
-                      </div>
-                      <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
-                    </div>
-                    <div className="mt-4 flex items-center gap-4 text-xs text-muted-foreground">
-                      <span className="inline-flex items-center gap-1"><FileText className="h-3.5 w-3.5" /> {meta?.count ?? 0} materials</span>
-                      {meta?.latest && <span>Updated {formatDistanceToNow(new Date(meta.latest), { addSuffix: true })}</span>}
-                    </div>
-                  </Link>
-                );
-              })
-            )}
-          </div>
         </section>
 
-        <div className="grid gap-8 lg:grid-cols-3 mt-10">
-          {/* Materials */}
-          <div className="lg:col-span-2">
-            <div className="flex items-end justify-between mb-3">
-              <h2 className="text-lg font-semibold">Materials</h2>
-              <span className="text-xs text-muted-foreground">{filtered.length} result{filtered.length === 1 ? "" : "s"}</span>
-            </div>
+        {/* 2 — Materials + all deadlines */}
+        <div className="grid gap-8 lg:grid-cols-3">
+          <div className="lg:col-span-2 min-w-0">
+            <SectionHeading
+              title="Materials"
+              action={<span className="text-xs text-muted-foreground" aria-live="polite">{filtered.length} result{filtered.length === 1 ? "" : "s"}</span>}
+            />
 
             <div className="rounded-2xl border border-border bg-card p-4 shadow-soft">
-              <div className="flex flex-col sm:flex-row gap-2">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input className="pl-9" placeholder="Search title, year, type…" value={q} onChange={(e) => setQ(e.target.value)} />
+              <Toolbar>
+                <div className="relative min-w-0 flex-1">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+                  <Input className="pl-9" aria-label="Search materials" placeholder="Search title, year, type…" value={q} onChange={(e) => setQ(e.target.value)} />
                 </div>
                 <Select value={subjectFilter} onValueChange={setSubjectFilter}>
-                  <SelectTrigger className="sm:w-44"><SelectValue placeholder="Subject" /></SelectTrigger>
+                  <SelectTrigger className="w-full sm:w-44" aria-label="Filter by subject"><SelectValue placeholder="Subject" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All subjects</SelectItem>
                     {(subjectsQ.data ?? []).map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
                   </SelectContent>
                 </Select>
                 <Select value={typeFilter} onValueChange={setTypeFilter}>
-                  <SelectTrigger className="sm:w-44"><SelectValue placeholder="Material type" /></SelectTrigger>
+                  <SelectTrigger className="w-full sm:w-44" aria-label="Filter by material type"><SelectValue placeholder="Material type" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All types</SelectItem>
                     {MATERIAL_TYPES.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
                   </SelectContent>
                 </Select>
-              </div>
+              </Toolbar>
             </div>
 
             <div className="mt-4 space-y-3">
               {materialsQ.isLoading ? (
-                [0,1,2].map((i) => <div key={i} className="h-24 rounded-2xl bg-muted animate-pulse" />)
+                <ListSkeleton rows={3} className="space-y-3 [&>*]:h-24 [&>*]:rounded-2xl" />
               ) : materialsQ.isError ? (
-                <ErrorState message="We couldn't load materials." onRetry={() => materialsQ.refetch()} />
+                <ErrorState title="We couldn't load your materials" error={materialsQ.error} onRetry={() => materialsQ.refetch()} />
               ) : filtered.length === 0 ? (
                 (materialsQ.data ?? []).length === 0
-                  ? <EmptyState icon={Inbox} title="No materials yet" description="When admins upload material for your subjects, it will appear here." />
-                  : <EmptyState icon={Inbox} title="No matches" description="Try clearing your search or filters." />
+                  ? <EmptyState icon={Inbox} title="No materials yet" description="When a semester admin uploads notes, slides or past papers for your subjects, they appear here instantly." />
+                  : <EmptyState icon={Inbox} title="No materials match your filters" description="Try a different search term, or reset the subject and type filters." action={<Button size="sm" variant="outline" onClick={() => { setQ(""); setTypeFilter("all"); setSubjectFilter("all"); }}>Clear filters</Button>} />
               ) : (
                 filtered.map((m) => (
-                  <article key={m.id} className="rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-soft hover:shadow-elevated transition-shadow">
-                    <div className="flex flex-wrap items-start gap-3 justify-between">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 flex-wrap">
+                  <article key={m.id} className="rounded-2xl border border-border bg-card p-4 shadow-soft transition-shadow hover:shadow-elevated sm:p-5">
+                    <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
                           <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${materialTypeBadge(m.material_type)}`}>{materialTypeLabel(m.material_type)}</span>
                           {m.year && <span className="text-xs text-muted-foreground">· {m.year}</span>}
                           {m.week_or_module && <span className="text-xs text-muted-foreground">· {m.week_or_module}</span>}
-                          <span className="text-xs text-muted-foreground">· {subjectsById[m.subject_id]?.name}</span>
+                          <span className="truncate text-xs text-muted-foreground">· {subjectsById[m.subject_id]?.name}</span>
                         </div>
-                        <h3 className="mt-1 font-semibold truncate">{m.title}</h3>
+                        <h3 className="mt-1 font-semibold line-clamp-2 break-words">{m.title}</h3>
                         {m.description && <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{m.description}</p>}
                         <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
                           <UploaderBadge uploader={m.uploaded_by ? uploadersQ.data?.[m.uploaded_by] : null} />
-                          <span>· {formatDistanceToNow(new Date(m.created_at), { addSuffix: true })}</span>
-                          
+                          <span>· {formatRelative(m.created_at)}</span>
                         </div>
                       </div>
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="outline" onClick={() => setPreviewing(m as PreviewableMaterial)}>
-                          <Eye className="mr-2 h-4 w-4" /> Preview
+                      <div className="flex gap-2 sm:shrink-0">
+                        <Button size="sm" variant="outline" className="flex-1 sm:flex-none" onClick={() => setPreviewing(m as PreviewableMaterial)}>
+                          <Eye className="mr-2 h-4 w-4" aria-hidden="true" /> Preview
                         </Button>
-                        <Button size="sm" onClick={async () => {
+                        <Button size="sm" className="flex-1 sm:flex-none" onClick={async () => {
                           const id = toast.loading("Preparing your download…");
                           try {
                             await downloadMaterial(m);
@@ -274,7 +240,7 @@ function DashboardContent({ sel }: { sel: Selection }) {
                             toast.error("Could not download this file", { id, description: (err as Error)?.message });
                           }
                         }}>
-                          <Download className="mr-2 h-4 w-4" /> Download
+                          <Download className="mr-2 h-4 w-4" aria-hidden="true" /> Download
                         </Button>
                       </div>
                     </div>
@@ -284,44 +250,60 @@ function DashboardContent({ sel }: { sel: Selection }) {
             </div>
           </div>
 
-          {/* All deadlines list */}
-          <aside>
+          <aside className="min-w-0" aria-label="All deadlines">
             {deadlinesQ.isLoading ? (
-              <div className="space-y-3">
-                {[0,1].map((i) => <div key={i} className="h-20 rounded-2xl bg-muted animate-pulse" />)}
-              </div>
+              <ListSkeleton rows={2} className="space-y-3 [&>*]:h-20 [&>*]:rounded-2xl" />
             ) : (
               <AllDeadlinesList deadlines={deadlinesQ.data ?? []} subjectsById={subjectsById} />
             )}
           </aside>
         </div>
 
-        <MaterialPreviewDialog material={previewing} onClose={() => setPreviewing(null)} />
+        {/* 3 — My subjects */}
+        <section className="mt-10">
+          <SectionHeading title="Your subjects" description="Jump straight into a subject's materials." />
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {subjectsQ.isLoading ? (
+              <CardGridSkeleton count={3} height="h-28" className="contents" />
+            ) : (subjectsQ.data ?? []).length === 0 ? (
+              <div className="sm:col-span-2 lg:col-span-3">
+                <EmptyState
+                  icon={Inbox}
+                  title="No subjects selected"
+                  description="Pick the subjects you're studying this semester and your dashboard will fill up automatically."
+                  action={<Button asChild size="sm"><Link to="/select">Choose subjects</Link></Button>}
+                />
+              </div>
+            ) : (
+              (subjectsQ.data ?? []).map((s) => {
+                const meta = subjectMaterialCounts[s.id];
+                return (
+                  <Link key={s.id} to="/subject/$id" params={{ id: s.id }} className="group rounded-2xl border border-border bg-card-soft p-5 shadow-soft transition-all hover:-translate-y-0.5 hover:shadow-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className="font-semibold line-clamp-2 group-hover:text-primary transition-colors">{s.name}</div>
+                        {s.code && <div className="truncate text-xs text-muted-foreground">{s.code}</div>}
+                      </div>
+                      <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground transition-all group-hover:translate-x-1 group-hover:text-primary" aria-hidden="true" />
+                    </div>
+                    <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                      <span className="inline-flex items-center gap-1"><FileText className="h-4 w-4" aria-hidden="true" /> {meta?.count ?? 0} materials</span>
+                      {meta?.latest && <span>Updated {formatRelative(meta.latest)}</span>}
+                    </div>
+                  </Link>
+                );
+              })
+            )}
+          </div>
+        </section>
 
-      </main>
+        <MaterialPreviewDialog material={previewing} onClose={() => setPreviewing(null)} />
+      </PageContainer>
       <SiteFooter />
     </div>
   );
 }
 
-function EmptyState({ icon: Icon, title, description }: { icon: typeof Inbox; title: string; description: string }) {
-  return (
-    <div className="rounded-2xl border border-dashed border-border bg-card p-10 text-center">
-      <Icon className="mx-auto h-8 w-8 text-muted-foreground" />
-      <h3 className="mt-3 font-semibold">{title}</h3>
-      <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-    </div>
-  );
-}
-
-function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
-  return (
-    <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-center">
-      <p className="text-sm text-destructive-foreground/90">{message}</p>
-      <Button size="sm" variant="outline" className="mt-3" onClick={onRetry}>Try again</Button>
-    </div>
-  );
-}
 
 function RequestDialog({ semesterId, subjects }: { semesterId: string; subjects: { id: string; name: string }[] }) {
   const [open, setOpen] = useState(false);
