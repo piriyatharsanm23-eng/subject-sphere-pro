@@ -451,21 +451,13 @@ function PreviewDialog({
 }
 
 function Empty({ label }: { label: string }) {
-  return (
-    <div className="rounded-2xl border border-dashed border-border bg-card p-10 text-center">
-      <FileText className="mx-auto h-8 w-8 text-muted-foreground" />
-      <p className="mt-3 text-sm text-muted-foreground">{label}</p>
-    </div>
-  );
+  return <EmptyState icon={FileText} title={label} />;
 }
 
 function MaterialSkeleton() {
-  return (
-    <div className="grid gap-3 sm:grid-cols-2">
-      {[0,1,2,3].map((i) => <div key={i} className="h-32 rounded-2xl bg-muted animate-pulse" />)}
-    </div>
-  );
+  return <CardGridSkeleton count={4} height="h-32" className="grid gap-3 sm:grid-cols-2" />;
 }
+
 
 type KuppiRow = {
   id: string;
