@@ -8,7 +8,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { materialTypeBadge, materialTypeLabel, downloadMaterial } from "@/lib/materials";
-import { format, formatDistanceToNow } from "date-fns";
+import { Skeleton } from "@/components/ui/skeleton";
+import { PageContainer, PageHeader } from "@/components/ui/page";
+import { CardGridSkeleton, EmptyState, ErrorState } from "@/components/ui/states";
+import { formatDateTime, formatRelative } from "@/lib/format";
 import { toast } from "sonner";
 import { useEffect, useMemo, useState } from "react";
 import { useUploaders } from "@/lib/uploaders";
@@ -115,32 +118,40 @@ function SubjectPage() {
   }, [groups.past_paper]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-muted/40">
+    <div className="min-h-dvh flex flex-col bg-muted/40">
       <SiteHeader />
-      <main className="container mx-auto px-4 sm:px-6 py-8 flex-1 max-w-6xl w-full">
-        <Button asChild variant="ghost" size="sm" className="mb-4"><Link to="/"><ArrowLeft className="mr-2 h-4 w-4" /> Back to home</Link></Button>
+      <PageContainer>
+        {subjectQ.isLoading ? (
+          <div className="mb-6 space-y-3">
+            <Skeleton className="h-3 w-32" />
+            <Skeleton className="h-9 w-64" />
+            <Skeleton className="h-4 w-full max-w-md" />
+          </div>
+        ) : subjectQ.isError ? (
+          <ErrorState className="mb-6" title="We couldn't load this subject" error={subjectQ.error} onRetry={() => subjectQ.refetch()} />
+        ) : !subjectQ.data ? (
+          <EmptyState
+            className="mb-6"
+            icon={FileText}
+            title="Subject not found"
+            description="It may have been removed by an admin. Head back to your dashboard to pick another subject."
+            action={<Button asChild size="sm"><Link to="/dashboard">Go to dashboard</Link></Button>}
+          />
+        ) : (
+          <PageHeader
+            breadcrumbs={[
+              { label: "Home", to: "/" },
+              ...((subjectQ.data as any)?.semester?.name
+                ? [{ label: (subjectQ.data as any).semester.name as string, to: "/semester/$id", params: { id: subjectQ.data.semester_id } }]
+                : []),
+              { label: subjectQ.data.name },
+            ]}
+            eyebrow={subjectQ.data.code}
+            title={subjectQ.data.name}
+            description={subjectQ.data.description ?? undefined}
+          />
+        )}
 
-        <header className="rounded-2xl border border-border bg-card-soft p-6 shadow-soft">
-          {subjectQ.isLoading ? (
-            <div className="space-y-3">
-              <div className="h-3 w-24 rounded bg-muted animate-pulse" />
-              <div className="h-8 w-64 rounded bg-muted animate-pulse" />
-              <div className="h-4 w-full max-w-md rounded bg-muted animate-pulse" />
-            </div>
-          ) : !subjectQ.data ? (
-            <div className="text-center py-6">
-              <FileText className="mx-auto h-8 w-8 text-muted-foreground" />
-              <p className="mt-3 font-semibold">Subject not found</p>
-              <p className="mt-1 text-sm text-muted-foreground">It may have been removed. Go back to the dashboard to pick another.</p>
-            </div>
-          ) : (
-            <>
-              <div className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{subjectQ.data.code}</div>
-              <h1 className="mt-1 text-3xl sm:text-4xl font-bold tracking-tight">{subjectQ.data.name}</h1>
-              {subjectQ.data.description && <p className="mt-2 text-muted-foreground max-w-2xl">{subjectQ.data.description}</p>}
-            </>
-          )}
-        </header>
 
         <Tabs defaultValue="note" className="mt-6">
           <TabsList className="grid grid-cols-3 h-auto w-full gap-1 sm:flex sm:flex-wrap sm:w-auto">
@@ -187,23 +198,23 @@ function SubjectPage() {
 
           <TabsContent value="deadlines" className="mt-4">
             {deadlinesQ.isLoading ? (
-              <div className="space-y-3">
-                {[0,1].map((i) => <div key={i} className="h-24 rounded-2xl bg-muted animate-pulse" />)}
-              </div>
-            ) : (deadlinesQ.data ?? []).length === 0 ? <Empty label="No active deadlines" /> : (
+              <CardGridSkeleton count={2} height="h-24" className="space-y-3" />
+            ) : (deadlinesQ.data ?? []).length === 0 ? (
+              <EmptyState icon={Calendar} title="No active deadlines" description="When an admin publishes a deadline for this subject it will appear here." />
+            ) : (
               <div className="space-y-3">
                 {deadlinesQ.data!.map((d) => (
-                  <div key={d.id} className="rounded-2xl border border-border bg-card p-5 shadow-soft">
-                    <div className="flex items-start gap-4">
-                      <div className="grid place-items-center h-12 w-12 rounded-xl bg-badge-assignment/10 text-badge-assignment">
-                        <Calendar className="h-5 w-5" />
+                  <div key={d.id} className="rounded-2xl border border-border bg-card p-4 shadow-soft sm:p-5">
+                    <div className="flex items-start gap-3 sm:gap-4">
+                      <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-badge-assignment/10 text-badge-assignment">
+                        <Calendar className="h-5 w-5" aria-hidden="true" />
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-semibold">{d.title}</div>
-                        {d.description && <p className="text-sm text-muted-foreground mt-1">{d.description}</p>}
+                      <div className="min-w-0 flex-1">
+                        <div className="font-semibold break-words">{d.title}</div>
+                        {d.description && <p className="mt-1 text-sm text-muted-foreground">{d.description}</p>}
                         <div className="mt-2 text-sm">
-                          <span className="text-badge-assignment font-medium">{format(new Date(d.deadline_at), "EEEE, MMM d, yyyy · h:mm a")}</span>
-                          <span className="text-muted-foreground"> · in {formatDistanceToNow(new Date(d.deadline_at))}</span>
+                          <span className="font-medium text-badge-assignment">{formatDateTime(d.deadline_at)}</span>
+                          <span className="text-muted-foreground"> · {formatRelative(d.deadline_at)}</span>
                         </div>
                       </div>
                     </div>
@@ -213,7 +224,8 @@ function SubjectPage() {
             )}
           </TabsContent>
         </Tabs>
-      </main>
+      </PageContainer>
+
       <SiteFooter />
     </div>
   );
@@ -267,7 +279,7 @@ function MaterialList({
             {m.description && <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{m.description}</p>}
             <div className="mt-3 min-w-0">
               <UploaderBadge uploader={m.uploaded_by ? uploaders[m.uploaded_by] : null} />
-              <div className="text-xs text-muted-foreground mt-1">{formatDistanceToNow(new Date(m.created_at), { addSuffix: true })}</div>
+              <div className="text-xs text-muted-foreground mt-1">{formatRelative(m.created_at)}</div>
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
               <Button size="sm" variant="outline" onClick={() => setPreviewing(m)}>
@@ -438,21 +450,13 @@ function PreviewDialog({
 }
 
 function Empty({ label }: { label: string }) {
-  return (
-    <div className="rounded-2xl border border-dashed border-border bg-card p-10 text-center">
-      <FileText className="mx-auto h-8 w-8 text-muted-foreground" />
-      <p className="mt-3 text-sm text-muted-foreground">{label}</p>
-    </div>
-  );
+  return <EmptyState icon={FileText} title={label} />;
 }
 
 function MaterialSkeleton() {
-  return (
-    <div className="grid gap-3 sm:grid-cols-2">
-      {[0,1,2,3].map((i) => <div key={i} className="h-32 rounded-2xl bg-muted animate-pulse" />)}
-    </div>
-  );
+  return <CardGridSkeleton count={4} height="h-32" className="grid gap-3 sm:grid-cols-2" />;
 }
+
 
 type KuppiRow = {
   id: string;
@@ -577,7 +581,7 @@ function KuppiCard({ k, onPlay }: { k: KuppiRow; onPlay: () => void }) {
           </div>
         </div>
         <div className="absolute bottom-2 right-2 rounded-md bg-black/70 px-2 py-0.5 text-[10px] font-medium text-white/90">
-          {formatDistanceToNow(new Date(k.created_at), { addSuffix: true })}
+          {formatRelative(k.created_at)}
         </div>
       </button>
 

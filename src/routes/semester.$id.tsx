@@ -1,12 +1,15 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, ArrowRight, BookOpen, CalendarClock, FileText, Layers, NotebookPen, ScrollText, Users, Video } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
+import { ArrowRight, BookOpen, CalendarClock, Layers, NotebookPen, ScrollText, Users, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { PageContainer, PageHeader, SectionHeading } from "@/components/ui/page";
+import { CardGridSkeleton, EmptyState, ErrorState } from "@/components/ui/states";
+import { formatRelative } from "@/lib/format";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { supabase } from "@/integrations/supabase/client";
+
 
 export const Route = createFileRoute("/semester/$id")({
   head: () => ({ meta: [{ title: "Semester — StudyHub" }] }),
@@ -128,80 +131,85 @@ function SemesterPage() {
   };
 
 
-  return (
-    <div className="min-h-screen flex flex-col bg-muted/40">
-      <SiteHeader />
-      <main className="container mx-auto px-4 sm:px-6 py-8 flex-1 max-w-6xl w-full">
-        <Button asChild variant="ghost" size="sm" className="mb-4">
-          <Link to="/"><ArrowLeft className="mr-2 h-4 w-4" />Back to home</Link>
-        </Button>
+  const isError = semesterQ.isError || subjectsQ.isError;
 
-        <header className="rounded-2xl border border-border bg-card-soft p-6 shadow-soft">
-          <div className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Semester</div>
-          <h1 className="mt-1 text-3xl sm:text-4xl font-bold tracking-tight">
-            {semesterQ.isLoading ? "Loading…" : semesterQ.data?.name ?? "Not found"}
-          </h1>
-          {semesterQ.data?.description && (
-            <p className="mt-2 text-muted-foreground max-w-2xl">{semesterQ.data.description}</p>
-          )}
-          <div className="mt-5 grid grid-cols-2 sm:grid-cols-5 gap-3">
+  return (
+    <div className="min-h-dvh flex flex-col bg-muted/40">
+      <SiteHeader />
+      <PageContainer>
+        <PageHeader
+          breadcrumbs={[{ label: "Home", to: "/" }, { label: semesterQ.data?.name ?? "Semester" }]}
+          eyebrow="Semester"
+          title={semesterQ.isLoading ? "Loading…" : (semesterQ.data?.name ?? "Semester not found")}
+          description={semesterQ.data?.description ?? "Browse every subject, note, past paper and deadline in this semester."}
+          actions={
+            <Button asChild variant="outline" size="sm">
+              <Link to="/select">Change preferences</Link>
+            </Button>
+          }
+        >
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
             <Stat icon={BookOpen} label="Subjects" value={totals.subjects} tone="text-sky-500" />
             <Stat icon={ScrollText} label="Tutorials" value={totals.tutorials} tone="text-violet-500" />
             <Stat icon={NotebookPen} label="Notes" value={totals.notes} tone="text-emerald-500" />
             <Stat icon={Layers} label="Past papers" value={totals.papers} tone="text-amber-500" />
             <Stat icon={CalendarClock} label="Deadlines" value={totals.deadlines} tone="text-rose-500" />
           </div>
-        </header>
+        </PageHeader>
+
+        {isError && (
+          <ErrorState
+            className="mb-6"
+            title="We couldn't load this semester"
+            error={(semesterQ.error ?? subjectsQ.error) as Error}
+            onRetry={() => { semesterQ.refetch(); subjectsQ.refetch(); }}
+          />
+        )}
 
         {(contributorsQ.data ?? []).length > 0 && (
-          <section className="mt-6 rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-soft">
+          <section className="mb-6 rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-soft">
             <div className="flex flex-wrap items-center gap-3">
-              <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-semibold text-muted-foreground">
-                <Users className="h-3.5 w-3.5" /> Contributors
-              </div>
+              <h2 className="flex items-center gap-2 text-xs uppercase tracking-wider font-semibold text-muted-foreground">
+                <Users className="h-4 w-4" aria-hidden="true" /> Contributors
+              </h2>
               <div className="flex flex-wrap items-center gap-2">
                 {(contributorsQ.data ?? []).map((c) => (
                   <Link
                     key={c.id}
                     to="/contributors/$id"
                     params={{ id: c.id }}
-                    className="group inline-flex items-center gap-2 rounded-full border border-border bg-muted/40 hover:border-primary/40 hover:bg-primary/5 pl-1 pr-3 py-1 transition-all"
+                    className="group inline-flex min-h-9 items-center gap-2 rounded-full border border-border bg-muted/40 pl-1 pr-3 py-1 transition-all hover:border-primary/40 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   >
                     <Avatar className="h-6 w-6">
-                      {c.avatar_url ? <AvatarImage src={c.avatar_url} alt={c.full_name ?? "Admin"} /> : null}
+                      {c.avatar_url ? <AvatarImage src={c.avatar_url} alt="" /> : null}
                       <AvatarFallback className="bg-primary/10 text-primary text-[10px] font-semibold">
                         {(c.full_name ?? "?").trim().split(/\s+/).slice(0, 2).map((p) => p[0]?.toUpperCase() ?? "").join("") || "?"}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="text-xs font-medium group-hover:text-primary transition-colors">
+                    <span className="max-w-[10rem] truncate text-xs font-medium group-hover:text-primary transition-colors">
                       {c.full_name ?? "Admin"}
                     </span>
                   </Link>
                 ))}
               </div>
-              <Link to="/contributors" className="ml-auto text-xs text-primary hover:underline">
+              <Link to="/contributors" className="ml-auto text-xs font-medium text-primary hover:underline">
                 View all
               </Link>
             </div>
           </section>
         )}
 
-
-
-        <section className="mt-8">
-          <h2 className="text-lg font-semibold mb-3">Subjects</h2>
+        <section>
+          <SectionHeading title="Subjects" description={`${perSubject.length} subject${perSubject.length === 1 ? "" : "s"} in this semester`} />
           {subjectsQ.isLoading ? (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {[0, 1, 2, 3].map((i) => <div key={i} className="h-44 rounded-2xl bg-muted animate-pulse" />)}
-            </div>
+            <CardGridSkeleton count={6} height="h-44" />
           ) : perSubject.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border bg-card p-10 text-center">
-              <BookOpen className="mx-auto h-8 w-8 text-muted-foreground" />
-              <p className="mt-3 font-semibold">No subjects yet</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Admins can add subjects to this semester from the admin dashboard.
-              </p>
-            </div>
+            <EmptyState
+              icon={BookOpen}
+              title="No subjects yet"
+              description="Semester admins add subjects from the admin dashboard. Check back soon or browse another semester."
+              action={<Button asChild variant="outline" size="sm"><Link to="/">Browse semesters</Link></Button>}
+            />
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {perSubject.map((s) => (
@@ -209,14 +217,14 @@ function SemesterPage() {
                   key={s.id}
                   to="/subject/$id"
                   params={{ id: s.id }}
-                  className="group rounded-2xl border border-border bg-card p-5 shadow-soft hover:shadow-elevated hover:-translate-y-0.5 transition-all"
+                  className="group rounded-2xl border border-border bg-card p-5 shadow-soft transition-all hover:-translate-y-0.5 hover:shadow-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      {s.code && <div className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">{s.code}</div>}
-                      <div className="font-semibold group-hover:text-primary transition-colors truncate">{s.name}</div>
+                      {s.code && <div className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground truncate">{s.code}</div>}
+                      <div className="font-semibold group-hover:text-primary transition-colors line-clamp-2">{s.name}</div>
                     </div>
-                    <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                    <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground transition-all group-hover:translate-x-1 group-hover:text-primary" aria-hidden="true" />
                   </div>
                   <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
                     <MiniStat icon={ScrollText} label="Tutorials" value={s.tutorials} tone="text-violet-500" />
@@ -225,16 +233,16 @@ function SemesterPage() {
                     <MiniStat icon={CalendarClock} label="Deadlines" value={s.deadlines} tone="text-rose-500" />
                     <MiniStat icon={Video} label="Kuppi" value={s.kuppis} tone="text-sky-500" />
                   </div>
-                  <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
-                    <span>{s.latest ? `Updated ${formatDistanceToNow(new Date(s.latest), { addSuffix: true })}` : "No uploads yet"}</span>
-                    <span className="font-medium text-primary group-hover:underline">View materials</span>
+                  <div className="mt-4 flex items-center justify-between gap-2 text-xs text-muted-foreground">
+                    <span className="truncate">{s.latest ? `Updated ${formatRelative(s.latest)}` : "No uploads yet"}</span>
+                    <span className="shrink-0 font-medium text-primary group-hover:underline">View materials</span>
                   </div>
                 </Link>
               ))}
             </div>
           )}
         </section>
-      </main>
+      </PageContainer>
       <SiteFooter />
     </div>
   );

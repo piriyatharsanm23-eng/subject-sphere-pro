@@ -6,6 +6,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
+import { CardGridSkeleton, EmptyState, ErrorState } from "@/components/ui/states";
 
 type Contributor = {
   id: string;
@@ -87,7 +88,7 @@ function ContributorsPage() {
   const semestersCovered = new Set(admins.map((a) => a.assigned_semester_id).filter(Boolean)).size;
 
   return (
-    <div className="min-h-screen flex flex-col bg-muted/30">
+    <div className="min-h-dvh flex flex-col bg-muted/30">
       <SiteHeader />
       <main className="flex-1">
         {/* Hero */}
@@ -96,49 +97,46 @@ function ContributorsPage() {
             className="absolute inset-0 -z-10 opacity-70"
             style={{
               background:
-                "radial-gradient(ellipse 80% 60% at 20% 0%, rgba(124,58,237,0.25), transparent 60%), radial-gradient(ellipse 60% 50% at 90% 20%, rgba(59,130,246,0.20), transparent 60%)",
+                "radial-gradient(ellipse 80% 60% at 20% 0%, color-mix(in oklab, var(--primary) 22%, transparent), transparent 60%), radial-gradient(ellipse 60% 50% at 90% 20%, color-mix(in oklab, var(--accent) 18%, transparent), transparent 60%)",
             }}
           />
-          <div className="container mx-auto px-4 sm:px-6 py-14 sm:py-20">
+          <div className="container mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
             <div className="max-w-2xl">
               <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-                <Sparkles className="h-3.5 w-3.5" /> The people behind StudyHub
+                <Sparkles className="h-3.5 w-3.5" aria-hidden="true" /> The people behind StudyHub
               </div>
-              <h1 className="mt-4 text-4xl sm:text-5xl font-bold tracking-tight">Contributors</h1>
-              <p className="mt-3 text-muted-foreground text-lg">
+              <h1 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">Contributors</h1>
+              <p className="mt-3 text-base text-muted-foreground sm:text-lg">
                 Semester admins curate materials, deadlines and past papers. Kuppi presenters record peer-led revision sessions in Sinhala, Tamil and English. Tap any card to see their contributions.
               </p>
             </div>
 
-            <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl">
-              <HeroStat icon={GraduationCap} label="Admins" value={admins.length} tone="text-violet-500" />
-              <HeroStat icon={BookOpen} label="Semesters covered" value={semestersCovered} tone="text-sky-500" />
-              <HeroStat icon={Upload} label="Materials shared" value={totalMaterials} tone="text-emerald-500" />
-              <HeroStat icon={Video} label="Kuppi videos" value={kuppiQ.data ?? 0} tone="text-rose-500" />
+            <div className="mt-8 grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4">
+              <HeroStat icon={GraduationCap} label="Admins" value={admins.length} />
+              <HeroStat icon={BookOpen} label="Semesters covered" value={semestersCovered} />
+              <HeroStat icon={Upload} label="Materials shared" value={totalMaterials} />
+              <HeroStat icon={Video} label="Kuppi videos" value={kuppiQ.data ?? 0} />
             </div>
           </div>
         </section>
 
-        <div className="container mx-auto px-4 sm:px-6 py-10">
+        <div className="container mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
           {contributorsQ.isLoading ? (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="h-40 rounded-2xl border border-border bg-card animate-pulse" />
-              ))}
-            </div>
+            <CardGridSkeleton count={6} />
+          ) : contributorsQ.isError ? (
+            <ErrorState title="We couldn't load contributors" error={contributorsQ.error} onRetry={() => contributorsQ.refetch()} />
           ) : (
             <>
               {admins.length > 0 ? (
                 <AdminSection admins={admins} uploads={uploadsQ.data ?? {}} />
               ) : (
-                <div className="rounded-2xl border border-dashed border-border p-10 text-center text-muted-foreground">
-                  No contributors yet.
-                </div>
+                <EmptyState icon={Users} title="No contributors yet" description="Once a super admin assigns semester admins, they'll be listed here." />
               )}
               <KuppiPresenters />
             </>
           )}
         </div>
+
       </main>
       <SiteFooter />
     </div>
@@ -149,23 +147,22 @@ function HeroStat({
   icon: Icon,
   label,
   value,
-  tone,
 }: {
   icon: typeof Users;
   label: string;
   value: number;
-  tone: string;
 }) {
   return (
-    <div className="rounded-2xl border border-border bg-card/70 backdrop-blur p-4 shadow-soft">
-      <div className="flex items-center justify-between">
-        <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">{label}</span>
-        <Icon className={`h-4 w-4 ${tone}`} />
+    <div className="rounded-2xl border border-border bg-card/70 p-4 shadow-soft backdrop-blur">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
+        <Icon className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
       </div>
       <div className="mt-1 text-2xl font-bold tabular-nums">{value}</div>
     </div>
   );
 }
+
 
 function AdminSection({ admins, uploads }: { admins: Contributor[]; uploads: Record<string, number> }) {
   return (

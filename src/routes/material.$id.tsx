@@ -2,9 +2,12 @@ import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { ArrowLeft, ArrowRight, Download, ExternalLink, FileText } from "lucide-react";
-import { format, formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Breadcrumbs, PageContainer, SectionHeading } from "@/components/ui/page";
+import { EmptyState, ErrorState } from "@/components/ui/states";
+import { formatDate, formatRelative, truncateFileName } from "@/lib/format";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { supabase } from "@/integrations/supabase/client";
@@ -95,25 +98,35 @@ function MaterialPage() {
   const canPreview = !!signedUrl && (isPdf || isImage);
 
   return (
-    <div className="min-h-screen flex flex-col bg-muted/40">
+    <div className="min-h-dvh flex flex-col bg-muted/40">
       <SiteHeader />
-      <main className="container mx-auto px-4 sm:px-6 py-8 flex-1 max-w-6xl w-full">
-        <Button asChild variant="ghost" size="sm" className="mb-4">
-          <Link to="/subject/$id" params={{ id: m?.subject_id ?? "" }}>
-            <ArrowLeft className="mr-2 h-4 w-4" />Back to subject
-          </Link>
-        </Button>
+      <PageContainer>
+        <Breadcrumbs
+          className="mb-3"
+          items={[
+            { label: "Home", to: "/" },
+            ...(subjectQ.data ? [{ label: subjectQ.data.name, to: "/subject/$id", params: { id: subjectQ.data.id } }] : []),
+            { label: m?.title ?? "Material" },
+          ]}
+        />
 
         {materialQ.isLoading ? (
-          <div className="h-64 rounded-2xl bg-muted animate-pulse" />
-        ) : !m ? (
-          <div className="rounded-2xl border border-dashed border-border bg-card p-10 text-center">
-            <FileText className="mx-auto h-8 w-8 text-muted-foreground" />
-            <p className="mt-3 font-semibold">Material not found</p>
+          <div className="space-y-4">
+            <Skeleton className="h-40 rounded-2xl" />
+            <Skeleton className="h-[50vh] rounded-2xl" />
           </div>
+        ) : materialQ.isError ? (
+          <ErrorState title="We couldn't load this material" error={materialQ.error} onRetry={() => materialQ.refetch()} />
+        ) : !m ? (
+          <EmptyState
+            icon={FileText}
+            title="Material not found"
+            description="This material may have been removed or replaced by an admin. Browse the subject to find the latest version."
+            action={<Button asChild size="sm"><Link to="/">Back to home</Link></Button>}
+          />
         ) : (
           <>
-            <header className="rounded-2xl border border-border bg-card-soft p-6 shadow-soft">
+            <header className="rounded-2xl border border-border bg-card-soft p-5 shadow-soft sm:p-6">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${materialTypeBadge(m.material_type)}`}>
                   {materialTypeLabel(m.material_type)}
@@ -127,24 +140,27 @@ function MaterialPage() {
                 {m.year && <span className="text-xs text-muted-foreground">· {m.year}</span>}
                 {m.week_or_module && <span className="text-xs text-muted-foreground">· {m.week_or_module}</span>}
               </div>
-              <h1 className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight">{m.title}</h1>
-              {m.description && <p className="mt-2 text-muted-foreground max-w-3xl">{m.description}</p>}
-              <div className="mt-4 flex items-center justify-between gap-4 flex-wrap">
+              <h1 className="mt-2 text-2xl font-bold tracking-tight break-words sm:text-3xl">{m.title}</h1>
+              {m.description && <p className="mt-2 max-w-3xl text-muted-foreground">{m.description}</p>}
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
                 <div className="flex flex-col gap-1 text-xs text-muted-foreground">
                   <UploaderBadge uploader={m.uploaded_by ? uploadersQ.data?.[m.uploaded_by] ?? null : null} />
-                  <div>
-                    Uploaded {format(new Date(m.created_at), "MMM d, yyyy")}
+                  <div className="break-words">
+                    Uploaded {formatDate(m.created_at)}
+                    {m.file_name ? ` · ${truncateFileName(m.file_name)}` : ""}
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   {signedUrl && (
-                    <Button asChild variant="outline">
+                    <Button asChild variant="outline" size="sm">
                       <a href={signedUrl} target="_blank" rel="noopener">
-                        <ExternalLink className="mr-2 h-4 w-4" />Open
+                        <ExternalLink className="mr-2 h-4 w-4" aria-hidden="true" />Open
                       </a>
                     </Button>
                   )}
+
                   <Button
+                    size="sm"
                     onClick={async () => {
                       const tid = toast.loading("Preparing your download…");
                       try {
@@ -155,7 +171,7 @@ function MaterialPage() {
                       }
                     }}
                   >
-                    <Download className="mr-2 h-4 w-4" />Download
+                    <Download className="mr-2 h-4 w-4" aria-hidden="true" />Download
                   </Button>
                   <ReportMaterialButton
                     materialId={m.id}
@@ -170,54 +186,52 @@ function MaterialPage() {
             <section className="mt-6 rounded-2xl border border-border bg-card p-4 shadow-soft">
               {canPreview ? (
                 isPdf ? (
-                  <iframe src={signedUrl!} title={m.title} className="w-full h-[70vh] rounded-xl bg-background" />
+                  <iframe src={signedUrl!} title={m.title} className="h-[60vh] w-full rounded-xl bg-background sm:h-[70vh]" />
                 ) : (
-                  <img src={signedUrl!} alt={m.title} className="w-full max-h-[70vh] object-contain rounded-xl bg-background" />
+                  <img src={signedUrl!} alt={m.title} className="max-h-[70vh] w-full rounded-xl bg-background object-contain" />
                 )
               ) : (
-                <div className="rounded-xl border border-dashed border-border bg-muted/40 p-10 text-center">
-                  <FileText className="mx-auto h-10 w-10 text-muted-foreground" />
-                  <p className="mt-3 font-semibold">Preview not available</p>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {m.file_name ?? "This file"} can't be previewed here. Use Open or Download.
-                  </p>
-                </div>
+                <EmptyState
+                  icon={FileText}
+                  title="Preview not available"
+                  description={`${m.file_name ? truncateFileName(m.file_name) : "This file"} can't be shown in the browser. Use Open or Download to view it in a native app.`}
+                />
               )}
             </section>
 
-            <div className="mt-6 flex items-center justify-between gap-3 flex-wrap">
+            <nav aria-label="Material navigation" className="mt-6 flex flex-wrap items-center justify-between gap-3">
               {prev ? (
-                <Button asChild variant="outline">
+                <Button asChild variant="outline" size="sm">
                   <Link to="/material/$id" params={{ id: prev.id }}>
-                    <ArrowLeft className="mr-2 h-4 w-4" />Previous
+                    <ArrowLeft className="mr-2 h-4 w-4" aria-hidden="true" />Previous
                   </Link>
                 </Button>
               ) : <div />}
               {next && (
-                <Button asChild variant="outline">
+                <Button asChild variant="outline" size="sm">
                   <Link to="/material/$id" params={{ id: next.id }}>
-                    Next<ArrowRight className="ml-2 h-4 w-4" />
+                    Next<ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
                   </Link>
                 </Button>
               )}
-            </div>
+            </nav>
 
             {related.length > 0 && (
               <section className="mt-10">
-                <h2 className="text-lg font-semibold mb-3">Related materials</h2>
+                <SectionHeading title="Related materials" />
                 <div className="grid gap-3 sm:grid-cols-2">
                   {related.map((r) => (
                     <Link
                       key={r.id}
                       to="/material/$id"
                       params={{ id: r.id }}
-                      className="group rounded-xl border border-border bg-card p-4 hover:shadow-elevated transition-shadow"
+                      className="group rounded-2xl border border-border bg-card p-4 transition-shadow hover:shadow-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     >
                       <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${materialTypeBadge(r.material_type)}`}>
                         {materialTypeLabel(r.material_type)}
                       </span>
-                      <div className="mt-2 font-medium group-hover:text-primary transition-colors line-clamp-2">{r.title}</div>
-                      <div className="mt-1 text-xs text-muted-foreground">{formatDistanceToNow(new Date(r.created_at), { addSuffix: true })}</div>
+                      <div className="mt-2 font-medium line-clamp-2 transition-colors group-hover:text-primary">{r.title}</div>
+                      <div className="mt-1 text-xs text-muted-foreground">{formatRelative(r.created_at)}</div>
                     </Link>
                   ))}
                 </div>
@@ -225,7 +239,8 @@ function MaterialPage() {
             )}
           </>
         )}
-      </main>
+      </PageContainer>
+
       <SiteFooter />
     </div>
   );
