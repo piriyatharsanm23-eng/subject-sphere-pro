@@ -56,41 +56,47 @@ function SelectPage() {
     navigate({ to: "/dashboard" });
   };
 
+  const canSave = !!semesterId && subjectIds.length > 0;
+
   return (
-    <div className="min-h-screen flex flex-col bg-muted/40">
+    <div className="min-h-dvh flex flex-col bg-muted/40">
       <SiteHeader />
-      <main className="container mx-auto px-4 sm:px-6 py-10 sm:py-16 max-w-5xl flex-1">
-        <div className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">Set your preferences</h1>
-          <p className="mt-2 text-muted-foreground">Choose a semester and the subjects you're studying. We'll remember it on this device.</p>
-        </div>
+      <PageContainer size="narrow">
+        <PageHeader
+          breadcrumbs={[{ label: "Home", to: "/" }, { label: "Preferences" }]}
+          eyebrow="Step by step"
+          title="Set your preferences"
+          description="Choose your semester and the subjects you're studying. We'll remember this on this device so your dashboard stays personal."
+        />
 
         {/* Step 1 */}
-        <section className="rounded-2xl border border-border bg-card shadow-soft p-6 sm:p-8">
-          <div className="flex items-center gap-3 mb-5">
-            <span className="grid h-7 w-7 place-items-center rounded-full bg-primary text-primary-foreground text-xs font-bold">1</span>
-            <h2 className="font-semibold text-lg">Select your semester</h2>
+        <section aria-labelledby="step-1" className="rounded-2xl border border-border bg-card p-5 shadow-soft sm:p-6">
+          <div className="mb-5 flex items-center gap-3">
+            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary text-xs font-bold text-primary-foreground">1</span>
+            <h2 id="step-1" className="text-base font-semibold sm:text-lg">Select your semester</h2>
           </div>
           {semestersQ.isLoading ? (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {[0,1,2].map((i) => <div key={i} className="h-24 rounded-xl bg-muted animate-pulse" />)}
-            </div>
+            <CardGridSkeleton count={3} height="h-24" className="grid grid-cols-1 gap-3 sm:grid-cols-2" />
+          ) : semestersQ.isError ? (
+            <ErrorState title="We couldn't load semesters" error={semestersQ.error} onRetry={() => semestersQ.refetch()} />
           ) : semestersQ.data && semestersQ.data.length > 0 ? (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {semestersQ.data.map((s) => {
                 const active = semesterId === s.id;
                 return (
                   <button
                     key={s.id}
+                    type="button"
+                    aria-pressed={active}
                     onClick={() => { setSemesterId(s.id); if (semesterId !== s.id) setSubjectIds([]); }}
                     className={cn(
-                      "text-left rounded-xl border p-4 transition-all",
-                      active ? "border-primary bg-primary/5 shadow-glow" : "border-border bg-card hover:border-primary/40 hover:shadow-soft"
+                      "min-h-11 rounded-xl border p-4 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                      active ? "border-primary bg-primary/5 shadow-glow" : "border-border bg-card hover:border-primary/40 hover:shadow-soft",
                     )}
                   >
                     <div className="flex items-start justify-between gap-2">
-                      <div className="font-semibold">{s.name}</div>
-                      {active && <Check className="h-4 w-4 text-primary" />}
+                      <div className="font-semibold break-words">{s.name}</div>
+                      {active && <Check className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />}
                     </div>
                     {s.description && <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{s.description}</p>}
                   </button>
@@ -98,42 +104,52 @@ function SelectPage() {
               })}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">No semesters available yet.</p>
+            <EmptyState title="No semesters available yet" description="An admin needs to publish a semester before you can pick one." />
           )}
         </section>
 
         {/* Step 2 */}
-        <section className={cn("mt-6 rounded-2xl border border-border bg-card shadow-soft p-6 sm:p-8 transition-opacity", !semesterId && "opacity-50 pointer-events-none")}>
-          <div className="flex items-center gap-3 mb-5">
-            <span className="grid h-7 w-7 place-items-center rounded-full bg-primary text-primary-foreground text-xs font-bold">2</span>
-            <h2 className="font-semibold text-lg">Pick your subjects</h2>
-            {subjectIds.length > 0 && <span className="ml-auto text-xs text-muted-foreground">{subjectIds.length} selected</span>}
+        <section
+          aria-labelledby="step-2"
+          className={cn(
+            "mt-4 rounded-2xl border border-border bg-card p-5 shadow-soft transition-opacity sm:mt-6 sm:p-6",
+            !semesterId && "pointer-events-none opacity-60",
+          )}
+        >
+          <div className="mb-5 flex flex-wrap items-center gap-3">
+            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary text-xs font-bold text-primary-foreground">2</span>
+            <h2 id="step-2" className="text-base font-semibold sm:text-lg">Pick your subjects</h2>
+            {subjectIds.length > 0 && (
+              <span className="ml-auto text-xs font-medium text-muted-foreground" aria-live="polite">{subjectIds.length} selected</span>
+            )}
           </div>
           {!semesterId ? (
             <p className="text-sm text-muted-foreground">Select a semester first.</p>
           ) : subjectsQ.isLoading ? (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {[0,1,2,3].map((i) => <div key={i} className="h-20 rounded-xl bg-muted animate-pulse" />)}
-            </div>
+            <CardGridSkeleton count={4} height="h-20" className="grid grid-cols-1 gap-3 sm:grid-cols-2" />
+          ) : subjectsQ.isError ? (
+            <ErrorState title="We couldn't load subjects" error={subjectsQ.error} onRetry={() => subjectsQ.refetch()} />
           ) : subjectsQ.data && subjectsQ.data.length > 0 ? (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {subjectsQ.data.map((sub) => {
                 const active = subjectIds.includes(sub.id);
                 return (
                   <button
                     key={sub.id}
+                    type="button"
+                    aria-pressed={active}
                     onClick={() => toggleSubject(sub.id)}
                     className={cn(
-                      "text-left rounded-xl border p-4 transition-all",
-                      active ? "border-primary bg-primary/5" : "border-border bg-card hover:border-primary/40"
+                      "min-h-11 rounded-xl border p-4 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                      active ? "border-primary bg-primary/5" : "border-border bg-card hover:border-primary/40",
                     )}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={cn("grid h-9 w-9 place-items-center rounded-lg", active ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground")}>
-                        {active ? <Check className="h-4 w-4" /> : <BookOpen className="h-4 w-4" />}
+                      <div className={cn("grid h-9 w-9 shrink-0 place-items-center rounded-lg", active ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground")}>
+                        {active ? <Check className="h-4 w-4" aria-hidden="true" /> : <BookOpen className="h-4 w-4" aria-hidden="true" />}
                       </div>
                       <div className="min-w-0">
-                        <div className="font-medium truncate">{sub.name}</div>
+                        <div className="truncate font-medium">{sub.name}</div>
                         {sub.code && <div className="text-xs text-muted-foreground">{sub.code}</div>}
                       </div>
                     </div>
@@ -142,17 +158,18 @@ function SelectPage() {
               })}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">No subjects in this semester yet.</p>
+            <EmptyState title="No subjects in this semester yet" description="Check back soon — admins add subjects as the semester starts." />
           )}
         </section>
 
-        <div className="mt-8 flex justify-end">
-          <Button size="lg" onClick={onSave} disabled={!semesterId || subjectIds.length === 0}>
-            Save & continue <ChevronRight className="ml-1 h-4 w-4" />
+        <div className="sticky bottom-0 z-10 -mx-4 mt-6 border-t border-border/60 bg-background/85 px-4 py-3 backdrop-blur-xl sm:static sm:mx-0 sm:mt-8 sm:flex sm:justify-end sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
+          <Button size="lg" className="w-full sm:w-auto" onClick={onSave} disabled={!canSave}>
+            Save & continue <ChevronRight className="ml-1 h-4 w-4" aria-hidden="true" />
           </Button>
         </div>
-      </main>
+      </PageContainer>
       <SiteFooter />
     </div>
   );
 }
+
