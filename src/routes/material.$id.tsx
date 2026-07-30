@@ -157,6 +157,7 @@ function MaterialPage() {
                   )}
 
                   <Button
+                    size="sm"
                     onClick={async () => {
                       const tid = toast.loading("Preparing your download…");
                       try {
@@ -167,7 +168,7 @@ function MaterialPage() {
                       }
                     }}
                   >
-                    <Download className="mr-2 h-4 w-4" />Download
+                    <Download className="mr-2 h-4 w-4" aria-hidden="true" />Download
                   </Button>
                   <ReportMaterialButton
                     materialId={m.id}
@@ -182,54 +183,52 @@ function MaterialPage() {
             <section className="mt-6 rounded-2xl border border-border bg-card p-4 shadow-soft">
               {canPreview ? (
                 isPdf ? (
-                  <iframe src={signedUrl!} title={m.title} className="w-full h-[70vh] rounded-xl bg-background" />
+                  <iframe src={signedUrl!} title={m.title} className="h-[60vh] w-full rounded-xl bg-background sm:h-[70vh]" />
                 ) : (
-                  <img src={signedUrl!} alt={m.title} className="w-full max-h-[70vh] object-contain rounded-xl bg-background" />
+                  <img src={signedUrl!} alt={m.title} className="max-h-[70vh] w-full rounded-xl bg-background object-contain" />
                 )
               ) : (
-                <div className="rounded-xl border border-dashed border-border bg-muted/40 p-10 text-center">
-                  <FileText className="mx-auto h-10 w-10 text-muted-foreground" />
-                  <p className="mt-3 font-semibold">Preview not available</p>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {m.file_name ?? "This file"} can't be previewed here. Use Open or Download.
-                  </p>
-                </div>
+                <EmptyState
+                  icon={FileText}
+                  title="Preview not available"
+                  description={`${m.file_name ? truncateFileName(m.file_name) : "This file"} can't be shown in the browser. Use Open or Download to view it in a native app.`}
+                />
               )}
             </section>
 
-            <div className="mt-6 flex items-center justify-between gap-3 flex-wrap">
+            <nav aria-label="Material navigation" className="mt-6 flex flex-wrap items-center justify-between gap-3">
               {prev ? (
-                <Button asChild variant="outline">
+                <Button asChild variant="outline" size="sm">
                   <Link to="/material/$id" params={{ id: prev.id }}>
-                    <ArrowLeft className="mr-2 h-4 w-4" />Previous
+                    <ArrowLeft className="mr-2 h-4 w-4" aria-hidden="true" />Previous
                   </Link>
                 </Button>
               ) : <div />}
               {next && (
-                <Button asChild variant="outline">
+                <Button asChild variant="outline" size="sm">
                   <Link to="/material/$id" params={{ id: next.id }}>
-                    Next<ArrowRight className="ml-2 h-4 w-4" />
+                    Next<ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
                   </Link>
                 </Button>
               )}
-            </div>
+            </nav>
 
             {related.length > 0 && (
               <section className="mt-10">
-                <h2 className="text-lg font-semibold mb-3">Related materials</h2>
+                <SectionHeading title="Related materials" />
                 <div className="grid gap-3 sm:grid-cols-2">
                   {related.map((r) => (
                     <Link
                       key={r.id}
                       to="/material/$id"
                       params={{ id: r.id }}
-                      className="group rounded-xl border border-border bg-card p-4 hover:shadow-elevated transition-shadow"
+                      className="group rounded-2xl border border-border bg-card p-4 transition-shadow hover:shadow-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     >
                       <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${materialTypeBadge(r.material_type)}`}>
                         {materialTypeLabel(r.material_type)}
                       </span>
-                      <div className="mt-2 font-medium group-hover:text-primary transition-colors line-clamp-2">{r.title}</div>
-                      <div className="mt-1 text-xs text-muted-foreground">{formatDistanceToNow(new Date(r.created_at), { addSuffix: true })}</div>
+                      <div className="mt-2 font-medium line-clamp-2 transition-colors group-hover:text-primary">{r.title}</div>
+                      <div className="mt-1 text-xs text-muted-foreground">{formatRelative(r.created_at)}</div>
                     </Link>
                   ))}
                 </div>
@@ -237,7 +236,8 @@ function MaterialPage() {
             )}
           </>
         )}
-      </main>
+      </PageContainer>
+
       <SiteFooter />
     </div>
   );
