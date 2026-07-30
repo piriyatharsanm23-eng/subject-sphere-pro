@@ -9,6 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { getSelection, setSelection } from "@/lib/selection";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { PageContainer, PageHeader } from "@/components/ui/page";
+import { CardGridSkeleton, EmptyState, ErrorState } from "@/components/ui/states";
 
 export const Route = createFileRoute("/select")({
   head: () => ({ meta: [{ title: "Choose your semester & subjects — StudyHub" }] }),
