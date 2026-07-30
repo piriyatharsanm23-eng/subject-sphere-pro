@@ -115,32 +115,40 @@ function SubjectPage() {
   }, [groups.past_paper]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-muted/40">
+    <div className="min-h-dvh flex flex-col bg-muted/40">
       <SiteHeader />
-      <main className="container mx-auto px-4 sm:px-6 py-8 flex-1 max-w-6xl w-full">
-        <Button asChild variant="ghost" size="sm" className="mb-4"><Link to="/"><ArrowLeft className="mr-2 h-4 w-4" /> Back to home</Link></Button>
+      <PageContainer>
+        {subjectQ.isLoading ? (
+          <div className="mb-6 space-y-3">
+            <Skeleton className="h-3 w-32" />
+            <Skeleton className="h-9 w-64" />
+            <Skeleton className="h-4 w-full max-w-md" />
+          </div>
+        ) : subjectQ.isError ? (
+          <ErrorState className="mb-6" title="We couldn't load this subject" error={subjectQ.error} onRetry={() => subjectQ.refetch()} />
+        ) : !subjectQ.data ? (
+          <EmptyState
+            className="mb-6"
+            icon={FileText}
+            title="Subject not found"
+            description="It may have been removed by an admin. Head back to your dashboard to pick another subject."
+            action={<Button asChild size="sm"><Link to="/dashboard">Go to dashboard</Link></Button>}
+          />
+        ) : (
+          <PageHeader
+            breadcrumbs={[
+              { label: "Home", to: "/" },
+              ...((subjectQ.data as any)?.semester?.name
+                ? [{ label: (subjectQ.data as any).semester.name as string, to: "/semester/$id", params: { id: subjectQ.data.semester_id } }]
+                : []),
+              { label: subjectQ.data.name },
+            ]}
+            eyebrow={subjectQ.data.code}
+            title={subjectQ.data.name}
+            description={subjectQ.data.description ?? undefined}
+          />
+        )}
 
-        <header className="rounded-2xl border border-border bg-card-soft p-6 shadow-soft">
-          {subjectQ.isLoading ? (
-            <div className="space-y-3">
-              <div className="h-3 w-24 rounded bg-muted animate-pulse" />
-              <div className="h-8 w-64 rounded bg-muted animate-pulse" />
-              <div className="h-4 w-full max-w-md rounded bg-muted animate-pulse" />
-            </div>
-          ) : !subjectQ.data ? (
-            <div className="text-center py-6">
-              <FileText className="mx-auto h-8 w-8 text-muted-foreground" />
-              <p className="mt-3 font-semibold">Subject not found</p>
-              <p className="mt-1 text-sm text-muted-foreground">It may have been removed. Go back to the dashboard to pick another.</p>
-            </div>
-          ) : (
-            <>
-              <div className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{subjectQ.data.code}</div>
-              <h1 className="mt-1 text-3xl sm:text-4xl font-bold tracking-tight">{subjectQ.data.name}</h1>
-              {subjectQ.data.description && <p className="mt-2 text-muted-foreground max-w-2xl">{subjectQ.data.description}</p>}
-            </>
-          )}
-        </header>
 
         <Tabs defaultValue="note" className="mt-6">
           <TabsList className="grid grid-cols-3 h-auto w-full gap-1 sm:flex sm:flex-wrap sm:w-auto">
