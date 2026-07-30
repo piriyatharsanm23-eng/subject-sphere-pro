@@ -1,12 +1,15 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, ArrowRight, BookOpen, CalendarClock, FileText, Layers, NotebookPen, ScrollText, Users, Video } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
+import { ArrowRight, BookOpen, CalendarClock, Layers, NotebookPen, ScrollText, Users, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { PageContainer, PageHeader, SectionHeading } from "@/components/ui/page";
+import { CardGridSkeleton, EmptyState, ErrorState } from "@/components/ui/states";
+import { formatRelative } from "@/lib/format";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { supabase } from "@/integrations/supabase/client";
+
 
 export const Route = createFileRoute("/semester/$id")({
   head: () => ({ meta: [{ title: "Semester — StudyHub" }] }),
