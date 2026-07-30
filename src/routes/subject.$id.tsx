@@ -8,7 +8,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { materialTypeBadge, materialTypeLabel, downloadMaterial } from "@/lib/materials";
-import { formatDistanceToNow } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PageContainer, PageHeader } from "@/components/ui/page";
 import { CardGridSkeleton, EmptyState, ErrorState } from "@/components/ui/states";
@@ -280,7 +279,7 @@ function MaterialList({
             {m.description && <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{m.description}</p>}
             <div className="mt-3 min-w-0">
               <UploaderBadge uploader={m.uploaded_by ? uploaders[m.uploaded_by] : null} />
-              <div className="text-xs text-muted-foreground mt-1">{formatDistanceToNow(new Date(m.created_at), { addSuffix: true })}</div>
+              <div className="text-xs text-muted-foreground mt-1">{formatRelative(m.created_at)}</div>
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
               <Button size="sm" variant="outline" onClick={() => setPreviewing(m)}>
@@ -582,7 +581,7 @@ function KuppiCard({ k, onPlay }: { k: KuppiRow; onPlay: () => void }) {
           </div>
         </div>
         <div className="absolute bottom-2 right-2 rounded-md bg-black/70 px-2 py-0.5 text-[10px] font-medium text-white/90">
-          {formatDistanceToNow(new Date(k.created_at), { addSuffix: true })}
+          {formatRelative(k.created_at)}
         </div>
       </button>
 
