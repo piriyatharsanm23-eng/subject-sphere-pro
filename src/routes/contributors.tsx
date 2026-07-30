@@ -146,23 +146,22 @@ function HeroStat({
   icon: Icon,
   label,
   value,
-  tone,
 }: {
   icon: typeof Users;
   label: string;
   value: number;
-  tone: string;
 }) {
   return (
-    <div className="rounded-2xl border border-border bg-card/70 backdrop-blur p-4 shadow-soft">
-      <div className="flex items-center justify-between">
-        <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">{label}</span>
-        <Icon className={`h-4 w-4 ${tone}`} />
+    <div className="rounded-2xl border border-border bg-card/70 p-4 shadow-soft backdrop-blur">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
+        <Icon className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
       </div>
       <div className="mt-1 text-2xl font-bold tabular-nums">{value}</div>
     </div>
   );
 }
+
 
 function AdminSection({ admins, uploads }: { admins: Contributor[]; uploads: Record<string, number> }) {
   return (
