@@ -195,23 +195,23 @@ function SubjectPage() {
 
           <TabsContent value="deadlines" className="mt-4">
             {deadlinesQ.isLoading ? (
-              <div className="space-y-3">
-                {[0,1].map((i) => <div key={i} className="h-24 rounded-2xl bg-muted animate-pulse" />)}
-              </div>
-            ) : (deadlinesQ.data ?? []).length === 0 ? <Empty label="No active deadlines" /> : (
+              <CardGridSkeleton count={2} height="h-24" className="space-y-3" />
+            ) : (deadlinesQ.data ?? []).length === 0 ? (
+              <EmptyState icon={Calendar} title="No active deadlines" description="When an admin publishes a deadline for this subject it will appear here." />
+            ) : (
               <div className="space-y-3">
                 {deadlinesQ.data!.map((d) => (
-                  <div key={d.id} className="rounded-2xl border border-border bg-card p-5 shadow-soft">
-                    <div className="flex items-start gap-4">
-                      <div className="grid place-items-center h-12 w-12 rounded-xl bg-badge-assignment/10 text-badge-assignment">
-                        <Calendar className="h-5 w-5" />
+                  <div key={d.id} className="rounded-2xl border border-border bg-card p-4 shadow-soft sm:p-5">
+                    <div className="flex items-start gap-3 sm:gap-4">
+                      <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-badge-assignment/10 text-badge-assignment">
+                        <Calendar className="h-5 w-5" aria-hidden="true" />
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-semibold">{d.title}</div>
-                        {d.description && <p className="text-sm text-muted-foreground mt-1">{d.description}</p>}
+                      <div className="min-w-0 flex-1">
+                        <div className="font-semibold break-words">{d.title}</div>
+                        {d.description && <p className="mt-1 text-sm text-muted-foreground">{d.description}</p>}
                         <div className="mt-2 text-sm">
-                          <span className="text-badge-assignment font-medium">{format(new Date(d.deadline_at), "EEEE, MMM d, yyyy · h:mm a")}</span>
-                          <span className="text-muted-foreground"> · in {formatDistanceToNow(new Date(d.deadline_at))}</span>
+                          <span className="font-medium text-badge-assignment">{formatDateTime(d.deadline_at)}</span>
+                          <span className="text-muted-foreground"> · {formatRelative(d.deadline_at)}</span>
                         </div>
                       </div>
                     </div>
@@ -221,7 +221,8 @@ function SubjectPage() {
             )}
           </TabsContent>
         </Tabs>
-      </main>
+      </PageContainer>
+
       <SiteFooter />
     </div>
   );
