@@ -21,6 +21,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SuperIndexRouteImport } from './routes/super.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as SuperVisitorsRouteImport } from './routes/super.visitors'
 import { Route as SuperUsersRouteImport } from './routes/super.users'
 import { Route as SuperSubjectsRouteImport } from './routes/super.subjects'
 import { Route as SuperSemestersRouteImport } from './routes/super.semesters'
@@ -113,6 +114,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRoute,
+} as any)
+const SuperVisitorsRoute = SuperVisitorsRouteImport.update({
+  id: '/visitors',
+  path: '/visitors',
+  getParentRoute: () => SuperRoute,
 } as any)
 const SuperUsersRoute = SuperUsersRouteImport.update({
   id: '/users',
@@ -317,6 +323,7 @@ export interface FileRoutesByFullPath {
   '/super/semesters': typeof SuperSemestersRoute
   '/super/subjects': typeof SuperSubjectsRoute
   '/super/users': typeof SuperUsersRoute
+  '/super/visitors': typeof SuperVisitorsRoute
   '/admin/': typeof AdminIndexRoute
   '/super/': typeof SuperIndexRoute
   '/api/public/telegram/health': typeof ApiPublicTelegramHealthRoute
@@ -361,6 +368,7 @@ export interface FileRoutesByTo {
   '/super/semesters': typeof SuperSemestersRoute
   '/super/subjects': typeof SuperSubjectsRoute
   '/super/users': typeof SuperUsersRoute
+  '/super/visitors': typeof SuperVisitorsRoute
   '/admin': typeof AdminIndexRoute
   '/super': typeof SuperIndexRoute
   '/api/public/telegram/health': typeof ApiPublicTelegramHealthRoute
@@ -408,6 +416,7 @@ export interface FileRoutesById {
   '/super/semesters': typeof SuperSemestersRoute
   '/super/subjects': typeof SuperSubjectsRoute
   '/super/users': typeof SuperUsersRoute
+  '/super/visitors': typeof SuperVisitorsRoute
   '/admin/': typeof AdminIndexRoute
   '/super/': typeof SuperIndexRoute
   '/api/public/telegram/health': typeof ApiPublicTelegramHealthRoute
@@ -456,6 +465,7 @@ export interface FileRouteTypes {
     | '/super/semesters'
     | '/super/subjects'
     | '/super/users'
+    | '/super/visitors'
     | '/admin/'
     | '/super/'
     | '/api/public/telegram/health'
@@ -500,6 +510,7 @@ export interface FileRouteTypes {
     | '/super/semesters'
     | '/super/subjects'
     | '/super/users'
+    | '/super/visitors'
     | '/admin'
     | '/super'
     | '/api/public/telegram/health'
@@ -546,6 +557,7 @@ export interface FileRouteTypes {
     | '/super/semesters'
     | '/super/subjects'
     | '/super/users'
+    | '/super/visitors'
     | '/admin/'
     | '/super/'
     | '/api/public/telegram/health'
@@ -659,6 +671,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/super/visitors': {
+      id: '/super/visitors'
+      path: '/visitors'
+      fullPath: '/super/visitors'
+      preLoaderRoute: typeof SuperVisitorsRouteImport
+      parentRoute: typeof SuperRoute
     }
     '/super/users': {
       id: '/super/users'
@@ -930,6 +949,7 @@ interface SuperRouteChildren {
   SuperSemestersRoute: typeof SuperSemestersRoute
   SuperSubjectsRoute: typeof SuperSubjectsRoute
   SuperUsersRoute: typeof SuperUsersRoute
+  SuperVisitorsRoute: typeof SuperVisitorsRoute
   SuperIndexRoute: typeof SuperIndexRoute
 }
 
@@ -950,6 +970,7 @@ const SuperRouteChildren: SuperRouteChildren = {
   SuperSemestersRoute: SuperSemestersRoute,
   SuperSubjectsRoute: SuperSubjectsRoute,
   SuperUsersRoute: SuperUsersRoute,
+  SuperVisitorsRoute: SuperVisitorsRoute,
   SuperIndexRoute: SuperIndexRoute,
 }
 
