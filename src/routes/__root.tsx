@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { LanguageProvider } from "@/lib/i18n";
 import { InstallPrompt } from "@/components/InstallPrompt";
+import { VisitTracker } from "@/components/VisitTracker";
 
 function NotFoundComponent() {
   return (
