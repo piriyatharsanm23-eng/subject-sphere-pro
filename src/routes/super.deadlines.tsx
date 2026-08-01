@@ -101,7 +101,21 @@ function DeadlinesPage() {
 
   return (
     <SuperShell title="All Deadlines" description="Oversee every deadline across the platform.">
+      <div className="flex justify-end mb-4">
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button><Plus className="mr-2 h-4 w-4" />New deadline</Button>
+          </DialogTrigger>
+          <NewDeadlineDialog
+            semesters={semestersQ.data ?? []}
+            subjects={subjectsQ.data ?? []}
+            onSaved={() => { setOpen(false); refresh(); }}
+          />
+        </Dialog>
+      </div>
+
       <div className="rounded-2xl border border-border bg-card p-4 shadow-soft mb-4">
+
         <div className="grid gap-2 md:grid-cols-3">
           <div className="relative md:col-span-2">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
