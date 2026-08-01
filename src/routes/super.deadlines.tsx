@@ -33,6 +33,8 @@ function DeadlinesPage() {
   const [q, setQ] = useState("");
   const [sem, setSem] = useState("all");
   const [showArchived, setShowArchived] = useState(false);
+  const [open, setOpen] = useState(false);
+
 
   const semestersQ = useQuery({
     queryKey: ["super-all-semesters"],
