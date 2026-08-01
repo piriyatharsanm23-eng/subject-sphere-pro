@@ -2,14 +2,20 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format, formatDistanceToNow } from "date-fns";
-import { Archive, ArchiveRestore, CalendarClock, Loader2, Search, Trash2 } from "lucide-react";
+import { Archive, ArchiveRestore, CalendarClock, Loader2, Plus, Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
+} from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SuperShell } from "@/components/SuperShell";
 import { supabase } from "@/integrations/supabase/client";
 import { logActivity } from "@/lib/activity";
+import { notifyDeadlineCreated } from "@/lib/notify-deadline.functions";
+
 
 export const Route = createFileRoute("/super/deadlines")({
   head: () => ({ meta: [{ title: "Deadlines — Super Admin" }] }),
