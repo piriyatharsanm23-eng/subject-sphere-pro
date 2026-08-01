@@ -2,14 +2,20 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format, formatDistanceToNow } from "date-fns";
-import { Archive, ArchiveRestore, CalendarClock, Loader2, Search, Trash2 } from "lucide-react";
+import { Archive, ArchiveRestore, CalendarClock, Loader2, Plus, Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
+} from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SuperShell } from "@/components/SuperShell";
 import { supabase } from "@/integrations/supabase/client";
 import { logActivity } from "@/lib/activity";
+import { notifyDeadlineCreated } from "@/lib/notify-deadline.functions";
+
 
 export const Route = createFileRoute("/super/deadlines")({
   head: () => ({ meta: [{ title: "Deadlines — Super Admin" }] }),
@@ -27,6 +33,8 @@ function DeadlinesPage() {
   const [q, setQ] = useState("");
   const [sem, setSem] = useState("all");
   const [showArchived, setShowArchived] = useState(false);
+  const [open, setOpen] = useState(false);
+
 
   const semestersQ = useQuery({
     queryKey: ["super-all-semesters"],
@@ -93,7 +101,21 @@ function DeadlinesPage() {
 
   return (
     <SuperShell title="All Deadlines" description="Oversee every deadline across the platform.">
+      <div className="flex justify-end mb-4">
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button><Plus className="mr-2 h-4 w-4" />New deadline</Button>
+          </DialogTrigger>
+          <NewDeadlineDialog
+            semesters={semestersQ.data ?? []}
+            subjects={subjectsQ.data ?? []}
+            onSaved={() => { setOpen(false); refresh(); }}
+          />
+        </Dialog>
+      </div>
+
       <div className="rounded-2xl border border-border bg-card p-4 shadow-soft mb-4">
+
         <div className="grid gap-2 md:grid-cols-3">
           <div className="relative md:col-span-2">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -173,3 +195,122 @@ function DeadlinesPage() {
     </SuperShell>
   );
 }
+
+function toLocalInput(iso: string | null) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function NewDeadlineDialog({
+  semesters, subjects, onSaved,
+}: {
+  semesters: { id: string; name: string }[];
+  subjects: { id: string; name: string; semester_id: string }[];
+  onSaved: () => void;
+}) {
+  const [semesterId, setSemesterId] = useState("");
+  const [subjectId, setSubjectId] = useState("");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [when, setWhen] = useState(toLocalInput(null));
+  const [saving, setSaving] = useState(false);
+
+  const semSubjects = useMemo(
+    () => subjects.filter((s) => s.semester_id === semesterId),
+    [subjects, semesterId],
+  );
+
+  const submit = async () => {
+    if (!semesterId) return toast.error("Select a semester");
+    if (!subjectId) return toast.error("Select a subject");
+    if (!title.trim()) return toast.error("Title is required");
+    if (!when) return toast.error("Pick a due date and time");
+
+    setSaving(true);
+    try {
+      const { data: userRes } = await supabase.auth.getUser();
+      const { data, error } = await supabase.from("deadlines").insert({
+        title: title.trim(),
+        description: description.trim() || null,
+        semester_id: semesterId,
+        subject_id: subjectId,
+        deadline_at: new Date(when).toISOString(),
+        created_by: userRes.user?.id ?? null,
+        status: "active",
+      }).select("id").maybeSingle();
+      if (error) throw error;
+
+      await logActivity({
+        action_type: "deadline_create",
+        description: `Created deadline "${title.trim()}"`,
+        target_type: "deadline", target_id: data?.id ?? null,
+        semester_id: semesterId, subject_id: subjectId,
+      });
+      toast.success("Deadline created");
+
+      if (data?.id) {
+        try {
+          const res = await notifyDeadlineCreated({ data: { deadlineId: data.id } });
+          if (res?.sent) toast.success(`Notified ${res.sent} Telegram subscriber${res.sent === 1 ? "" : "s"}`);
+        } catch (err) {
+          console.error("telegram notify failed", err);
+        }
+      }
+
+      setTitle(""); setDescription(""); setWhen(""); setSubjectId("");
+      onSaved();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to save");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <DialogContent className="max-w-lg">
+      <DialogHeader><DialogTitle>New deadline</DialogTitle></DialogHeader>
+      <div className="space-y-3">
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-sm font-medium">Semester</label>
+            <Select value={semesterId} onValueChange={(v) => { setSemesterId(v); setSubjectId(""); }}>
+              <SelectTrigger><SelectValue placeholder="Semester" /></SelectTrigger>
+              <SelectContent>
+                {semesters.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <label className="text-sm font-medium">Subject</label>
+            <Select value={subjectId} onValueChange={setSubjectId} disabled={!semesterId}>
+              <SelectTrigger><SelectValue placeholder={semesterId ? "Subject" : "Pick semester first"} /></SelectTrigger>
+              <SelectContent>
+                {semSubjects.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        <div>
+          <label className="text-sm font-medium">Title</label>
+          <Input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={140} placeholder="e.g. Assignment 2 submission" />
+        </div>
+        <div>
+          <label className="text-sm font-medium">Due at</label>
+          <Input type="datetime-local" value={when} onChange={(e) => setWhen(e.target.value)} />
+        </div>
+        <div>
+          <label className="text-sm font-medium">Description (optional)</label>
+          <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} maxLength={800} />
+        </div>
+      </div>
+      <DialogFooter>
+        <Button onClick={submit} disabled={saving}>
+          {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Create
+        </Button>
+      </DialogFooter>
+    </DialogContent>
+  );
+}
+
