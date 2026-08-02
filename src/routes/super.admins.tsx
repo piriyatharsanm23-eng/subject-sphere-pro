@@ -212,18 +212,33 @@ function AssignDialog({
 }: {
   profiles: Profile[]; semesters: Semester[]; existing: RoleRow[]; onSaved: () => void;
 }) {
-  const [email, setEmail] = useState("");
+  const [userId, setUserId] = useState("");
+  const [userSearch, setUserSearch] = useState("");
   const [role, setRole] = useState<Role>("admin");
   const [semesterIds, setSemesterIds] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
+
+  const filteredProfiles = useMemo(() => {
+    const n = userSearch.trim().toLowerCase();
+    const list = [...profiles].sort((a, b) =>
+      (a.full_name || a.email || "").localeCompare(b.full_name || b.email || ""),
+    );
+    if (!n) return list;
+    return list.filter(
+      (p) =>
+        (p.email ?? "").toLowerCase().includes(n) ||
+        (p.full_name ?? "").toLowerCase().includes(n),
+    );
+  }, [profiles, userSearch]);
 
   const toggle = (id: string) =>
     setSemesterIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
 
   const save = async () => {
-    const target = profiles.find((p) => (p.email ?? "").toLowerCase() === email.trim().toLowerCase());
-    if (!target) return toast.error("No user with that email. Ask them to sign up at /auth first.");
+    const target = profiles.find((p) => p.id === userId);
+    if (!target) return toast.error("Select a user account first.");
     if (role === "admin" && semesterIds.length === 0) return toast.error("Choose at least one semester for the admin");
+
 
     setSaving(true);
     if (role === "super_admin") {
@@ -280,10 +295,36 @@ function AssignDialog({
       <DialogHeader><DialogTitle>Assign admin role</DialogTitle></DialogHeader>
       <div className="space-y-3">
         <div>
-          <label className="text-sm font-medium">User email</label>
-          <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="admin@example.com" />
-          <p className="text-xs text-muted-foreground mt-1">The user must have already signed up.</p>
+          <label className="text-sm font-medium">User account</label>
+          <div className="relative mt-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              className="pl-9"
+              placeholder="Search accounts by name or email…"
+              value={userSearch}
+              onChange={(e) => setUserSearch(e.target.value)}
+            />
+          </div>
+          <div className="mt-1 max-h-56 overflow-auto rounded-lg border border-border divide-y divide-border">
+            {filteredProfiles.length === 0 ? (
+              <div className="p-3 text-sm text-muted-foreground">No matching accounts.</div>
+            ) : filteredProfiles.map((p) => (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => setUserId(p.id)}
+                className={`w-full text-left px-3 py-2 text-sm hover:bg-muted/40 ${
+                  userId === p.id ? "bg-primary/10" : ""
+                }`}
+              >
+                <div className="font-medium">{p.full_name || "—"}</div>
+                <div className="text-xs text-muted-foreground break-all">{p.email ?? p.id}</div>
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground mt-1">Only users who already signed up are listed.</p>
         </div>
+
         <div>
           <label className="text-sm font-medium">Role</label>
           <Select value={role} onValueChange={(v) => setRole(v as Role)}>
