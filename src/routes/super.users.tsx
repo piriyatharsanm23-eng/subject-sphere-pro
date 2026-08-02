@@ -166,6 +166,24 @@ function UsersPage() {
                       <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
                         {p.created_at ? new Date(p.created_at).toLocaleDateString() : "—"}
                       </td>
+                      <td className="px-4 py-3 text-right whitespace-nowrap">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-rose-400 hover:text-rose-300"
+                          disabled={isSuper || p.id === meId}
+                          title={
+                            isSuper
+                              ? "Remove super-admin role first"
+                              : p.id === meId
+                                ? "You cannot delete your own account"
+                                : "Delete account"
+                          }
+                          onClick={() => setTarget(p)}
+                        >
+                          <Trash2 className="h-4 w-4 mr-1" />Delete
+                        </Button>
+                      </td>
                     </tr>
                   );
                 })}
@@ -174,6 +192,28 @@ function UsersPage() {
           </div>
         )}
       </div>
+
+      <AlertDialog open={!!target} onOpenChange={(o) => !o && setTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this account permanently?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {target?.email ?? target?.full_name} will be removed from the system along with their
+              roles and notifications. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => { e.preventDefault(); confirmDelete(); }}
+              disabled={deleting}
+            >
+              {deleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Delete account
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </SuperShell>
   );
 }
+
