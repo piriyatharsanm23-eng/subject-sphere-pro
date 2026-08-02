@@ -168,12 +168,11 @@ function PendingPage() {
                           <img src={s.avatar_url} alt="" className="h-11 w-11 rounded-full object-cover" />
                         ) : (
                           <div className="h-11 w-11 rounded-full bg-muted grid place-items-center text-sm font-medium">
-                            {(s.full_name || s.email || "?").slice(0, 1).toUpperCase()}
+                            {(s.full_name || "?").slice(0, 1).toUpperCase()}
                           </div>
                         )}
                         <div className="min-w-0 flex-1">
                           <div className="font-medium">{s.full_name || "Super Admin"}</div>
-                          <div className="text-xs text-muted-foreground break-all">{s.email ?? "—"}</div>
                           {s.phone && (
                             <div className="text-xs text-muted-foreground mt-0.5">{s.phone}</div>
                           )}
@@ -188,14 +187,6 @@ function PendingPage() {
                               >
                                 <MessageCircle className="h-4 w-4 mr-1.5" />
                                 WhatsApp
-                              </a>
-                            </Button>
-                          )}
-                          {s.email && (
-                            <Button asChild size="sm" variant="outline">
-                              <a href={`mailto:${s.email}?subject=StudyHub%20semester%20assignment&body=${waMessage}`}>
-                                <Mail className="h-4 w-4 mr-1.5" />
-                                Email
                               </a>
                             </Button>
                           )}
