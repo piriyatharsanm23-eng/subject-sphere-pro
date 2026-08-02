@@ -30,7 +30,38 @@ type Profile = {
 type RoleRow = { user_id: string; role: "admin" | "super_admin"; assigned_semester_id: string | null };
 
 function UsersPage() {
+  const qc = useQueryClient();
   const [q, setQ] = useState("");
+  const [target, setTarget] = useState<Profile | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [meId, setMeId] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setMeId(data.user?.id ?? null));
+  }, []);
+
+  const confirmDelete = async () => {
+    if (!target) return;
+    setDeleting(true);
+    try {
+      await deleteUserAccount({ data: { userId: target.id } });
+      await logActivity({
+        action_type: "account_delete",
+        description: `Deleted account ${target.email ?? target.id}`,
+        target_type: "user", target_id: target.id,
+      });
+      toast.success("Account deleted");
+      setTarget(null);
+      qc.invalidateQueries({ queryKey: ["super-all-profiles"] });
+      qc.invalidateQueries({ queryKey: ["super-all-roles-lite"] });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Could not delete this account");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+
 
   const profilesQ = useQuery({
     queryKey: ["super-all-profiles"],
