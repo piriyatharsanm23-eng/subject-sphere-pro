@@ -295,10 +295,36 @@ function AssignDialog({
       <DialogHeader><DialogTitle>Assign admin role</DialogTitle></DialogHeader>
       <div className="space-y-3">
         <div>
-          <label className="text-sm font-medium">User email</label>
-          <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="admin@example.com" />
-          <p className="text-xs text-muted-foreground mt-1">The user must have already signed up.</p>
+          <label className="text-sm font-medium">User account</label>
+          <div className="relative mt-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              className="pl-9"
+              placeholder="Search accounts by name or email…"
+              value={userSearch}
+              onChange={(e) => setUserSearch(e.target.value)}
+            />
+          </div>
+          <div className="mt-1 max-h-56 overflow-auto rounded-lg border border-border divide-y divide-border">
+            {filteredProfiles.length === 0 ? (
+              <div className="p-3 text-sm text-muted-foreground">No matching accounts.</div>
+            ) : filteredProfiles.map((p) => (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => setUserId(p.id)}
+                className={`w-full text-left px-3 py-2 text-sm hover:bg-muted/40 ${
+                  userId === p.id ? "bg-primary/10" : ""
+                }`}
+              >
+                <div className="font-medium">{p.full_name || "—"}</div>
+                <div className="text-xs text-muted-foreground break-all">{p.email ?? p.id}</div>
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground mt-1">Only users who already signed up are listed.</p>
         </div>
+
         <div>
           <label className="text-sm font-medium">Role</label>
           <Select value={role} onValueChange={(v) => setRole(v as Role)}>
