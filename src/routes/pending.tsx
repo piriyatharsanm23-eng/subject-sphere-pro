@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
-  Clock, LogOut, Mail, MessageCircle, ShieldCheck, Loader2, HelpCircle,
+  Clock, LogOut, MessageCircle, ShieldCheck, Loader2, HelpCircle,
 } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -23,7 +23,6 @@ export const Route = createFileRoute("/pending")({
 type SuperContact = {
   id: string;
   full_name: string | null;
-  email: string | null;
   phone: string | null;
   avatar_url: string | null;
 };
@@ -67,19 +66,9 @@ function PendingPage() {
     enabled: check === "ready",
     queryKey: ["pending-super-contacts"],
     queryFn: async () => {
-      const { data: roles, error } = await supabase
-        .from("user_roles")
-        .select("user_id")
-        .eq("role", "super_admin");
+      const { data, error } = await supabase.rpc("get_support_contacts");
       if (error) throw error;
-      const ids = Array.from(new Set((roles ?? []).map((r) => r.user_id)));
-      if (ids.length === 0) return [] as SuperContact[];
-      const { data: profs, error: pErr } = await supabase
-        .from("profiles")
-        .select("id,full_name,email,phone,avatar_url")
-        .in("id", ids);
-      if (pErr) throw pErr;
-      return (profs ?? []) as SuperContact[];
+      return (data ?? []) as SuperContact[];
     },
   });
 
@@ -179,12 +168,11 @@ function PendingPage() {
                           <img src={s.avatar_url} alt="" className="h-11 w-11 rounded-full object-cover" />
                         ) : (
                           <div className="h-11 w-11 rounded-full bg-muted grid place-items-center text-sm font-medium">
-                            {(s.full_name || s.email || "?").slice(0, 1).toUpperCase()}
+                            {(s.full_name || "?").slice(0, 1).toUpperCase()}
                           </div>
                         )}
                         <div className="min-w-0 flex-1">
                           <div className="font-medium">{s.full_name || "Super Admin"}</div>
-                          <div className="text-xs text-muted-foreground break-all">{s.email ?? "—"}</div>
                           {s.phone && (
                             <div className="text-xs text-muted-foreground mt-0.5">{s.phone}</div>
                           )}
@@ -199,14 +187,6 @@ function PendingPage() {
                               >
                                 <MessageCircle className="h-4 w-4 mr-1.5" />
                                 WhatsApp
-                              </a>
-                            </Button>
-                          )}
-                          {s.email && (
-                            <Button asChild size="sm" variant="outline">
-                              <a href={`mailto:${s.email}?subject=StudyHub%20semester%20assignment&body=${waMessage}`}>
-                                <Mail className="h-4 w-4 mr-1.5" />
-                                Email
                               </a>
                             </Button>
                           )}

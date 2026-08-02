@@ -957,6 +957,15 @@ export type Database = {
     }
     Functions: {
       admin_semester: { Args: { _user_id: string }; Returns: string }
+      get_support_contacts: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          full_name: string
+          id: string
+          phone: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
