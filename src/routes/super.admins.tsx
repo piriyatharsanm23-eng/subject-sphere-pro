@@ -212,18 +212,33 @@ function AssignDialog({
 }: {
   profiles: Profile[]; semesters: Semester[]; existing: RoleRow[]; onSaved: () => void;
 }) {
-  const [email, setEmail] = useState("");
+  const [userId, setUserId] = useState("");
+  const [userSearch, setUserSearch] = useState("");
   const [role, setRole] = useState<Role>("admin");
   const [semesterIds, setSemesterIds] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
+
+  const filteredProfiles = useMemo(() => {
+    const n = userSearch.trim().toLowerCase();
+    const list = [...profiles].sort((a, b) =>
+      (a.full_name || a.email || "").localeCompare(b.full_name || b.email || ""),
+    );
+    if (!n) return list;
+    return list.filter(
+      (p) =>
+        (p.email ?? "").toLowerCase().includes(n) ||
+        (p.full_name ?? "").toLowerCase().includes(n),
+    );
+  }, [profiles, userSearch]);
 
   const toggle = (id: string) =>
     setSemesterIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
 
   const save = async () => {
-    const target = profiles.find((p) => (p.email ?? "").toLowerCase() === email.trim().toLowerCase());
-    if (!target) return toast.error("No user with that email. Ask them to sign up at /auth first.");
+    const target = profiles.find((p) => p.id === userId);
+    if (!target) return toast.error("Select a user account first.");
     if (role === "admin" && semesterIds.length === 0) return toast.error("Choose at least one semester for the admin");
+
 
     setSaving(true);
     if (role === "super_admin") {
