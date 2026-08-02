@@ -126,6 +126,8 @@ function UsersPage() {
                   <th className="text-left font-medium px-4 py-3">Email</th>
                   <th className="text-left font-medium px-4 py-3">Role</th>
                   <th className="text-left font-medium px-4 py-3">Joined</th>
+                  <th className="text-right font-medium px-4 py-3">Actions</th>
+
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
