@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
-  Clock, LogOut, Mail, MessageCircle, ShieldCheck, Loader2, HelpCircle,
+  Clock, LogOut, MessageCircle, ShieldCheck, Loader2, HelpCircle,
 } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
