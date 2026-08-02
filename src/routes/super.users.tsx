@@ -1,15 +1,24 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Loader2, Search, ShieldCheck } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Loader2, Search, ShieldCheck, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { SuperShell } from "@/components/SuperShell";
 import { supabase } from "@/integrations/supabase/client";
+import { deleteUserAccount } from "@/lib/admin-users.functions";
+import { logActivity } from "@/lib/activity";
 
 export const Route = createFileRoute("/super/users")({
   head: () => ({ meta: [{ title: "All accounts — Super Admin" }] }),
   component: UsersPage,
 });
+
 
 type Profile = {
   id: string;
@@ -21,7 +30,38 @@ type Profile = {
 type RoleRow = { user_id: string; role: "admin" | "super_admin"; assigned_semester_id: string | null };
 
 function UsersPage() {
+  const qc = useQueryClient();
   const [q, setQ] = useState("");
+  const [target, setTarget] = useState<Profile | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [meId, setMeId] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setMeId(data.user?.id ?? null));
+  }, []);
+
+  const confirmDelete = async () => {
+    if (!target) return;
+    setDeleting(true);
+    try {
+      await deleteUserAccount({ data: { userId: target.id } });
+      await logActivity({
+        action_type: "delete",
+        description: `Deleted account ${target.email ?? target.id}`,
+        target_type: "user", target_id: target.id,
+      });
+      toast.success("Account deleted");
+      setTarget(null);
+      qc.invalidateQueries({ queryKey: ["super-all-profiles"] });
+      qc.invalidateQueries({ queryKey: ["super-all-roles-lite"] });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Could not delete this account");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+
 
   const profilesQ = useQuery({
     queryKey: ["super-all-profiles"],
@@ -86,6 +126,8 @@ function UsersPage() {
                   <th className="text-left font-medium px-4 py-3">Email</th>
                   <th className="text-left font-medium px-4 py-3">Role</th>
                   <th className="text-left font-medium px-4 py-3">Joined</th>
+                  <th className="text-right font-medium px-4 py-3">Actions</th>
+
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -124,6 +166,24 @@ function UsersPage() {
                       <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
                         {p.created_at ? new Date(p.created_at).toLocaleDateString() : "—"}
                       </td>
+                      <td className="px-4 py-3 text-right whitespace-nowrap">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-rose-400 hover:text-rose-300"
+                          disabled={isSuper || p.id === meId}
+                          title={
+                            isSuper
+                              ? "Remove super-admin role first"
+                              : p.id === meId
+                                ? "You cannot delete your own account"
+                                : "Delete account"
+                          }
+                          onClick={() => setTarget(p)}
+                        >
+                          <Trash2 className="h-4 w-4 mr-1" />Delete
+                        </Button>
+                      </td>
                     </tr>
                   );
                 })}
@@ -132,6 +192,28 @@ function UsersPage() {
           </div>
         )}
       </div>
+
+      <AlertDialog open={!!target} onOpenChange={(o) => !o && setTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this account permanently?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {target?.email ?? target?.full_name} will be removed from the system along with their
+              roles and notifications. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => { e.preventDefault(); confirmDelete(); }}
+              disabled={deleting}
+            >
+              {deleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Delete account
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </SuperShell>
   );
 }
+
