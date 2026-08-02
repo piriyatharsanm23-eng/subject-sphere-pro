@@ -1,15 +1,24 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Loader2, Search, ShieldCheck } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Loader2, Search, ShieldCheck, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { SuperShell } from "@/components/SuperShell";
 import { supabase } from "@/integrations/supabase/client";
+import { deleteUserAccount } from "@/lib/admin-users.functions";
+import { logActivity } from "@/lib/activity";
 
 export const Route = createFileRoute("/super/users")({
   head: () => ({ meta: [{ title: "All accounts — Super Admin" }] }),
   component: UsersPage,
 });
+
 
 type Profile = {
   id: string;
