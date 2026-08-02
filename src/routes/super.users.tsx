@@ -46,7 +46,7 @@ function UsersPage() {
     try {
       await deleteUserAccount({ data: { userId: target.id } });
       await logActivity({
-        action_type: "account_delete",
+        action_type: "delete",
         description: `Deleted account ${target.email ?? target.id}`,
         target_type: "user", target_id: target.id,
       });
