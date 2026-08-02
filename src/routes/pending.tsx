@@ -67,19 +67,9 @@ function PendingPage() {
     enabled: check === "ready",
     queryKey: ["pending-super-contacts"],
     queryFn: async () => {
-      const { data: roles, error } = await supabase
-        .from("user_roles")
-        .select("user_id")
-        .eq("role", "super_admin");
+      const { data, error } = await supabase.rpc("get_support_contacts");
       if (error) throw error;
-      const ids = Array.from(new Set((roles ?? []).map((r) => r.user_id)));
-      if (ids.length === 0) return [] as SuperContact[];
-      const { data: profs, error: pErr } = await supabase
-        .from("profiles")
-        .select("id,full_name,email,phone,avatar_url")
-        .in("id", ids);
-      if (pErr) throw pErr;
-      return (profs ?? []) as SuperContact[];
+      return (data ?? []) as SuperContact[];
     },
   });
 
