@@ -169,6 +169,7 @@ export type Database = {
           id: string
           is_archived: boolean
           pending_delete: boolean
+          push_notified_at: string | null
           semester_id: string
           status: string
           subject_id: string
@@ -184,6 +185,7 @@ export type Database = {
           id?: string
           is_archived?: boolean
           pending_delete?: boolean
+          push_notified_at?: string | null
           semester_id: string
           status?: string
           subject_id: string
@@ -199,6 +201,7 @@ export type Database = {
           id?: string
           is_archived?: boolean
           pending_delete?: boolean
+          push_notified_at?: string | null
           semester_id?: string
           status?: string
           subject_id?: string
@@ -355,6 +358,7 @@ export type Database = {
           is_archived: boolean
           material_type: string
           pending_delete: boolean
+          push_notified_at: string | null
           semester_id: string
           subject_id: string
           telegram_notified_at: string | null
@@ -374,6 +378,7 @@ export type Database = {
           is_archived?: boolean
           material_type: string
           pending_delete?: boolean
+          push_notified_at?: string | null
           semester_id: string
           subject_id: string
           telegram_notified_at?: string | null
@@ -393,6 +398,7 @@ export type Database = {
           is_archived?: boolean
           material_type?: string
           pending_delete?: boolean
+          push_notified_at?: string | null
           semester_id?: string
           subject_id?: string
           telegram_notified_at?: string | null
@@ -506,6 +512,7 @@ export type Database = {
           id: string
           kind: string
           link: string | null
+          pushed_at: string | null
           read_at: string | null
           title: string
           user_id: string
@@ -516,6 +523,7 @@ export type Database = {
           id?: string
           kind: string
           link?: string | null
+          pushed_at?: string | null
           read_at?: string | null
           title: string
           user_id: string
@@ -526,6 +534,7 @@ export type Database = {
           id?: string
           kind?: string
           link?: string | null
+          pushed_at?: string | null
           read_at?: string | null
           title?: string
           user_id?: string
@@ -667,6 +676,45 @@ export type Database = {
           full_name?: string | null
           id?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          failure_count: number
+          id: string
+          p256dh: string
+          subject_ids: string[]
+          updated_at: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          failure_count?: number
+          id?: string
+          p256dh: string
+          subject_ids?: string[]
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          failure_count?: number
+          id?: string
+          p256dh?: string
+          subject_ids?: string[]
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }

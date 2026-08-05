@@ -6,6 +6,8 @@ import { useState } from "react";
 import { GlobalSearch, SearchTrigger, useGlobalSearch } from "@/components/GlobalSearch";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { PushToggle } from "@/components/PushToggle";
+
 import { useT } from "@/lib/i18n";
 
 export function SiteHeader() {
@@ -46,8 +48,10 @@ export function SiteHeader() {
               </Link>
             </Button>
           ))}
+          <PushToggle className="h-9 w-9" />
           <LanguageSwitcher className="h-9 w-9" />
           <ThemeToggle className="h-9 w-9" />
+
           <Button asChild variant="outline" size="sm">
             <Link to="/auth">
               <LogIn className="h-4 w-4 mr-1.5" /> {t("nav.admin")}
@@ -57,7 +61,9 @@ export function SiteHeader() {
 
         {/* Mobile actions */}
         <div className="md:hidden flex items-center gap-1">
+          <PushToggle className="h-9 w-9" />
           <LanguageSwitcher className="h-9 w-9" />
+
           <ThemeToggle className="h-9 w-9" />
           <Button size="icon" variant="ghost" aria-label={t("nav.search")} className="h-9 w-9" onClick={() => search.setOpen(true)}>
             <Menu className="hidden" />
