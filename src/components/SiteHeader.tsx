@@ -61,7 +61,9 @@ export function SiteHeader() {
 
         {/* Mobile actions */}
         <div className="md:hidden flex items-center gap-1">
+          <PushToggle className="h-9 w-9" />
           <LanguageSwitcher className="h-9 w-9" />
+
           <ThemeToggle className="h-9 w-9" />
           <Button size="icon" variant="ghost" aria-label={t("nav.search")} className="h-9 w-9" onClick={() => search.setOpen(true)}>
             <Menu className="hidden" />
