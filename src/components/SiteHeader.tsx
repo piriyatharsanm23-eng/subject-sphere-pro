@@ -6,6 +6,8 @@ import { useState } from "react";
 import { GlobalSearch, SearchTrigger, useGlobalSearch } from "@/components/GlobalSearch";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { PushToggle } from "@/components/PushToggle";
+
 import { useT } from "@/lib/i18n";
 
 export function SiteHeader() {
