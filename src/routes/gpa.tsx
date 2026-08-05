@@ -38,7 +38,7 @@ export const Route = createFileRoute("/gpa")({
 
 /** University of Moratuwa — Faculty of Engineering grade point scale. */
 const GRADES: { label: string; points: number }[] = [
-  { label: "A+", points: 4.0 },
+  { label: "A+", points: 4.2 },
   { label: "A", points: 4.0 },
   { label: "A-", points: 3.7 },
   { label: "B+", points: 3.3 },
