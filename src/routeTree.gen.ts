@@ -54,6 +54,7 @@ import { Route as AdminDeadlinesRouteImport } from './routes/admin.deadlines'
 import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram/webhook'
 import { Route as ApiPublicTelegramNotifyMaterialsRouteImport } from './routes/api/public/telegram/notify-materials'
 import { Route as ApiPublicTelegramHealthRouteImport } from './routes/api/public/telegram/health'
+import { Route as ApiPublicPushSubscribeRouteImport } from './routes/api/public/push/subscribe'
 import { Route as ApiPublicPushConfigRouteImport } from './routes/api/public/push/config'
 
 const SuperRoute = SuperRouteImport.update({
@@ -283,6 +284,11 @@ const ApiPublicTelegramHealthRoute = ApiPublicTelegramHealthRouteImport.update({
   path: '/api/public/telegram/health',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicPushSubscribeRoute = ApiPublicPushSubscribeRouteImport.update({
+  id: '/api/public/push/subscribe',
+  path: '/api/public/push/subscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicPushConfigRoute = ApiPublicPushConfigRouteImport.update({
   id: '/api/public/push/config',
   path: '/api/public/push/config',
@@ -333,6 +339,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/super/': typeof SuperIndexRoute
   '/api/public/push/config': typeof ApiPublicPushConfigRoute
+  '/api/public/push/subscribe': typeof ApiPublicPushSubscribeRoute
   '/api/public/telegram/health': typeof ApiPublicTelegramHealthRoute
   '/api/public/telegram/notify-materials': typeof ApiPublicTelegramNotifyMaterialsRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
@@ -379,6 +386,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/super': typeof SuperIndexRoute
   '/api/public/push/config': typeof ApiPublicPushConfigRoute
+  '/api/public/push/subscribe': typeof ApiPublicPushSubscribeRoute
   '/api/public/telegram/health': typeof ApiPublicTelegramHealthRoute
   '/api/public/telegram/notify-materials': typeof ApiPublicTelegramNotifyMaterialsRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
@@ -428,6 +436,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/super/': typeof SuperIndexRoute
   '/api/public/push/config': typeof ApiPublicPushConfigRoute
+  '/api/public/push/subscribe': typeof ApiPublicPushSubscribeRoute
   '/api/public/telegram/health': typeof ApiPublicTelegramHealthRoute
   '/api/public/telegram/notify-materials': typeof ApiPublicTelegramNotifyMaterialsRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
@@ -478,6 +487,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/super/'
     | '/api/public/push/config'
+    | '/api/public/push/subscribe'
     | '/api/public/telegram/health'
     | '/api/public/telegram/notify-materials'
     | '/api/public/telegram/webhook'
@@ -524,6 +534,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/super'
     | '/api/public/push/config'
+    | '/api/public/push/subscribe'
     | '/api/public/telegram/health'
     | '/api/public/telegram/notify-materials'
     | '/api/public/telegram/webhook'
@@ -572,6 +583,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/super/'
     | '/api/public/push/config'
+    | '/api/public/push/subscribe'
     | '/api/public/telegram/health'
     | '/api/public/telegram/notify-materials'
     | '/api/public/telegram/webhook'
@@ -594,6 +606,7 @@ export interface RootRouteChildren {
   SemesterIdRoute: typeof SemesterIdRoute
   SubjectIdRoute: typeof SubjectIdRoute
   ApiPublicPushConfigRoute: typeof ApiPublicPushConfigRoute
+  ApiPublicPushSubscribeRoute: typeof ApiPublicPushSubscribeRoute
   ApiPublicTelegramHealthRoute: typeof ApiPublicTelegramHealthRoute
   ApiPublicTelegramNotifyMaterialsRoute: typeof ApiPublicTelegramNotifyMaterialsRoute
   ApiPublicTelegramWebhookRoute: typeof ApiPublicTelegramWebhookRoute
@@ -916,6 +929,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicTelegramHealthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/push/subscribe': {
+      id: '/api/public/push/subscribe'
+      path: '/api/public/push/subscribe'
+      fullPath: '/api/public/push/subscribe'
+      preLoaderRoute: typeof ApiPublicPushSubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/push/config': {
       id: '/api/public/push/config'
       path: '/api/public/push/config'
@@ -1013,6 +1033,7 @@ const rootRouteChildren: RootRouteChildren = {
   SemesterIdRoute: SemesterIdRoute,
   SubjectIdRoute: SubjectIdRoute,
   ApiPublicPushConfigRoute: ApiPublicPushConfigRoute,
+  ApiPublicPushSubscribeRoute: ApiPublicPushSubscribeRoute,
   ApiPublicTelegramHealthRoute: ApiPublicTelegramHealthRoute,
   ApiPublicTelegramNotifyMaterialsRoute: ApiPublicTelegramNotifyMaterialsRoute,
   ApiPublicTelegramWebhookRoute: ApiPublicTelegramWebhookRoute,
