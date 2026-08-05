@@ -46,8 +46,10 @@ export function SiteHeader() {
               </Link>
             </Button>
           ))}
+          <PushToggle className="h-9 w-9" />
           <LanguageSwitcher className="h-9 w-9" />
           <ThemeToggle className="h-9 w-9" />
+
           <Button asChild variant="outline" size="sm">
             <Link to="/auth">
               <LogIn className="h-4 w-4 mr-1.5" /> {t("nav.admin")}
