@@ -1,10 +1,11 @@
 import { Link } from "@tanstack/react-router";
-import { Calculator, GraduationCap, Settings, LogIn, Users, Menu, LayoutDashboard, HelpCircle } from "lucide-react";
+import { GraduationCap, Settings, LogIn, Users, Menu, LayoutDashboard, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useState } from "react";
 import { GlobalSearch, SearchTrigger, useGlobalSearch } from "@/components/GlobalSearch";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useT } from "@/lib/i18n";
 
 export function SiteHeader() {
@@ -14,7 +15,6 @@ export function SiteHeader() {
   const NAV = [
     { to: "/dashboard" as const, label: t("nav.dashboard"), icon: LayoutDashboard },
     { to: "/contributors" as const, label: t("nav.contributors"), icon: Users },
-    { to: "/gpa" as const, label: "GPA", icon: Calculator },
     { to: "/help" as const, label: t("nav.help"), icon: HelpCircle },
     { to: "/select" as const, label: t("nav.preferences"), icon: Settings },
   ];
@@ -46,6 +46,7 @@ export function SiteHeader() {
               </Link>
             </Button>
           ))}
+          <LanguageSwitcher className="h-9 w-9" />
           <ThemeToggle className="h-9 w-9" />
           <Button asChild variant="outline" size="sm">
             <Link to="/auth">
@@ -56,6 +57,7 @@ export function SiteHeader() {
 
         {/* Mobile actions */}
         <div className="md:hidden flex items-center gap-1">
+          <LanguageSwitcher className="h-9 w-9" />
           <ThemeToggle className="h-9 w-9" />
           <Button size="icon" variant="ghost" aria-label={t("nav.search")} className="h-9 w-9" onClick={() => search.setOpen(true)}>
             <Menu className="hidden" />

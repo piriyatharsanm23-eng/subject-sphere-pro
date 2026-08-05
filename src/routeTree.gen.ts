@@ -14,7 +14,6 @@ import { Route as SelectRouteImport } from './routes/select'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PendingRouteImport } from './routes/pending'
 import { Route as HelpRouteImport } from './routes/help'
-import { Route as GpaRouteImport } from './routes/gpa'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContributorsRouteImport } from './routes/contributors'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -79,11 +78,6 @@ const PendingRoute = PendingRouteImport.update({
 const HelpRoute = HelpRouteImport.update({
   id: '/help',
   path: '/help',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GpaRoute = GpaRouteImport.update({
-  id: '/gpa',
-  path: '/gpa',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -295,7 +289,6 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/contributors': typeof ContributorsRoute
   '/dashboard': typeof DashboardRoute
-  '/gpa': typeof GpaRoute
   '/help': typeof HelpRoute
   '/pending': typeof PendingRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -342,7 +335,6 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/contributors': typeof ContributorsRoute
   '/dashboard': typeof DashboardRoute
-  '/gpa': typeof GpaRoute
   '/help': typeof HelpRoute
   '/pending': typeof PendingRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -390,7 +382,6 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/contributors': typeof ContributorsRoute
   '/dashboard': typeof DashboardRoute
-  '/gpa': typeof GpaRoute
   '/help': typeof HelpRoute
   '/pending': typeof PendingRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -440,7 +431,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/contributors'
     | '/dashboard'
-    | '/gpa'
     | '/help'
     | '/pending'
     | '/reset-password'
@@ -487,7 +477,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/contributors'
     | '/dashboard'
-    | '/gpa'
     | '/help'
     | '/pending'
     | '/reset-password'
@@ -534,7 +523,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/contributors'
     | '/dashboard'
-    | '/gpa'
     | '/help'
     | '/pending'
     | '/reset-password'
@@ -583,7 +571,6 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ContributorsRoute: typeof ContributorsRoute
   DashboardRoute: typeof DashboardRoute
-  GpaRoute: typeof GpaRoute
   HelpRoute: typeof HelpRoute
   PendingRoute: typeof PendingRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -634,13 +621,6 @@ declare module '@tanstack/react-router' {
       path: '/help'
       fullPath: '/help'
       preLoaderRoute: typeof HelpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/gpa': {
-      id: '/gpa'
-      path: '/gpa'
-      fullPath: '/gpa'
-      preLoaderRoute: typeof GpaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -1002,7 +982,6 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ContributorsRoute: ContributorsRoute,
   DashboardRoute: DashboardRoute,
-  GpaRoute: GpaRoute,
   HelpRoute: HelpRoute,
   PendingRoute: PendingRoute,
   ResetPasswordRoute: ResetPasswordRoute,
