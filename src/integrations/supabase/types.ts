@@ -1025,6 +1025,7 @@ export type Database = {
         Args: { _semester_id: string; _user_id: string }
         Returns: boolean
       }
+      is_public_contributor: { Args: { _user_id: string }; Returns: boolean }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
