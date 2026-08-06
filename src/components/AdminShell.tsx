@@ -61,6 +61,8 @@ export function AdminShell({
   const [semesters, setSemesters] = useState<AdminSemester[]>([]);
   const [meta, setMeta] = useState<{ userId: string; isSuper: boolean } | null>(null);
   const [unread, setUnread] = useState<Record<string, number>>({});
+  const [menuOpen, setMenuOpen] = useState(false);
+
 
   // Poll unread notifications (grouped by kind) every 60s.
   useEffect(() => {
