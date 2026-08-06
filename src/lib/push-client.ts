@@ -5,6 +5,24 @@ import { getSelection } from "@/lib/selection";
 
 const SW_URL = "/push-sw.js";
 
+/** Public VAPID key (safe to ship to the browser) used when the config call is unavailable. */
+const FALLBACK_VAPID_PUBLIC_KEY =
+  "BFq54VGtW-vA-jRbXsnsL_wNhfKmQXHgz9Zvs_FupOGwxv21LmqXqXOQHVmx2PxGLo3jxGHpgqsOnAYVxglvfms";
+
+async function getVapidPublicKey(): Promise<string | null> {
+  try {
+    const res = await fetch("/api/public/push/config", { headers: { accept: "application/json" } });
+    if (res.ok && (res.headers.get("content-type") ?? "").includes("application/json")) {
+      const cfg = (await res.json()) as { enabled?: boolean; publicKey?: string | null };
+      if (cfg?.publicKey) return cfg.publicKey;
+    }
+  } catch {
+    /* fall through to the built-in key */
+  }
+  return FALLBACK_VAPID_PUBLIC_KEY || null;
+}
+
+
 export function pushSupported() {
   return (
     typeof window !== "undefined" &&
@@ -93,7 +111,7 @@ export async function enablePush(): Promise<boolean> {
     existing ??
     (await reg.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(cfg.publicKey),
+      applicationServerKey: urlBase64ToUint8Array(publicKey),
     }));
 
   await saveSubscription(sub);
