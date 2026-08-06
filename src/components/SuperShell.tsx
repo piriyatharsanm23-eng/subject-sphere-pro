@@ -47,6 +47,8 @@ export function SuperShell({
   const [state, setState] = useState<"checking" | "denied" | "ok">("checking");
   const [uid, setUid] = useState<string | null>(null);
   const [unread, setUnread] = useState<Record<string, number>>({});
+  const [menuOpen, setMenuOpen] = useState(false);
+
 
   useEffect(() => {
     let mounted = true;
