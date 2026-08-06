@@ -77,8 +77,13 @@ export async function enablePush(): Promise<boolean> {
       : await Notification.requestPermission();
   if (permission !== "granted") return false;
 
-  const cfg = await fetch("/api/public/push/config").then((r) => r.json());
-  if (!cfg?.enabled || !cfg.publicKey) throw new Error("Notifications are not configured yet");
+  const publicKey = await getVapidPublicKey();
+  if (!publicKey) {
+    throw new Error(
+      "Notifications aren't available on this address yet. Open the app from the main site and try again.",
+    );
+  }
+
 
   const reg = await getRegistration();
   await navigator.serviceWorker.ready;
