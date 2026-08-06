@@ -3,7 +3,7 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   CalendarClock, FileText, LayoutDashboard, Loader2,
   LogOut, MessageSquare, ShieldAlert, Star, UserCircle2, Check, ChevronsUpDown,
-  BookPlus, LifeBuoy, Video,
+  BookPlus, LifeBuoy, Video, Menu,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -11,7 +11,9 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useT } from "@/lib/i18n";
+
 
 
 export type AdminSemester = { id: string; name: string };
@@ -209,15 +211,89 @@ export function AdminShell({
     );
   }
 
+  const navList = (onNavigate?: () => void) => (
+    <nav className="flex flex-col gap-1">
+      {NAV.map((item) => {
+        const active = item.exact ? path === item.to : path.startsWith(item.to);
+        const badgeKind =
+          item.to === "/admin/requests" ? "student_request" :
+          item.to === "/admin/feedback" ? "feedback" :
+          item.to === "/admin/modules" ? "module_request" : null;
+        const count = badgeKind ? (unread[badgeKind] ?? 0) : 0;
+        return (
+          <Link
+            key={item.to}
+            to={item.to}
+            onClick={onNavigate}
+            className={`flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition-colors ${
+              active
+                ? "bg-primary/10 text-primary font-medium"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+            }`}
+          >
+            <item.icon className="h-4 w-4 shrink-0" />
+            <span className="truncate">{item.label}</span>
+            {count > 0 && (
+              <span className="ml-auto rounded-full bg-rose-500 text-white text-[10px] font-semibold px-1.5 min-w-[18px] text-center tabular-nums">
+                {count > 99 ? "99+" : count}
+              </span>
+            )}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+
+  const activeLabel = NAV.find((i) => (i.exact ? path === i.to : path.startsWith(i.to)))?.label ?? t("admin.overview");
+  const totalUnread = Object.values(unread).reduce((a, b) => a + b, 0);
+
   return (
     <div className="min-h-screen flex flex-col bg-muted/30">
       <SiteHeader />
       <main className="container mx-auto px-3 sm:px-6 py-4 sm:py-6 flex-1 max-w-7xl w-full">
+        {/* Mobile menu button */}
+        <div className="lg:hidden mb-4">
+          <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+            <SheetTrigger asChild>
+              <button
+                type="button"
+                className="w-full flex items-center gap-3 rounded-xl border border-border bg-card px-3 py-2.5 text-sm font-medium shadow-soft"
+              >
+                <Menu className="h-4 w-4 shrink-0" />
+                <span className="truncate">{activeLabel}</span>
+                {totalUnread > 0 && (
+                  <span className="ml-auto rounded-full bg-rose-500 text-white text-[10px] font-semibold px-1.5 min-w-[18px] text-center tabular-nums">
+                    {totalUnread > 99 ? "99+" : totalUnread}
+                  </span>
+                )}
+              </button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[82vw] max-w-xs p-0 flex flex-col">
+              <SheetHeader className="px-4 py-4 border-b border-border text-left">
+                <SheetTitle className="text-xs uppercase tracking-wider text-muted-foreground">
+                  {t("admin.currentSemester")}
+                </SheetTitle>
+                <SemesterPicker
+                  semesters={ctx.semesters}
+                  value={ctx.semesterId}
+                  onChange={ctx.setSemesterId}
+                />
+              </SheetHeader>
+              <div className="flex-1 overflow-y-auto p-2">{navList(() => setMenuOpen(false))}</div>
+              <div className="border-t border-border p-2">
+                <Button variant="ghost" size="sm" className="w-full justify-start text-muted-foreground" onClick={signOut}>
+                  <LogOut className="h-4 w-4 mr-2" />{t("admin.signOut")}
+                </Button>
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
+
         <div className="grid gap-4 sm:gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
-          <aside className="lg:sticky lg:top-20 lg:self-start min-w-0">
+          <aside className="hidden lg:block lg:sticky lg:top-20 lg:self-start min-w-0">
             <div className="rounded-2xl border border-border bg-card p-2 shadow-soft">
               <div className="px-2 py-2">
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold px-1 hidden lg:block">{t("admin.currentSemester")}</div>
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold px-1">{t("admin.currentSemester")}</div>
                 <SemesterPicker
                   semesters={ctx.semesters}
                   value={ctx.semesterId}
@@ -225,42 +301,16 @@ export function AdminShell({
                 />
               </div>
 
-              <nav className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible scrollbar-thin">
-                {NAV.map((item) => {
-                  const active = item.exact ? path === item.to : path.startsWith(item.to);
-                  const badgeKind =
-                    item.to === "/admin/requests" ? "student_request" :
-                    item.to === "/admin/feedback" ? "feedback" :
-                    item.to === "/admin/modules" ? "module_request" : null;
-                  const count = badgeKind ? (unread[badgeKind] ?? 0) : 0;
-                  return (
-                    <Link
-                      key={item.to}
-                      to={item.to}
-                      className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm whitespace-nowrap transition-colors shrink-0 lg:shrink ${
-                        active
-                          ? "bg-primary/10 text-primary font-medium"
-                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                      }`}
-                    >
-                      <item.icon className="h-4 w-4 shrink-0" />
-                      <span>{item.label}</span>
-                      {count > 0 && (
-                        <span className="ml-auto rounded-full bg-rose-500 text-white text-[10px] font-semibold px-1.5 min-w-[18px] text-center tabular-nums">
-                          {count > 99 ? "99+" : count}
-                        </span>
-                      )}
-                    </Link>
-                  );
-                })}
-              </nav>
-              <div className="hidden lg:block px-2 pt-2 mt-2 border-t border-border">
+              {navList()}
+
+              <div className="px-2 pt-2 mt-2 border-t border-border">
                 <Button variant="ghost" size="sm" className="w-full justify-start text-muted-foreground" onClick={signOut}>
                   <LogOut className="h-4 w-4 mr-2" />{t("admin.signOut")}
                 </Button>
               </div>
             </div>
           </aside>
+
           <section className="min-w-0">
             <div className="mb-4 sm:mb-6 flex flex-wrap items-end gap-3 justify-between">
               <div>
