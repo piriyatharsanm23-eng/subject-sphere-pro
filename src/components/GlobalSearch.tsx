@@ -37,7 +37,10 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean; onOpenChan
     queryKey: ["global-search", q],
     enabled: open,
     queryFn: async () => {
-      const like = q.trim() ? `%${q.trim()}%` : "%";
+      // Strip characters that carry meaning in PostgREST filter strings (,()."\)
+      // and LIKE wildcards, so a search term can never alter the query it is used in.
+      const safe = q.trim().replace(/[,()."'\\%_*]/g, " ").replace(/\s+/g, " ").trim().slice(0, 80);
+      const like = safe ? `%${safe}%` : "%";
       const [sem, sub, mat, dead] = await Promise.all([
         supabase.from("semesters").select("id,name").ilike("name", like).limit(6),
         supabase.from("subjects").select("id,name,code").or(`name.ilike.${like},code.ilike.${like}`).limit(8),
