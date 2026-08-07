@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public.notify_super_admins_on_pending_change() FROM PUBLIC, anon, authenticated;
