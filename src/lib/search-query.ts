@@ -11,8 +11,12 @@
  * `buildSearchFilters`; see src/lib/__tests__/search-query.test.ts.
  */
 
-/** Characters that carry meaning in PostgREST filter syntax or LIKE patterns. */
-const UNSAFE = /[,()."'\\%_*:&|!~<>#]/g;
+/**
+ * Allowlist, not blocklist: only letters (any script), digits, spaces and
+ * hyphens survive. Everything else — quotes, commas, dots, parentheses,
+ * wildcards, `&`, `=`, `;` — is replaced with a space.
+ */
+const UNSAFE = /[^\p{L}\p{N} -]/gu;
 
 export const MAX_SEARCH_LENGTH = 80;
 
