@@ -38,7 +38,7 @@ describe("sanitizeSearchTerm", () => {
   it.each(PAYLOADS)("neutralises payload: %s", (payload) => {
     const safe = sanitizeSearchTerm(payload);
     // Only letters, digits, spaces and hyphens may survive.
-    expect(safe).toMatch(/^[\p{L}\p{N} -]*$/u);
+    expect(safe).toMatch(/^[\p{L}\p{M}\p{N} -]*$/u);
     expect(safe).not.toContain("--");
     expect(safe.length).toBeLessThanOrEqual(MAX_SEARCH_LENGTH);
   });
@@ -75,7 +75,7 @@ describe("buildSearchFilters", () => {
       // Every condition must still be a plain ilike on the expected column.
       for (const part of parts) {
         // Either the empty-term fallback ("%") or a plain wrapped term.
-        expect(part).toMatch(/^(name|code|title|year)\.ilike\.(%|%[\p{L}\p{N} -]+%)$/u);
+        expect(part).toMatch(/^(name|code|title|year)\.ilike\.(%|%[\p{L}\p{M}\p{N} -]+%)$/u);
       }
     }
   });

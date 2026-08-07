@@ -13,10 +13,10 @@
 
 /**
  * Allowlist, not blocklist: only letters (any script), digits, spaces and
- * hyphens survive. Everything else — quotes, commas, dots, parentheses,
+ * single hyphens survive (runs of hyphens, e.g. the SQL comment marker, go too). Everything else — quotes, commas, dots, parentheses,
  * wildcards, `&`, `=`, `;` — is replaced with a space.
  */
-const UNSAFE = /[^\p{L}\p{N} -]/gu;
+const UNSAFE = /[^\p{L}\p{M}\p{N} -]/gu;
 
 export const MAX_SEARCH_LENGTH = 80;
 
@@ -24,6 +24,7 @@ export const MAX_SEARCH_LENGTH = 80;
 export function sanitizeSearchTerm(input: string): string {
   return (input ?? "")
     .replace(UNSAFE, " ")
+    .replace(/-{2,}/g, " ")
     .replace(/\s+/g, " ")
     .trim()
     .slice(0, MAX_SEARCH_LENGTH)
