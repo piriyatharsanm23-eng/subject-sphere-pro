@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/command";
 import { supabase } from "@/integrations/supabase/client";
 import { materialTypeLabel } from "@/lib/materials";
+import { buildSearchFilters } from "@/lib/search-query";
 
 export function useGlobalSearch() {
   const [open, setOpen] = useState(false);
@@ -37,18 +38,17 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean; onOpenChan
     queryKey: ["global-search", q],
     enabled: open,
     queryFn: async () => {
-      // Strip characters that carry meaning in PostgREST filter strings (,()."\)
-      // and LIKE wildcards, so a search term can never alter the query it is used in.
-      const safe = q.trim().replace(/[,()."'\\%_*]/g, " ").replace(/\s+/g, " ").trim().slice(0, 80);
-      const like = safe ? `%${safe}%` : "%";
+      // User text is never interpolated raw into a PostgREST filter.
+      // See src/lib/search-query.ts + its injection regression tests.
+      const { like, subjectsOr, materialsOr } = buildSearchFilters(q);
       const [sem, sub, mat, dead] = await Promise.all([
         supabase.from("semesters").select("id,name").ilike("name", like).limit(6),
-        supabase.from("subjects").select("id,name,code").or(`name.ilike.${like},code.ilike.${like}`).limit(8),
+        supabase.from("subjects").select("id,name,code").or(subjectsOr).limit(8),
         supabase
           .from("materials")
           .select("id,title,material_type,year,subject_id,semester_id").eq("pending_delete", false)
           .eq("is_archived", false)
-          .or(`title.ilike.${like},year.ilike.${like}`)
+          .or(materialsOr)
           .order("created_at", { ascending: false })
           .limit(10),
         supabase
