@@ -74,7 +74,8 @@ describe("buildSearchFilters", () => {
       expect(parts).toHaveLength(2);
       // Every condition must still be a plain ilike on the expected column.
       for (const part of parts) {
-        expect(part).toMatch(/^(name|code|title|year)\.ilike\.%[\p{L}\p{N} -]*%$/u);
+        // Either the empty-term fallback ("%") or a plain wrapped term.
+        expect(part).toMatch(/^(name|code|title|year)\.ilike\.(%|%[\p{L}\p{N} -]+%)$/u);
       }
     }
   });
