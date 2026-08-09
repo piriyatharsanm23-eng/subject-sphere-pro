@@ -254,7 +254,7 @@ function DashboardContent({ sel }: { sel: Selection }) {
             </div>
           </div>
 
-          <aside className="min-w-0" aria-label="All deadlines">
+          <aside className="min-w-0 lg:sticky lg:top-24 lg:self-start" aria-label="All deadlines">
             {deadlinesQ.isLoading ? (
               <ListSkeleton rows={2} className="space-y-3 [&>*]:h-20 [&>*]:rounded-2xl" />
             ) : (
