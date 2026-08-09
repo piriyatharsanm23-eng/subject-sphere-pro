@@ -97,8 +97,11 @@ export function PageHeader({
           ) : null}
         </div>
         {actions ? (
-          <div className="flex flex-wrap items-center gap-2 [&>*]:flex-1 sm:[&>*]:flex-none">{actions}</div>
+          <div className="grid grid-cols-2 gap-2 [&>*]:w-full sm:flex sm:flex-wrap sm:items-center sm:[&>*]:w-auto">
+            {actions}
+          </div>
         ) : null}
+
       </div>
       {children ? <div className="mt-4">{children}</div> : null}
     </header>
