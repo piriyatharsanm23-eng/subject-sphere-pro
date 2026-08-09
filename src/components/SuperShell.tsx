@@ -188,7 +188,7 @@ export function SuperShell({
             <SheetContent side="left" className="w-[82vw] max-w-xs p-0 flex flex-col">
               <SheetHeader className="px-4 py-4 border-b border-border text-left">
                 <SheetTitle className="text-xs uppercase tracking-wider text-muted-foreground">
-                  {t("super.title")}
+                  Super Admin
                 </SheetTitle>
               </SheetHeader>
               <div className="flex-1 overflow-y-auto p-2">{navList(() => setMenuOpen(false))}</div>
@@ -201,7 +201,7 @@ export function SuperShell({
           <aside className="hidden lg:block lg:sticky lg:top-20 lg:self-start min-w-0">
             <div className="rounded-2xl border border-border bg-card p-2 shadow-soft">
               <div className="px-3 py-2">
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{t("super.title")}</div>
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Super Admin</div>
               </div>
               {navList()}
             </div>
