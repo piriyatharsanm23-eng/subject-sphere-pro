@@ -86,7 +86,7 @@ export function PageHeader({
   return (
     <header className={cn("mb-6 sm:mb-8", className)}>
       {breadcrumbs?.length ? <Breadcrumbs items={breadcrumbs} className="mb-2" /> : null}
-      <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start lg:gap-6">
         <div className="min-w-0">
           {eyebrow ? (
             <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{eyebrow}</div>
