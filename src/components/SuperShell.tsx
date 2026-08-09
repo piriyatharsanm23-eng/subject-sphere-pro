@@ -40,7 +40,6 @@ function useSuperNav(): NavItem[] {
 export function SuperShell({
   title, description, children,
 }: { title: string; description?: string; children: ReactNode }) {
-  const { t } = useT();
   const NAV = useSuperNav();
   const navigate = useNavigate();
   const path = useRouterState({ select: (s) => s.location.pathname });
