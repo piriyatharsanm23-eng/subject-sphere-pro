@@ -172,14 +172,15 @@ function DashboardContent({ sel }: { sel: Selection }) {
         </section>
 
         {/* 2 — Materials + all deadlines */}
-        <div className="grid gap-8 lg:grid-cols-3">
-          <div className="lg:col-span-2 min-w-0">
+        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)] xl:gap-8">
+          <div className="min-w-0">
             <SectionHeading
               title="Materials"
               action={<span className="text-xs text-muted-foreground" aria-live="polite">{filtered.length} result{filtered.length === 1 ? "" : "s"}</span>}
             />
 
-            <div className="rounded-2xl border border-border bg-card p-4 shadow-soft">
+            <div className="rounded-2xl border border-border bg-card p-3 shadow-soft sm:p-4">
+
               <Toolbar>
                 <div className="relative min-w-0 flex-1">
                   <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
@@ -214,26 +215,27 @@ function DashboardContent({ sel }: { sel: Selection }) {
               ) : (
                 filtered.map((m) => (
                   <article key={m.id} className="rounded-2xl border border-border bg-card p-4 shadow-soft transition-shadow hover:shadow-elevated sm:p-5">
-                    <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
+                    <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-4">
                       <div className="min-w-0">
-                        <div className="flex flex-wrap items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                           <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${materialTypeBadge(m.material_type)}`}>{materialTypeLabel(m.material_type)}</span>
                           {m.year && <span className="text-xs text-muted-foreground">· {m.year}</span>}
                           {m.week_or_module && <span className="text-xs text-muted-foreground">· {m.week_or_module}</span>}
-                          <span className="truncate text-xs text-muted-foreground">· {subjectsById[m.subject_id]?.name}</span>
+                          <span className="min-w-0 truncate text-xs text-muted-foreground">· {subjectsById[m.subject_id]?.name}</span>
                         </div>
-                        <h3 className="mt-1 font-semibold line-clamp-2 break-words">{m.title}</h3>
+                        <h3 className="mt-1.5 font-semibold leading-snug line-clamp-2 break-words">{m.title}</h3>
                         {m.description && <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{m.description}</p>}
                         <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
                           <UploaderBadge uploader={m.uploaded_by ? uploadersQ.data?.[m.uploaded_by] : null} />
                           <span>· {formatRelative(m.created_at)}</span>
                         </div>
                       </div>
-                      <div className="flex gap-2 sm:shrink-0">
-                        <Button size="sm" variant="outline" className="flex-1 sm:flex-none" onClick={() => setPreviewing(m as PreviewableMaterial)}>
+                      <div className="grid grid-cols-2 gap-2 sm:w-[15.5rem] sm:shrink-0">
+                        <Button size="sm" variant="outline" className="w-full" onClick={() => setPreviewing(m as PreviewableMaterial)}>
                           <Eye className="mr-2 h-4 w-4" aria-hidden="true" /> Preview
                         </Button>
-                        <Button size="sm" className="flex-1 sm:flex-none" onClick={async () => {
+                        <Button size="sm" className="w-full" onClick={async () => {
+
                           const id = toast.loading("Preparing your download…");
                           try {
                             await downloadMaterial(m);
@@ -252,7 +254,7 @@ function DashboardContent({ sel }: { sel: Selection }) {
             </div>
           </div>
 
-          <aside className="min-w-0" aria-label="All deadlines">
+          <aside className="min-w-0 lg:sticky lg:top-24 lg:self-start" aria-label="All deadlines">
             {deadlinesQ.isLoading ? (
               <ListSkeleton rows={2} className="space-y-3 [&>*]:h-20 [&>*]:rounded-2xl" />
             ) : (

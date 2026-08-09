@@ -30,12 +30,12 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <div className="hidden md:flex flex-1 justify-center max-w-md">
+        <div className="hidden lg:flex flex-1 justify-center max-w-md">
           <SearchTrigger onClick={() => search.setOpen(true)} className="w-full" />
         </div>
 
         {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-1">
+        <nav className="hidden lg:flex items-center gap-1">
           {NAV.map((n) => (
             <Button key={n.to} asChild variant="ghost" size="sm">
               <Link to={n.to}>
@@ -55,7 +55,7 @@ export function SiteHeader() {
         </nav>
 
         {/* Mobile actions */}
-        <div className="md:hidden flex items-center gap-1">
+        <div className="lg:hidden flex items-center gap-1">
           <PushToggle className="h-9 w-9" />
           <ThemeToggle className="h-9 w-9" />
           <Button size="icon" variant="ghost" aria-label="Search" className="h-9 w-9" onClick={() => search.setOpen(true)}>
