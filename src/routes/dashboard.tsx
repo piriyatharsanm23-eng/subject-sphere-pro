@@ -172,14 +172,15 @@ function DashboardContent({ sel }: { sel: Selection }) {
         </section>
 
         {/* 2 — Materials + all deadlines */}
-        <div className="grid gap-8 lg:grid-cols-3">
-          <div className="lg:col-span-2 min-w-0">
+        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)] xl:gap-8">
+          <div className="min-w-0">
             <SectionHeading
               title="Materials"
               action={<span className="text-xs text-muted-foreground" aria-live="polite">{filtered.length} result{filtered.length === 1 ? "" : "s"}</span>}
             />
 
-            <div className="rounded-2xl border border-border bg-card p-4 shadow-soft">
+            <div className="rounded-2xl border border-border bg-card p-3 shadow-soft sm:p-4">
+
               <Toolbar>
                 <div className="relative min-w-0 flex-1">
                   <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
