@@ -281,7 +281,7 @@ function MaterialList({
               <UploaderBadge uploader={m.uploaded_by ? uploaders[m.uploaded_by] : null} />
               <div className="text-xs text-muted-foreground mt-1">{formatRelative(m.created_at)}</div>
             </div>
-            <div className="mt-4 grid grid-cols-2 gap-2 pt-1 [&>*]:w-full mt-auto">
+            <div className="mt-auto grid grid-cols-2 gap-2 pt-4 [&>*]:w-full">
               <Button size="sm" variant="outline" onClick={() => setPreviewing(m)}>
                 <Eye className="mr-2 h-4 w-4" aria-hidden="true" />Preview
               </Button>
