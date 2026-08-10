@@ -290,7 +290,7 @@ function DashboardContent({ sel }: { sel: Selection }) {
                       </div>
                       <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground transition-all group-hover:translate-x-1 group-hover:text-primary" aria-hidden="true" />
                     </div>
-                    <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                    <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 pt-4 text-xs text-muted-foreground">
                       <span className="inline-flex items-center gap-1"><FileText className="h-4 w-4" aria-hidden="true" /> {meta?.count ?? 0} materials</span>
                       {meta?.latest && <span>Updated {formatRelative(meta.latest)}</span>}
                     </div>
