@@ -266,7 +266,7 @@ function DashboardContent({ sel }: { sel: Selection }) {
         {/* 3 — My subjects */}
         <section className="mt-10">
           <SectionHeading title="Your subjects" description="Jump straight into a subject's materials." />
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {subjectsQ.isLoading ? (
               <CardGridSkeleton count={3} height="h-28" className="contents" />
             ) : (subjectsQ.data ?? []).length === 0 ? (
