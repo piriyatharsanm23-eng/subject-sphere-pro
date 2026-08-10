@@ -267,23 +267,23 @@ function MaterialList({
   if (items.length === 0) return <Empty label="Nothing here yet" />;
   return (
     <>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-1 items-stretch gap-3 sm:grid-cols-2">
         {items.map((m) => (
-          <div key={m.id} className="rounded-2xl border border-border bg-card p-4 shadow-soft hover:shadow-elevated transition-shadow">
+          <div key={m.id} className="flex h-full min-w-0 flex-col rounded-2xl border border-border bg-card p-4 shadow-soft hover:shadow-elevated transition-shadow">
             <div className="flex items-center gap-2 flex-wrap">
               <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${materialTypeBadge(m.material_type)}`}>{materialTypeLabel(m.material_type)}</span>
-              {m.week_or_module && <span className="text-xs text-muted-foreground">{m.week_or_module}</span>}
+              {m.week_or_module && <span className="min-w-0 truncate text-xs text-muted-foreground">{m.week_or_module}</span>}
               {m.year && <span className="text-xs text-muted-foreground">{m.year}</span>}
             </div>
-            <h4 className="mt-2 font-semibold">{m.title}</h4>
+            <h4 className="mt-2 font-semibold leading-snug line-clamp-2 break-words">{m.title}</h4>
             {m.description && <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{m.description}</p>}
             <div className="mt-3 min-w-0">
               <UploaderBadge uploader={m.uploaded_by ? uploaders[m.uploaded_by] : null} />
               <div className="text-xs text-muted-foreground mt-1">{formatRelative(m.created_at)}</div>
             </div>
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className="mt-4 grid grid-cols-2 gap-2 pt-1 [&>*]:w-full mt-auto">
               <Button size="sm" variant="outline" onClick={() => setPreviewing(m)}>
-                <Eye className="mr-2 h-4 w-4" />Preview
+                <Eye className="mr-2 h-4 w-4" aria-hidden="true" />Preview
               </Button>
               <Button size="sm" onClick={async () => {
                 const id = toast.loading("Preparing your download…");
@@ -293,23 +293,24 @@ function MaterialList({
                 } catch (err) {
                   toast.error("Could not download", { id, description: (err as Error)?.message });
                 }
-              }}><Download className="mr-2 h-4 w-4" />Download</Button>
+              }}><Download className="mr-2 h-4 w-4" aria-hidden="true" />Download</Button>
               {showChatGPT && (
                 <Button size="sm" variant="secondary" onClick={() => openAI(m, "chatgpt")}>
-                  <Bot className="mr-2 h-4 w-4 text-emerald-400" />ChatGPT
-                  <ExternalLink className="ml-1 h-3 w-3 opacity-70" />
+                  <Bot className="mr-2 h-4 w-4 text-emerald-400" aria-hidden="true" />ChatGPT
+                  <ExternalLink className="ml-1 h-3 w-3 opacity-70" aria-hidden="true" />
                 </Button>
               )}
               {showGemini && (
                 <Button size="sm" variant="secondary" onClick={() => openAI(m, "gemini")}>
-                  <Sparkles className="mr-2 h-4 w-4 text-sky-400" />Gemini
-                  <ExternalLink className="ml-1 h-3 w-3 opacity-70" />
+                  <Sparkles className="mr-2 h-4 w-4 text-sky-400" aria-hidden="true" />Gemini
+                  <ExternalLink className="ml-1 h-3 w-3 opacity-70" aria-hidden="true" />
                 </Button>
               )}
             </div>
           </div>
         ))}
       </div>
+
 
       <PreviewDialog
         material={previewing}
