@@ -267,10 +267,11 @@ function DashboardContent({ sel }: { sel: Selection }) {
         {/* 3 — My subjects */}
         <section className="mt-10">
           <SectionHeading title="Your subjects" description="Jump straight into a subject's materials." />
+          {subjectsQ.isLoading ? (
+            <SubjectCardSkeleton count={Math.min(Math.max(sel.subjectIds.length, 1), 6)} />
+          ) : (
           <div className="grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {subjectsQ.isLoading ? (
-              <CardGridSkeleton count={3} height="h-28" className="contents" />
-            ) : (subjectsQ.data ?? []).length === 0 ? (
+            {(subjectsQ.data ?? []).length === 0 ? (
               <div className="sm:col-span-2 lg:col-span-3">
                 <EmptyState
                   icon={Inbox}
