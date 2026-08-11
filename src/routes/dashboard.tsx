@@ -205,7 +205,8 @@ function DashboardContent({ sel }: { sel: Selection }) {
 
             <div className="mt-4 space-y-3">
               {materialsQ.isLoading ? (
-                <ListSkeleton rows={3} className="space-y-3 [&>*]:h-24 [&>*]:rounded-2xl" />
+                <MaterialCardSkeleton count={3} />
+
               ) : materialsQ.isError ? (
                 <ErrorState title="We couldn't load your materials" error={materialsQ.error} onRetry={() => materialsQ.refetch()} />
               ) : filtered.length === 0 ? (
