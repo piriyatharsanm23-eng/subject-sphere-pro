@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { materialTypeBadge, materialTypeLabel, downloadMaterial } from "@/lib/materials";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PageContainer, PageHeader } from "@/components/ui/page";
-import { CardGridSkeleton, EmptyState, ErrorState } from "@/components/ui/states";
+import { CardGridSkeleton, EmptyState, ErrorState, MaterialCardSkeleton } from "@/components/ui/states";
 import { formatDateTime, formatRelative } from "@/lib/format";
 import { toast } from "sonner";
 import { useEffect, useMemo, useState } from "react";
@@ -450,12 +450,18 @@ function PreviewDialog({
   );
 }
 
-function Empty({ label }: { label: string }) {
-  return <EmptyState icon={FileText} title={label} />;
+function Empty({ label, description }: { label: string; description?: string }) {
+  return (
+    <EmptyState
+      icon={FileText}
+      title={label}
+      description={description ?? "Nothing has been published here yet — check back soon, or use \u201cRequest material\u201d on your dashboard to ask an admin for it."}
+    />
+  );
 }
 
 function MaterialSkeleton() {
-  return <CardGridSkeleton count={4} height="h-32" className="grid gap-3 sm:grid-cols-2" />;
+  return <MaterialCardSkeleton count={3} />;
 }
 
 
