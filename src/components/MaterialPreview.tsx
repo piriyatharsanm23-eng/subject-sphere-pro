@@ -23,6 +23,7 @@ export function MaterialPreviewDialog({
 }) {
   const [signedUrl, setSignedUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const dl = useMaterialDownload();
 
   useEffect(() => {
     let cancelled = false;

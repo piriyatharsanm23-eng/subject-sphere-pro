@@ -23,6 +23,7 @@ export const Route = createFileRoute("/material/$id")({
 });
 
 function MaterialPage() {
+  const dl = useMaterialDownload();
   const { id } = useParams({ from: "/material/$id" });
 
   const materialQ = useQuery({

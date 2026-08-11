@@ -358,6 +358,8 @@ function PreviewDialog({
     return () => { cancelled = true; };
   }, [material?.file_url]);
 
+  const dlg = useMaterialDownload();
+
   const isPdf =
     !!material &&
     ((material.file_type ?? "").includes("pdf") ||
