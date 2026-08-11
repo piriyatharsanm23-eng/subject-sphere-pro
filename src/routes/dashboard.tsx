@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Search, Download, Eye, ArrowRight, Settings2, Inbox, FileText, MessageSquarePlus, Star } from "lucide-react";
+import { Search, Download, Eye, ArrowRight, Settings2, Inbox, FileText, MessageSquarePlus, Star, Loader2 } from "lucide-react";
 import { MaterialPreviewDialog, type PreviewableMaterial } from "@/components/MaterialPreview";
 import { DeadlineBanner, AllDeadlinesList } from "@/components/DeadlineBanner";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { supabase } from "@/integrations/supabase/client";
 import { getSelection, type Selection } from "@/lib/selection";
-import { MATERIAL_TYPES, materialTypeBadge, materialTypeLabel, downloadMaterial } from "@/lib/materials";
+import { MATERIAL_TYPES, materialTypeBadge, materialTypeLabel } from "@/lib/materials";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -22,6 +22,7 @@ import { formatRelative } from "@/lib/format";
 import { useUploaders } from "@/lib/uploaders";
 import { UploaderBadge } from "@/components/UploaderBadge";
 import { useRealtimeInvalidate } from "@/hooks/useRealtimeInvalidate";
+import { useMaterialDownload } from "@/hooks/useMaterialDownload";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({ meta: [{ title: "Your dashboard — StudyHub" }] }),
@@ -49,6 +50,7 @@ function DashboardContent({ sel }: { sel: Selection }) {
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [subjectFilter, setSubjectFilter] = useState<string>("all");
   const [previewing, setPreviewing] = useState<PreviewableMaterial | null>(null);
+  const dl = useMaterialDownload();
 
   const semesterQ = useQuery({
     queryKey: ["semester", sel.semesterId],
