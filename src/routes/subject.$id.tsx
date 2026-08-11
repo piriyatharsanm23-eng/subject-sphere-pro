@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Bot, Calendar, Download, ExternalLink, Eye, FileText, Sparkles, Video, X } from "lucide-react";
+import { ArrowLeft, Bot, Calendar, Download, ExternalLink, Eye, FileText, Loader2, Sparkles, Video, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { materialTypeBadge, materialTypeLabel, downloadMaterial } from "@/lib/materials";
+import { useMaterialDownload } from "@/hooks/useMaterialDownload";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PageContainer, PageHeader } from "@/components/ui/page";
 import { CardGridSkeleton, EmptyState, ErrorState, MaterialCardSkeleton } from "@/components/ui/states";
@@ -402,19 +403,12 @@ function PreviewDialog({
           </div>
           <div className="flex gap-2">
             {material && (
-              <Button
-                size="sm"
-                onClick={async () => {
-                  const id = toast.loading("Preparing your download…");
-                  try {
-                    await downloadMaterial(material);
-                    toast.success("Download started", { id });
-                  } catch (err) {
-                    toast.error("Could not download", { id, description: (err as Error)?.message });
-                  }
-                }}
-              >
-                <Download className="mr-2 h-4 w-4" /> Download
+              <Button size="sm" disabled={dlg.busy} aria-busy={dlg.busy} onClick={() => dlg.download(material)}>
+                {dlg.busy ? (
+                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Preparing…</>
+                ) : (
+                  <><Download className="mr-2 h-4 w-4" /> Download</>
+                )}
               </Button>
             )}
             <Button size="sm" variant="ghost" onClick={onClose}>
