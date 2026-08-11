@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { Download, FileText } from "lucide-react";
+import { Download, FileText, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { downloadMaterial } from "@/lib/materials";
+import { useMaterialDownload } from "@/hooks/useMaterialDownload";
 import { toast } from "sonner";
 
 export type PreviewableMaterial = {
@@ -23,6 +23,7 @@ export function MaterialPreviewDialog({
 }) {
   const [signedUrl, setSignedUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const dl = useMaterialDownload();
 
   useEffect(() => {
     let cancelled = false;
@@ -85,19 +86,12 @@ export function MaterialPreviewDialog({
           <div className="text-xs text-muted-foreground truncate">{material?.file_name}</div>
           <div className="flex gap-2">
             {material && (
-              <Button
-                size="sm"
-                onClick={async () => {
-                  const id = toast.loading("Preparing your download…");
-                  try {
-                    await downloadMaterial(material as never);
-                    toast.success("Download started", { id });
-                  } catch (err) {
-                    toast.error("Could not download", { id, description: (err as Error)?.message });
-                  }
-                }}
-              >
-                <Download className="mr-2 h-4 w-4" /> Download
+              <Button size="sm" disabled={dl.busy} aria-busy={dl.busy} onClick={() => dl.download(material as never)}>
+                {dl.busy ? (
+                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Preparing…</>
+                ) : (
+                  <><Download className="mr-2 h-4 w-4" /> Download</>
+                )}
               </Button>
             )}
           </div>

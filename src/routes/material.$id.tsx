@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, Download, ExternalLink, FileText } from "lucide-react";
+import { ArrowLeft, ArrowRight, Download, ExternalLink, FileText, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -11,7 +11,8 @@ import { formatDate, formatRelative, truncateFileName } from "@/lib/format";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { supabase } from "@/integrations/supabase/client";
-import { downloadMaterial, materialTypeBadge, materialTypeLabel } from "@/lib/materials";
+import { materialTypeBadge, materialTypeLabel } from "@/lib/materials";
+import { useMaterialDownload } from "@/hooks/useMaterialDownload";
 import { useUploaders } from "@/lib/uploaders";
 import { UploaderBadge } from "@/components/UploaderBadge";
 import { ReportMaterialButton } from "@/components/ReportMaterialButton";
@@ -22,6 +23,7 @@ export const Route = createFileRoute("/material/$id")({
 });
 
 function MaterialPage() {
+  const dl = useMaterialDownload();
   const { id } = useParams({ from: "/material/$id" });
 
   const materialQ = useQuery({
@@ -159,19 +161,12 @@ function MaterialPage() {
                     </Button>
                   )}
 
-                  <Button
-                    size="sm"
-                    onClick={async () => {
-                      const tid = toast.loading("Preparing your download…");
-                      try {
-                        await downloadMaterial(m);
-                        toast.success("Download started", { id: tid });
-                      } catch (err) {
-                        toast.error("Could not download", { id: tid, description: (err as Error)?.message });
-                      }
-                    }}
-                  >
-                    <Download className="mr-2 h-4 w-4" aria-hidden="true" />Download
+                  <Button size="sm" disabled={dl.busy} aria-busy={dl.busy} onClick={() => dl.download(m)}>
+                    {dl.busy ? (
+                      <><Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />Preparing…</>
+                    ) : (
+                      <><Download className="mr-2 h-4 w-4" aria-hidden="true" />Download</>
+                    )}
                   </Button>
                   <ReportMaterialButton
                     materialId={m.id}
