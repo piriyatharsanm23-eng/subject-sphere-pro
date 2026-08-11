@@ -133,3 +133,61 @@ export function LoadingState({ label = "Loading…", className }: { label?: stri
     </div>
   );
 }
+
+/** Skeleton that mirrors a material card: meta row, title, description and the
+ *  fixed-width Preview/Download button pair, so nothing shifts once data lands. */
+export function MaterialCardSkeleton({ count = 3, className }: { count?: number; className?: string }) {
+  return (
+    <div className={cn("space-y-3", className)} aria-hidden="true">
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i} className="rounded-2xl border border-border bg-card p-4 shadow-soft sm:p-5">
+          <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-4">
+            <div className="min-w-0 space-y-2">
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-4 w-16 rounded-full" />
+                <Skeleton className="h-3 w-10" />
+                <Skeleton className="h-3 w-24" />
+              </div>
+              <Skeleton className="h-5 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
+              <Skeleton className="h-3 w-40" />
+            </div>
+            <div className="grid grid-cols-2 gap-2 sm:w-[15.5rem] sm:shrink-0">
+              <Skeleton className="h-8 w-full rounded-md" />
+              <Skeleton className="h-8 w-full rounded-md" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** Skeleton for subject cards — same height/rhythm as the real card. */
+export function SubjectCardSkeleton({
+  count = 3,
+  className = "grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3",
+}: {
+  count?: number;
+  className?: string;
+}) {
+  return (
+    <div className={className} aria-hidden="true">
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i} className="flex h-full flex-col rounded-2xl border border-border bg-card-soft p-5 shadow-soft">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0 flex-1 space-y-2">
+              <Skeleton className="h-5 w-3/4" />
+              <Skeleton className="h-3 w-16" />
+            </div>
+            <Skeleton className="h-4 w-4 rounded" />
+          </div>
+          <div className="mt-auto flex items-center gap-4 pt-6">
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-3 w-20" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
