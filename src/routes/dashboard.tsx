@@ -301,6 +301,7 @@ function DashboardContent({ sel }: { sel: Selection }) {
               })
             )}
           </div>
+          )}
         </section>
 
         <MaterialPreviewDialog material={previewing} onClose={() => setPreviewing(null)} />
