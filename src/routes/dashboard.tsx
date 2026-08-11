@@ -232,22 +232,18 @@ function DashboardContent({ sel }: { sel: Selection }) {
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-2 sm:w-[15.5rem] sm:shrink-0">
-                        <Button size="sm" variant="outline" className="w-full" onClick={() => setPreviewing(m as PreviewableMaterial)}>
+                        <Button size="sm" variant="outline" className="w-full" disabled={dl.isDownloading(m.id)} onClick={() => setPreviewing(m as PreviewableMaterial)}>
                           <Eye className="mr-2 h-4 w-4" aria-hidden="true" /> Preview
                         </Button>
-                        <Button size="sm" className="w-full" onClick={async () => {
-
-                          const id = toast.loading("Preparing your download…");
-                          try {
-                            await downloadMaterial(m);
-                            toast.success("Download started", { id });
-                          } catch (err) {
-                            toast.error("Could not download this file", { id, description: (err as Error)?.message });
-                          }
-                        }}>
-                          <Download className="mr-2 h-4 w-4" aria-hidden="true" /> Download
+                        <Button size="sm" className="w-full" disabled={dl.isDownloading(m.id)} aria-busy={dl.isDownloading(m.id)} onClick={() => dl.download(m)}>
+                          {dl.isDownloading(m.id) ? (
+                            <><Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" /> Preparing…</>
+                          ) : (
+                            <><Download className="mr-2 h-4 w-4" aria-hidden="true" /> Download</>
+                          )}
                         </Button>
                       </div>
+
                     </div>
                   </article>
                 ))
