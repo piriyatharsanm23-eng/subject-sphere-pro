@@ -17,7 +17,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { PageContainer, PageHeader, SectionHeading, Toolbar } from "@/components/ui/page";
-import { CardGridSkeleton, EmptyState, ErrorState, ListSkeleton } from "@/components/ui/states";
+import { CardGridSkeleton, EmptyState, ErrorState, ListSkeleton, MaterialCardSkeleton, SubjectCardSkeleton } from "@/components/ui/states";
 import { formatRelative } from "@/lib/format";
 import { useUploaders } from "@/lib/uploaders";
 import { UploaderBadge } from "@/components/UploaderBadge";
