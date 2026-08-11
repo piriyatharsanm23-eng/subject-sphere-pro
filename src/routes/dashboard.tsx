@@ -17,7 +17,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { PageContainer, PageHeader, SectionHeading, Toolbar } from "@/components/ui/page";
-import { CardGridSkeleton, EmptyState, ErrorState, ListSkeleton } from "@/components/ui/states";
+import { CardGridSkeleton, EmptyState, ErrorState, ListSkeleton, MaterialCardSkeleton, SubjectCardSkeleton } from "@/components/ui/states";
 import { formatRelative } from "@/lib/format";
 import { useUploaders } from "@/lib/uploaders";
 import { UploaderBadge } from "@/components/UploaderBadge";
@@ -205,7 +205,8 @@ function DashboardContent({ sel }: { sel: Selection }) {
 
             <div className="mt-4 space-y-3">
               {materialsQ.isLoading ? (
-                <ListSkeleton rows={3} className="space-y-3 [&>*]:h-24 [&>*]:rounded-2xl" />
+                <MaterialCardSkeleton count={3} />
+
               ) : materialsQ.isError ? (
                 <ErrorState title="We couldn't load your materials" error={materialsQ.error} onRetry={() => materialsQ.refetch()} />
               ) : filtered.length === 0 ? (
@@ -266,10 +267,11 @@ function DashboardContent({ sel }: { sel: Selection }) {
         {/* 3 — My subjects */}
         <section className="mt-10">
           <SectionHeading title="Your subjects" description="Jump straight into a subject's materials." />
+          {subjectsQ.isLoading ? (
+            <SubjectCardSkeleton count={Math.min(Math.max(sel.subjectIds.length, 1), 6)} />
+          ) : (
           <div className="grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {subjectsQ.isLoading ? (
-              <CardGridSkeleton count={3} height="h-28" className="contents" />
-            ) : (subjectsQ.data ?? []).length === 0 ? (
+            {(subjectsQ.data ?? []).length === 0 ? (
               <div className="sm:col-span-2 lg:col-span-3">
                 <EmptyState
                   icon={Inbox}
@@ -299,6 +301,7 @@ function DashboardContent({ sel }: { sel: Selection }) {
               })
             )}
           </div>
+          )}
         </section>
 
         <MaterialPreviewDialog material={previewing} onClose={() => setPreviewing(null)} />
