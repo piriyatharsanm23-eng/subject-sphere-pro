@@ -8,8 +8,8 @@ let _sb: SupabaseClient<Database> | null = null;
 function sb() {
   if (!_sb) {
     _sb = createClient<Database>(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      (process.env.EXTERNAL_SUPABASE_URL || process.env.SUPABASE_URL)!,
+      (process.env.EXTERNAL_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY)!,
       { auth: { persistSession: false, autoRefreshToken: false } },
     );
   }
