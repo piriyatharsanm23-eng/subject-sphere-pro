@@ -4,6 +4,8 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@source inline("subject-card-indigo subject-card-violet subject-card-fuchsia subject-card-rose subject-card-amber subject-card-emerald subject-card-sky subject-card-teal");
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -347,3 +349,76 @@
 }
 
 @utility relative-z { position: relative; z-index: 1; }
+
+/* ============================================================
+   SUBJECT CARD COLOR THEMES
+   Each subject card gets a deterministic soft tint that works
+   in both light and dark mode.
+   ============================================================ */
+:root {
+  --sc-indigo-bg: linear-gradient(135deg, rgba(79, 70, 229, 0.12) 0%, var(--card) 60%);
+  --sc-violet-bg: linear-gradient(135deg, rgba(139, 92, 246, 0.12) 0%, var(--card) 60%);
+  --sc-fuchsia-bg: linear-gradient(135deg, rgba(217, 70, 239, 0.12) 0%, var(--card) 60%);
+  --sc-rose-bg: linear-gradient(135deg, rgba(244, 63, 94, 0.12) 0%, var(--card) 60%);
+  --sc-amber-bg: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, var(--card) 60%);
+  --sc-emerald-bg: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, var(--card) 60%);
+  --sc-sky-bg: linear-gradient(135deg, rgba(14, 165, 233, 0.12) 0%, var(--card) 60%);
+  --sc-teal-bg: linear-gradient(135deg, rgba(20, 184, 166, 0.12) 0%, var(--card) 60%);
+
+  --sc-indigo-border: rgba(79, 70, 229, 0.22);
+  --sc-violet-border: rgba(139, 92, 246, 0.22);
+  --sc-fuchsia-border: rgba(217, 70, 239, 0.22);
+  --sc-rose-border: rgba(244, 63, 94, 0.22);
+  --sc-amber-border: rgba(245, 158, 11, 0.22);
+  --sc-emerald-border: rgba(16, 185, 129, 0.22);
+  --sc-sky-border: rgba(14, 165, 233, 0.22);
+  --sc-teal-border: rgba(20, 184, 166, 0.22);
+
+  --sc-indigo-accent: #4F46E5;
+  --sc-violet-accent: #7C3AED;
+  --sc-fuchsia-accent: #C026D3;
+  --sc-rose-accent: #E11D48;
+  --sc-amber-accent: #D97706;
+  --sc-emerald-accent: #059669;
+  --sc-sky-accent: #0284C7;
+  --sc-teal-accent: #0D9488;
+}
+
+.dark {
+  --sc-indigo-bg: linear-gradient(135deg, rgba(99, 102, 241, 0.18) 0%, var(--card) 60%);
+  --sc-violet-bg: linear-gradient(135deg, rgba(167, 139, 250, 0.18) 0%, var(--card) 60%);
+  --sc-fuchsia-bg: linear-gradient(135deg, rgba(232, 121, 249, 0.18) 0%, var(--card) 60%);
+  --sc-rose-bg: linear-gradient(135deg, rgba(251, 113, 133, 0.18) 0%, var(--card) 60%);
+  --sc-amber-bg: linear-gradient(135deg, rgba(251, 191, 36, 0.18) 0%, var(--card) 60%);
+  --sc-emerald-bg: linear-gradient(135deg, rgba(52, 211, 153, 0.18) 0%, var(--card) 60%);
+  --sc-sky-bg: linear-gradient(135deg, rgba(56, 189, 248, 0.18) 0%, var(--card) 60%);
+  --sc-teal-bg: linear-gradient(135deg, rgba(45, 212, 191, 0.18) 0%, var(--card) 60%);
+
+  --sc-indigo-border: rgba(129, 140, 248, 0.35);
+  --sc-violet-border: rgba(167, 139, 250, 0.35);
+  --sc-fuchsia-border: rgba(232, 121, 249, 0.35);
+  --sc-rose-border: rgba(251, 113, 133, 0.35);
+  --sc-amber-border: rgba(251, 191, 36, 0.35);
+  --sc-emerald-border: rgba(52, 211, 153, 0.35);
+  --sc-sky-border: rgba(56, 189, 248, 0.35);
+  --sc-teal-border: rgba(45, 212, 191, 0.35);
+
+  --sc-indigo-accent: #818CF8;
+  --sc-violet-accent: #A78BFA;
+  --sc-fuchsia-accent: #E879F9;
+  --sc-rose-accent: #FB7185;
+  --sc-amber-accent: #FBBF24;
+  --sc-emerald-accent: #34D399;
+  --sc-sky-accent: #38BDF8;
+  --sc-teal-accent: #2DD4BF;
+}
+
+@utility subject-card-indigo { background: var(--sc-indigo-bg); border-color: var(--sc-indigo-border); --subject-accent: var(--sc-indigo-accent); }
+@utility subject-card-violet { background: var(--sc-violet-bg); border-color: var(--sc-violet-border); --subject-accent: var(--sc-violet-accent); }
+@utility subject-card-fuchsia { background: var(--sc-fuchsia-bg); border-color: var(--sc-fuchsia-border); --subject-accent: var(--sc-fuchsia-accent); }
+@utility subject-card-rose { background: var(--sc-rose-bg); border-color: var(--sc-rose-border); --subject-accent: var(--sc-rose-accent); }
+@utility subject-card-amber { background: var(--sc-amber-bg); border-color: var(--sc-amber-border); --subject-accent: var(--sc-amber-accent); }
+@utility subject-card-emerald { background: var(--sc-emerald-bg); border-color: var(--sc-emerald-border); --subject-accent: var(--sc-emerald-accent); }
+@utility subject-card-sky { background: var(--sc-sky-bg); border-color: var(--sc-sky-border); --subject-accent: var(--sc-sky-accent); }
+@utility subject-card-teal { background: var(--sc-teal-bg); border-color: var(--sc-teal-border); --subject-accent: var(--sc-teal-accent); }
+

@@ -19,6 +19,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { PageContainer, PageHeader, SectionHeading, Toolbar } from "@/components/ui/page";
 import { CardGridSkeleton, EmptyState, ErrorState, ListSkeleton, MaterialCardSkeleton, SubjectCardSkeleton } from "@/components/ui/states";
 import { formatRelative } from "@/lib/format";
+import { subjectThemeClass } from "@/lib/subject-theme";
 import { useUploaders } from "@/lib/uploaders";
 import { UploaderBadge } from "@/components/UploaderBadge";
 import { useRealtimeInvalidate } from "@/hooks/useRealtimeInvalidate";
@@ -282,13 +283,13 @@ function DashboardContent({ sel }: { sel: Selection }) {
               (subjectsQ.data ?? []).map((s) => {
                 const meta = subjectMaterialCounts[s.id];
                 return (
-                  <Link key={s.id} to="/subject/$id" params={{ id: s.id }} className="group flex h-full min-w-0 flex-col rounded-2xl border border-border bg-card-soft p-5 shadow-soft transition-all hover:-translate-y-0.5 hover:shadow-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
+                  <Link key={s.id} to="/subject/$id" params={{ id: s.id }} className={`group flex h-full min-w-0 flex-col rounded-2xl border border-border ${subjectThemeClass(s.id)} p-5 shadow-soft transition-all hover:-translate-y-0.5 hover:shadow-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background`}>
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
-                        <div className="font-semibold line-clamp-2 group-hover:text-primary transition-colors">{s.name}</div>
+                        <div className="font-semibold line-clamp-2 group-hover:text-[var(--subject-accent)] transition-colors">{s.name}</div>
                         {s.code && <div className="truncate text-xs text-muted-foreground">{s.code}</div>}
                       </div>
-                      <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground transition-all group-hover:translate-x-1 group-hover:text-primary" aria-hidden="true" />
+                      <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground transition-all group-hover:translate-x-1 group-hover:text-[var(--subject-accent)]" aria-hidden="true" />
                     </div>
                     <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 pt-4 text-xs text-muted-foreground">
                       <span className="inline-flex items-center gap-1"><FileText className="h-4 w-4" aria-hidden="true" /> {meta?.count ?? 0} materials</span>

@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PageContainer, PageHeader, SectionHeading } from "@/components/ui/page";
 import { CardGridSkeleton, EmptyState, ErrorState } from "@/components/ui/states";
 import { formatRelative } from "@/lib/format";
+import { subjectThemeClass } from "@/lib/subject-theme";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { supabase } from "@/integrations/supabase/client";
@@ -217,25 +218,25 @@ function SemesterPage() {
                   key={s.id}
                   to="/subject/$id"
                   params={{ id: s.id }}
-                  className="group rounded-2xl border border-border bg-card p-5 shadow-soft transition-all hover:-translate-y-0.5 hover:shadow-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  className={`group rounded-2xl border border-border ${subjectThemeClass(s.id)} p-5 shadow-soft transition-all hover:-translate-y-0.5 hover:shadow-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       {s.code && <div className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground truncate">{s.code}</div>}
-                      <div className="font-semibold group-hover:text-primary transition-colors line-clamp-2">{s.name}</div>
+                      <div className="font-semibold group-hover:text-[var(--subject-accent)] transition-colors line-clamp-2">{s.name}</div>
                     </div>
-                    <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground transition-all group-hover:translate-x-1 group-hover:text-primary" aria-hidden="true" />
+                    <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground transition-all group-hover:translate-x-1 group-hover:text-[var(--subject-accent)]" aria-hidden="true" />
                   </div>
                   <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
-                    <MiniStat icon={ScrollText} label="Tutorials" value={s.tutorials} tone="text-violet-500" />
-                    <MiniStat icon={NotebookPen} label="Notes" value={s.notes} tone="text-emerald-500" />
-                    <MiniStat icon={Layers} label="Papers" value={s.papers} tone="text-amber-500" />
-                    <MiniStat icon={CalendarClock} label="Deadlines" value={s.deadlines} tone="text-rose-500" />
-                    <MiniStat icon={Video} label="Kuppi" value={s.kuppis} tone="text-sky-500" />
+                    <MiniStat icon={ScrollText} label="Tutorials" value={s.tutorials} tone="text-[var(--subject-accent)]" />
+                    <MiniStat icon={NotebookPen} label="Notes" value={s.notes} tone="text-[var(--subject-accent)]" />
+                    <MiniStat icon={Layers} label="Papers" value={s.papers} tone="text-[var(--subject-accent)]" />
+                    <MiniStat icon={CalendarClock} label="Deadlines" value={s.deadlines} tone="text-[var(--subject-accent)]" />
+                    <MiniStat icon={Video} label="Kuppi" value={s.kuppis} tone="text-[var(--subject-accent)]" />
                   </div>
                   <div className="mt-4 flex items-center justify-between gap-2 text-xs text-muted-foreground">
                     <span className="truncate">{s.latest ? `Updated ${formatRelative(s.latest)}` : "No uploads yet"}</span>
-                    <span className="shrink-0 font-medium text-primary group-hover:underline">View materials</span>
+                    <span className="shrink-0 font-medium text-[var(--subject-accent)] group-hover:underline">View materials</span>
                   </div>
                 </Link>
               ))}
