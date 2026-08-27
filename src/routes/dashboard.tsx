@@ -19,6 +19,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { PageContainer, PageHeader, SectionHeading, Toolbar } from "@/components/ui/page";
 import { CardGridSkeleton, EmptyState, ErrorState, ListSkeleton, MaterialCardSkeleton, SubjectCardSkeleton } from "@/components/ui/states";
 import { formatRelative } from "@/lib/format";
+import { subjectThemeClass } from "@/lib/subject-theme";
 import { useUploaders } from "@/lib/uploaders";
 import { UploaderBadge } from "@/components/UploaderBadge";
 import { useRealtimeInvalidate } from "@/hooks/useRealtimeInvalidate";
