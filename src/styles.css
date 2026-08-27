@@ -4,6 +4,8 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@source inline("subject-card-indigo subject-card-violet subject-card-fuchsia subject-card-rose subject-card-amber subject-card-emerald subject-card-sky subject-card-teal");
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
