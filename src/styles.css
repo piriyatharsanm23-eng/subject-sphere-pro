@@ -422,3 +422,53 @@
 @utility subject-card-sky { background: var(--sc-sky-bg); border-color: var(--sc-sky-border); --subject-accent: var(--sc-sky-accent); }
 @utility subject-card-teal { background: var(--sc-teal-bg); border-color: var(--sc-teal-border); --subject-accent: var(--sc-teal-accent); }
 
+
+/* Shared interaction feedback for subject cards (works with any subject-card-* theme) */
+.subject-card {
+    position: relative;
+    border-width: 1px;
+    border-style: solid;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    transition:
+      transform 150ms ease,
+      box-shadow 200ms ease,
+      border-color 200ms ease,
+      background-color 200ms ease;
+  }
+
+  .subject-card:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in oklab, var(--subject-accent) 62%, transparent);
+    box-shadow:
+      0 12px 28px -14px color-mix(in oklab, var(--subject-accent) 55%, transparent),
+      inset 0 0 0 1px color-mix(in oklab, var(--subject-accent) 28%, transparent);
+  }
+
+  .subject-card:focus-visible {
+    outline-color: var(--subject-accent);
+    border-color: color-mix(in oklab, var(--subject-accent) 70%, transparent);
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--subject-accent) 22%, transparent);
+  }
+
+  .subject-card:active {
+    transform: translateY(0);
+    box-shadow: inset 0 1px 3px color-mix(in oklab, var(--subject-accent) 30%, transparent);
+  }
+
+  .subject-card[data-selected="true"],
+  .subject-card[aria-current="page"] {
+    border-color: var(--subject-accent);
+    box-shadow:
+      0 0 0 1px var(--subject-accent),
+      0 10px 24px -16px color-mix(in oklab, var(--subject-accent) 60%, transparent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .subject-card,
+    .subject-card:hover,
+    .subject-card:active {
+      transform: none;
+      transition: box-shadow 120ms ease, border-color 120ms ease;
+    }
+  }
