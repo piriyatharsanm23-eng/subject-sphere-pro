@@ -19,6 +19,7 @@ function useSuperNav(): NavItem[] {
   return [
     { to: "/super", label: "Overview", icon: LayoutDashboard, exact: true },
     { to: "/super/notifications", label: "Notifications", icon: Bell },
+    { to: "/super/broadcast", label: "Broadcast", icon: Megaphone },
     { to: "/super/semesters", label: "Semesters", icon: BookOpen },
     { to: "/super/subjects", label: "Subjects", icon: Library },
     { to: "/super/modules", label: "Module requests", icon: BookPlus },
