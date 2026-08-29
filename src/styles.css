@@ -424,8 +424,7 @@
 
 
 /* Shared interaction feedback for subject cards (works with any subject-card-* theme) */
-@layer components {
-  .subject-card {
+.subject-card {
     position: relative;
     border-width: 1px;
     border-style: solid;
@@ -473,4 +472,3 @@
       transition: box-shadow 120ms ease, border-color 120ms ease;
     }
   }
-}
