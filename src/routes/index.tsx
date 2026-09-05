@@ -365,7 +365,7 @@ function SemesterCards({ semesters }: { semesters: { id: string; name: string; d
   }
 
   return (
-    <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="stagger-children grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {semesters.map((s) => {
         const st = statsQ.data?.[s.id];
         const empty = st && st.subjects === 0 && st.tutorials === 0 && st.notes === 0 && st.papers === 0 && st.deadlines === 0;
@@ -439,7 +439,7 @@ function RecentUploads() {
         </div>
       </div>
       {q.isLoading ? (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="stagger-children grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {[0, 1, 2].map((i) => <div key={i} className="h-32 rounded-2xl bg-muted animate-pulse" />)}
         </div>
       ) : (q.data ?? []).length === 0 ? (

@@ -149,7 +149,7 @@ function SemesterPage() {
             </Button>
           }
         >
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+          <div className="stagger-children grid grid-cols-2 gap-3 sm:grid-cols-5">
             <Stat icon={BookOpen} label="Subjects" value={totals.subjects} tone="text-sky-500" />
             <Stat icon={ScrollText} label="Tutorials" value={totals.tutorials} tone="text-violet-500" />
             <Stat icon={NotebookPen} label="Notes" value={totals.notes} tone="text-emerald-500" />
@@ -212,7 +212,7 @@ function SemesterPage() {
               action={<Button asChild variant="outline" size="sm"><Link to="/">Browse semesters</Link></Button>}
             />
           ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="stagger-children grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {perSubject.map((s) => (
                 <Link
                   key={s.id}
