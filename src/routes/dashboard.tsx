@@ -269,7 +269,7 @@ function DashboardContent({ sel }: { sel: Selection }) {
           {subjectsQ.isLoading ? (
             <SubjectCardSkeleton count={Math.min(Math.max(sel.subjectIds.length, 1), 6)} />
           ) : (
-          <div className="grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="stagger-children grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {(subjectsQ.data ?? []).length === 0 ? (
               <div className="sm:col-span-2 lg:col-span-3">
                 <EmptyState
