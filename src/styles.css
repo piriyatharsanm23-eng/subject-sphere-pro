@@ -350,6 +350,13 @@
 
 @utility relative-z { position: relative; z-index: 1; }
 
+/* One shared content width so header, page content and footer line up. */
+@utility container {
+  width: 100%;
+  margin-inline: auto;
+  max-width: 72rem;
+}
+
 /* ============================================================
    SUBJECT CARD COLOR THEMES
    Each subject card gets a deterministic soft tint that works
