@@ -1,0 +1,1 @@
+GRANT EXECUTE ON FUNCTION public.list_public_contributors() TO PUBLIC;
