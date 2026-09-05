@@ -218,7 +218,7 @@ function SemesterPage() {
                   key={s.id}
                   to="/subject/$id"
                   params={{ id: s.id }}
-                  className={`group subject-card rounded-2xl ${subjectThemeClass(s.id)} p-5 shadow-soft focus-visible:outline-2`}
+                  className={`group subject-card flex h-full min-w-0 flex-col rounded-2xl ${subjectThemeClass(s.id)} p-5 shadow-soft focus-visible:outline-2`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
@@ -234,7 +234,7 @@ function SemesterPage() {
                     <MiniStat icon={CalendarClock} label="Deadlines" value={s.deadlines} tone="text-[var(--subject-accent)]" />
                     <MiniStat icon={Video} label="Kuppi" value={s.kuppis} tone="text-[var(--subject-accent)]" />
                   </div>
-                  <div className="mt-4 flex items-center justify-between gap-2 text-xs text-muted-foreground">
+                  <div className="mt-auto flex items-center justify-between gap-2 border-t border-border/40 pt-3 text-xs text-muted-foreground">
                     <span className="truncate">{s.latest ? `Updated ${formatRelative(s.latest)}` : "No uploads yet"}</span>
                     <span className="shrink-0 font-medium text-[var(--subject-accent)] group-hover:underline">View materials</span>
                   </div>
