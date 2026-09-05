@@ -148,12 +148,12 @@ function Landing() {
           <div className="grid items-center gap-12 lg:grid-cols-[1.15fr_1fr]">
             {/* COPY */}
             <div className="max-w-2xl">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-medium text-white/90 backdrop-blur">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-medium text-white/90 backdrop-blur animate-fade-up">
                 <Sparkles className="h-3.5 w-3.5 text-emerald-300" />
                 <span>Built for students, organised by semester</span>
               </div>
 
-              <h1 className="mt-5 text-[2.25rem] leading-[1.05] sm:text-5xl lg:text-[4rem] font-extrabold tracking-tight text-white">
+              <h1 className="animate-fade-up [animation-delay:0.1s] mt-5 text-[2.25rem] leading-[1.05] sm:text-5xl lg:text-[4rem] font-extrabold tracking-tight text-white">
                 Every lecture slide and past paper,{" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-200 via-violet-200 to-indigo-300">
                   one calm place
@@ -161,11 +161,11 @@ function Landing() {
                 <span className="text-indigo-300">.</span>
               </h1>
 
-              <p className="mt-5 text-base sm:text-lg text-white/75 max-w-xl leading-relaxed">
+              <p className="animate-fade-up [animation-delay:0.2s] mt-5 text-base sm:text-lg text-white/75 max-w-xl leading-relaxed">
                 Instant, no-login access to lecture materials, notes, past papers and upcoming deadlines — sorted by your semester and subjects.
               </p>
 
-              <div className="mt-8 flex flex-col sm:flex-row gap-3">
+              <div className="animate-fade-up [animation-delay:0.3s] mt-8 flex flex-col sm:flex-row gap-3">
                 <Button
                   size="lg"
                   onClick={() => navigate({ to: hasSelection ? "/dashboard" : "/select" })}
@@ -185,7 +185,7 @@ function Landing() {
               </div>
 
               {/* trust row */}
-              <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 text-xs text-white/70">
+              <div className="animate-fade-up [animation-delay:0.4s] mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 text-xs text-white/70">
                 <div className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-emerald-300" /> No sign-up required</div>
                 <div className="flex items-center gap-2"><Clock className="h-4 w-4 text-emerald-300" /> Live deadline alerts</div>
                 <div className="flex items-center gap-2"><Layers className="h-4 w-4 text-emerald-300" /> Organised by subject</div>
@@ -193,7 +193,7 @@ function Landing() {
             </div>
 
             {/* PREVIEW CARD */}
-            <div className="relative hidden lg:block">
+            <div className="relative hidden lg:block animate-soft-pop [animation-delay:0.25s]">
               <div className="absolute -inset-6 rounded-3xl bg-gradient-to-br from-emerald-400/30 via-teal-400/20 to-transparent blur-2xl" />
               <div className="relative rounded-3xl border border-white/15 bg-white/10 backdrop-blur-xl p-5 shadow-2xl">
                 <div className="flex items-center justify-between mb-4">
@@ -251,7 +251,7 @@ function Landing() {
 
       {/* FEATURES */}
       <section className="container mx-auto px-4 sm:px-6 -mt-10 sm:-mt-14 relative z-10">
-        <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
+        <div className="stagger-children grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
           {[
             { icon: FileText, title: "Lecture slides & notes", desc: "Download up-to-date material from every subject.", tint: "from-sky-500/15 to-transparent", iconBg: "bg-sky-500/10 text-sky-600 dark:text-sky-300" },
             { icon: BookOpen, title: "Past papers archive", desc: "Browse past papers, organised by year.", tint: "from-violet-500/15 to-transparent", iconBg: "bg-violet-500/10 text-violet-600 dark:text-violet-300" },
