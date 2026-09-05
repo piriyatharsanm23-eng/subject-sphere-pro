@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1788606638579,
+      "tag": "0000_security_fixes_definer_view_admin_semesters_settings",
+      "breakpoints": true
+    }
+  ]
+}

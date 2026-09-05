@@ -968,15 +968,7 @@ export type Database = {
           role: string | null
           semester_name: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "user_roles_semester_fk"
-            columns: ["assigned_semester_id"]
-            isOneToOne: false
-            referencedRelation: "semesters"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       super_admin_contacts: {
         Row: {
@@ -1005,6 +997,7 @@ export type Database = {
     }
     Functions: {
       admin_semester: { Args: { _user_id: string }; Returns: string }
+      admin_semesters: { Args: { _user_id: string }; Returns: string[] }
       get_support_contacts: {
         Args: never
         Returns: {
@@ -1027,6 +1020,17 @@ export type Database = {
       }
       is_public_contributor: { Args: { _user_id: string }; Returns: boolean }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
+      list_public_contributors: {
+        Args: never
+        Returns: {
+          assigned_semester_id: string
+          avatar_url: string
+          full_name: string
+          id: string
+          role: string
+          semester_name: string
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "super_admin"
