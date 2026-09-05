@@ -218,7 +218,7 @@ function SemesterPage() {
                   key={s.id}
                   to="/subject/$id"
                   params={{ id: s.id }}
-                  className={`group subject-card rounded-2xl ${subjectThemeClass(s.id)} p-5 shadow-soft focus-visible:outline-2`}
+                  className={`group subject-card flex h-full min-w-0 flex-col rounded-2xl ${subjectThemeClass(s.id)} p-5 shadow-soft focus-visible:outline-2`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
