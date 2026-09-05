@@ -234,7 +234,7 @@ function SemesterPage() {
                     <MiniStat icon={CalendarClock} label="Deadlines" value={s.deadlines} tone="text-[var(--subject-accent)]" />
                     <MiniStat icon={Video} label="Kuppi" value={s.kuppis} tone="text-[var(--subject-accent)]" />
                   </div>
-                  <div className="mt-4 flex items-center justify-between gap-2 text-xs text-muted-foreground">
+                  <div className="mt-auto flex items-center justify-between gap-2 border-t border-border/40 pt-3 text-xs text-muted-foreground [margin-block-start:auto]" style={{ marginTop: "auto" }}>
                     <span className="truncate">{s.latest ? `Updated ${formatRelative(s.latest)}` : "No uploads yet"}</span>
                     <span className="shrink-0 font-medium text-[var(--subject-accent)] group-hover:underline">View materials</span>
                   </div>
