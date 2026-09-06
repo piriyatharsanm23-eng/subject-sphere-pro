@@ -57,34 +57,47 @@ function ContributorsPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("materials")
-        .select("uploaded_by")
+        .select("uploaded_by,semester_id")
         .eq("pending_delete", false)
         .eq("is_archived", false);
       if (error) throw error;
-      const counts: Record<string, number> = {};
+      const byUser: Record<string, number> = {};
+      const byUserSemester: Record<string, number> = {};
       for (const r of data ?? []) {
-        if (r.uploaded_by) counts[r.uploaded_by] = (counts[r.uploaded_by] ?? 0) + 1;
+        if (!r.uploaded_by) continue;
+        byUser[r.uploaded_by] = (byUser[r.uploaded_by] ?? 0) + 1;
+        const k = `${r.uploaded_by}:${r.semester_id}`;
+        byUserSemester[k] = (byUserSemester[k] ?? 0) + 1;
       }
-      return counts;
+      return { byUser, byUserSemester, total: (data ?? []).length };
     },
     staleTime: 60_000,
   });
 
   const kuppiQ = useQuery({
-    queryKey: ["contributor-kuppi-count"],
+    queryKey: ["contributor-kuppi"],
     queryFn: async () => {
-      const { count, error } = await (supabase as any)
+      const { data, error } = await (supabase as any)
         .from("kuppi_videos")
-        .select("id", { count: "exact", head: true })
+        .select("uploaded_by,semester_id")
         .eq("pending_delete", false);
       if (error) throw error;
-      return count ?? 0;
+      const rows = (data ?? []) as { uploaded_by: string | null; semester_id: string }[];
+      const byUser: Record<string, number> = {};
+      const byUserSemester: Record<string, number> = {};
+      for (const r of rows) {
+        if (!r.uploaded_by) continue;
+        byUser[r.uploaded_by] = (byUser[r.uploaded_by] ?? 0) + 1;
+        const k = `${r.uploaded_by}:${r.semester_id}`;
+        byUserSemester[k] = (byUserSemester[k] ?? 0) + 1;
+      }
+      return { byUser, byUserSemester, total: rows.length };
     },
     staleTime: 60_000,
   });
 
   const admins = (contributorsQ.data ?? []).filter((c) => c.role === "admin");
-  const totalMaterials = Object.values(uploadsQ.data ?? {}).reduce((a, b) => a + b, 0);
+  const totalMaterials = uploadsQ.data?.total ?? 0;
   const semestersCovered = new Set(admins.map((a) => a.assigned_semester_id).filter(Boolean)).size;
 
   return (
@@ -115,7 +128,7 @@ function ContributorsPage() {
               <HeroStat icon={GraduationCap} label="Admins" value={admins.length} />
               <HeroStat icon={BookOpen} label="Semesters covered" value={semestersCovered} />
               <HeroStat icon={Upload} label="Materials shared" value={totalMaterials} />
-              <HeroStat icon={Video} label="Kuppi videos" value={kuppiQ.data ?? 0} />
+              <HeroStat icon={Video} label="Kuppi videos" value={kuppiQ.data?.total ?? 0} />
             </div>
           </div>
         </section>
@@ -128,7 +141,13 @@ function ContributorsPage() {
           ) : (
             <>
               {admins.length > 0 ? (
-                <AdminSection admins={admins} uploads={uploadsQ.data ?? {}} />
+                <AdminSection
+                  admins={admins}
+                  uploads={uploadsQ.data?.byUserSemester ?? {}}
+                  uploadsByUser={uploadsQ.data?.byUser ?? {}}
+                  kuppi={kuppiQ.data?.byUserSemester ?? {}}
+                  kuppiByUser={kuppiQ.data?.byUser ?? {}}
+                />
               ) : (
                 <EmptyState icon={Users} title="No contributors yet" description="Once a super admin assigns semester admins, they'll be listed here." />
               )}
@@ -164,7 +183,19 @@ function HeroStat({
 }
 
 
-function AdminSection({ admins, uploads }: { admins: Contributor[]; uploads: Record<string, number> }) {
+function AdminSection({
+  admins,
+  uploads,
+  uploadsByUser,
+  kuppi,
+  kuppiByUser,
+}: {
+  admins: Contributor[];
+  uploads: Record<string, number>;
+  uploadsByUser: Record<string, number>;
+  kuppi: Record<string, number>;
+  kuppiByUser: Record<string, number>;
+}) {
   return (
     <section>
       <div className="flex items-center gap-2 mb-5">
@@ -176,7 +207,9 @@ function AdminSection({ admins, uploads }: { admins: Contributor[]; uploads: Rec
       </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {admins.map((c) => {
-          const count = uploads[c.id] ?? 0;
+          const sem = c.assigned_semester_id;
+          const count = sem ? (uploads[`${c.id}:${sem}`] ?? 0) : (uploadsByUser[c.id] ?? 0);
+          const kuppiCount = sem ? (kuppi[`${c.id}:${sem}`] ?? 0) : (kuppiByUser[c.id] ?? 0);
           return (
             <Link
               key={`${c.id}-${c.role}-${c.assigned_semester_id ?? "unassigned"}`}
@@ -209,11 +242,17 @@ function AdminSection({ admins, uploads }: { admins: Contributor[]; uploads: Rec
                   </div>
                 </div>
               </div>
-              <div className="relative mt-4 flex items-center justify-between border-t border-border/60 pt-3 text-xs">
-                <span className="inline-flex items-center gap-1.5 text-muted-foreground">
-                  <Upload className="h-3.5 w-3.5" />
-                  <span className="font-semibold text-foreground tabular-nums">{count}</span> upload{count === 1 ? "" : "s"}
-                </span>
+              <div className="relative mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-border/60 pt-3 text-xs">
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+                    <Upload className="h-3.5 w-3.5" />
+                    <span className="font-semibold text-foreground tabular-nums">{count}</span> upload{count === 1 ? "" : "s"}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+                    <Video className="h-3.5 w-3.5" />
+                    <span className="font-semibold text-foreground tabular-nums">{kuppiCount}</span> kuppi
+                  </span>
+                </div>
                 <span className="font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">
                   View profile →
                 </span>
