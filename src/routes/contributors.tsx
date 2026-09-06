@@ -141,7 +141,13 @@ function ContributorsPage() {
           ) : (
             <>
               {admins.length > 0 ? (
-                <AdminSection admins={admins} uploads={uploadsQ.data ?? {}} />
+                <AdminSection
+                  admins={admins}
+                  uploads={uploadsQ.data?.byUserSemester ?? {}}
+                  uploadsByUser={uploadsQ.data?.byUser ?? {}}
+                  kuppi={kuppiQ.data?.byUserSemester ?? {}}
+                  kuppiByUser={kuppiQ.data?.byUser ?? {}}
+                />
               ) : (
                 <EmptyState icon={Users} title="No contributors yet" description="Once a super admin assigns semester admins, they'll be listed here." />
               )}
