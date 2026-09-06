@@ -57,34 +57,47 @@ function ContributorsPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("materials")
-        .select("uploaded_by")
+        .select("uploaded_by,semester_id")
         .eq("pending_delete", false)
         .eq("is_archived", false);
       if (error) throw error;
-      const counts: Record<string, number> = {};
+      const byUser: Record<string, number> = {};
+      const byUserSemester: Record<string, number> = {};
       for (const r of data ?? []) {
-        if (r.uploaded_by) counts[r.uploaded_by] = (counts[r.uploaded_by] ?? 0) + 1;
+        if (!r.uploaded_by) continue;
+        byUser[r.uploaded_by] = (byUser[r.uploaded_by] ?? 0) + 1;
+        const k = `${r.uploaded_by}:${r.semester_id}`;
+        byUserSemester[k] = (byUserSemester[k] ?? 0) + 1;
       }
-      return counts;
+      return { byUser, byUserSemester, total: (data ?? []).length };
     },
     staleTime: 60_000,
   });
 
   const kuppiQ = useQuery({
-    queryKey: ["contributor-kuppi-count"],
+    queryKey: ["contributor-kuppi"],
     queryFn: async () => {
-      const { count, error } = await (supabase as any)
+      const { data, error } = await (supabase as any)
         .from("kuppi_videos")
-        .select("id", { count: "exact", head: true })
+        .select("uploaded_by,semester_id")
         .eq("pending_delete", false);
       if (error) throw error;
-      return count ?? 0;
+      const rows = (data ?? []) as { uploaded_by: string | null; semester_id: string }[];
+      const byUser: Record<string, number> = {};
+      const byUserSemester: Record<string, number> = {};
+      for (const r of rows) {
+        if (!r.uploaded_by) continue;
+        byUser[r.uploaded_by] = (byUser[r.uploaded_by] ?? 0) + 1;
+        const k = `${r.uploaded_by}:${r.semester_id}`;
+        byUserSemester[k] = (byUserSemester[k] ?? 0) + 1;
+      }
+      return { byUser, byUserSemester, total: rows.length };
     },
     staleTime: 60_000,
   });
 
   const admins = (contributorsQ.data ?? []).filter((c) => c.role === "admin");
-  const totalMaterials = Object.values(uploadsQ.data ?? {}).reduce((a, b) => a + b, 0);
+  const totalMaterials = uploadsQ.data?.total ?? 0;
   const semestersCovered = new Set(admins.map((a) => a.assigned_semester_id).filter(Boolean)).size;
 
   return (
