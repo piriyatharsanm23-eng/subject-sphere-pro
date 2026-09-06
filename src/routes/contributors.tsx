@@ -183,7 +183,19 @@ function HeroStat({
 }
 
 
-function AdminSection({ admins, uploads }: { admins: Contributor[]; uploads: Record<string, number> }) {
+function AdminSection({
+  admins,
+  uploads,
+  uploadsByUser,
+  kuppi,
+  kuppiByUser,
+}: {
+  admins: Contributor[];
+  uploads: Record<string, number>;
+  uploadsByUser: Record<string, number>;
+  kuppi: Record<string, number>;
+  kuppiByUser: Record<string, number>;
+}) {
   return (
     <section>
       <div className="flex items-center gap-2 mb-5">
@@ -195,7 +207,9 @@ function AdminSection({ admins, uploads }: { admins: Contributor[]; uploads: Rec
       </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {admins.map((c) => {
-          const count = uploads[c.id] ?? 0;
+          const sem = c.assigned_semester_id;
+          const count = sem ? (uploads[`${c.id}:${sem}`] ?? 0) : (uploadsByUser[c.id] ?? 0);
+          const kuppiCount = sem ? (kuppi[`${c.id}:${sem}`] ?? 0) : (kuppiByUser[c.id] ?? 0);
           return (
             <Link
               key={`${c.id}-${c.role}-${c.assigned_semester_id ?? "unassigned"}`}
