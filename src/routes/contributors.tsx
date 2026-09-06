@@ -128,7 +128,7 @@ function ContributorsPage() {
               <HeroStat icon={GraduationCap} label="Admins" value={admins.length} />
               <HeroStat icon={BookOpen} label="Semesters covered" value={semestersCovered} />
               <HeroStat icon={Upload} label="Materials shared" value={totalMaterials} />
-              <HeroStat icon={Video} label="Kuppi videos" value={kuppiQ.data ?? 0} />
+              <HeroStat icon={Video} label="Kuppi videos" value={kuppiQ.data?.total ?? 0} />
             </div>
           </div>
         </section>
