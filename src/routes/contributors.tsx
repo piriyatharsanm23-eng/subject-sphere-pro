@@ -242,11 +242,17 @@ function AdminSection({
                   </div>
                 </div>
               </div>
-              <div className="relative mt-4 flex items-center justify-between border-t border-border/60 pt-3 text-xs">
-                <span className="inline-flex items-center gap-1.5 text-muted-foreground">
-                  <Upload className="h-3.5 w-3.5" />
-                  <span className="font-semibold text-foreground tabular-nums">{count}</span> upload{count === 1 ? "" : "s"}
-                </span>
+              <div className="relative mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-border/60 pt-3 text-xs">
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+                    <Upload className="h-3.5 w-3.5" />
+                    <span className="font-semibold text-foreground tabular-nums">{count}</span> upload{count === 1 ? "" : "s"}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+                    <Video className="h-3.5 w-3.5" />
+                    <span className="font-semibold text-foreground tabular-nums">{kuppiCount}</span> kuppi
+                  </span>
+                </div>
                 <span className="font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">
                   View profile →
                 </span>
