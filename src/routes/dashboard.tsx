@@ -326,7 +326,7 @@ function RequestDialog({ semesterId, subjects }: { semesterId: string; subjects:
       request_text: text.trim(),
     });
     setBusy(false);
-    if (error) { toast.error("Could not submit request"); return; }
+    if (error) { toast.error(error.message || "Could not submit request"); return; }
     toast.success("Request submitted — thank you!");
     setText(""); setSubjectId(""); setOpen(false);
   };
