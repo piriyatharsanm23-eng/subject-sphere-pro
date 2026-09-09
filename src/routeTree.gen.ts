@@ -52,9 +52,11 @@ import { Route as AdminKuppiRouteImport } from './routes/admin.kuppi'
 import { Route as AdminGuideRouteImport } from './routes/admin.guide'
 import { Route as AdminFeedbackRouteImport } from './routes/admin.feedback'
 import { Route as AdminDeadlinesRouteImport } from './routes/admin.deadlines'
+import { Route as ApiPublicTelegramWeeklySummaryRouteImport } from './routes/api/public/telegram/weekly-summary'
 import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram/webhook'
 import { Route as ApiPublicTelegramNotifyMaterialsRouteImport } from './routes/api/public/telegram/notify-materials'
 import { Route as ApiPublicTelegramHealthRouteImport } from './routes/api/public/telegram/health'
+import { Route as ApiPublicTelegramDailyDeadlinesRouteImport } from './routes/api/public/telegram/daily-deadlines'
 import { Route as ApiPublicPushSubscribeRouteImport } from './routes/api/public/push/subscribe'
 import { Route as ApiPublicPushDispatchRouteImport } from './routes/api/public/push/dispatch'
 import { Route as ApiPublicPushConfigRouteImport } from './routes/api/public/push/config'
@@ -274,6 +276,12 @@ const AdminDeadlinesRoute = AdminDeadlinesRouteImport.update({
   path: '/deadlines',
   getParentRoute: () => AdminRoute,
 } as any)
+const ApiPublicTelegramWeeklySummaryRoute =
+  ApiPublicTelegramWeeklySummaryRouteImport.update({
+    id: '/api/public/telegram/weekly-summary',
+    path: '/api/public/telegram/weekly-summary',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicTelegramWebhookRoute =
   ApiPublicTelegramWebhookRouteImport.update({
     id: '/api/public/telegram/webhook',
@@ -291,6 +299,12 @@ const ApiPublicTelegramHealthRoute = ApiPublicTelegramHealthRouteImport.update({
   path: '/api/public/telegram/health',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicTelegramDailyDeadlinesRoute =
+  ApiPublicTelegramDailyDeadlinesRouteImport.update({
+    id: '/api/public/telegram/daily-deadlines',
+    path: '/api/public/telegram/daily-deadlines',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicPushSubscribeRoute = ApiPublicPushSubscribeRouteImport.update({
   id: '/api/public/push/subscribe',
   path: '/api/public/push/subscribe',
@@ -354,9 +368,11 @@ export interface FileRoutesByFullPath {
   '/api/public/push/config': typeof ApiPublicPushConfigRoute
   '/api/public/push/dispatch': typeof ApiPublicPushDispatchRoute
   '/api/public/push/subscribe': typeof ApiPublicPushSubscribeRoute
+  '/api/public/telegram/daily-deadlines': typeof ApiPublicTelegramDailyDeadlinesRoute
   '/api/public/telegram/health': typeof ApiPublicTelegramHealthRoute
   '/api/public/telegram/notify-materials': typeof ApiPublicTelegramNotifyMaterialsRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
+  '/api/public/telegram/weekly-summary': typeof ApiPublicTelegramWeeklySummaryRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -403,9 +419,11 @@ export interface FileRoutesByTo {
   '/api/public/push/config': typeof ApiPublicPushConfigRoute
   '/api/public/push/dispatch': typeof ApiPublicPushDispatchRoute
   '/api/public/push/subscribe': typeof ApiPublicPushSubscribeRoute
+  '/api/public/telegram/daily-deadlines': typeof ApiPublicTelegramDailyDeadlinesRoute
   '/api/public/telegram/health': typeof ApiPublicTelegramHealthRoute
   '/api/public/telegram/notify-materials': typeof ApiPublicTelegramNotifyMaterialsRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
+  '/api/public/telegram/weekly-summary': typeof ApiPublicTelegramWeeklySummaryRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -455,9 +473,11 @@ export interface FileRoutesById {
   '/api/public/push/config': typeof ApiPublicPushConfigRoute
   '/api/public/push/dispatch': typeof ApiPublicPushDispatchRoute
   '/api/public/push/subscribe': typeof ApiPublicPushSubscribeRoute
+  '/api/public/telegram/daily-deadlines': typeof ApiPublicTelegramDailyDeadlinesRoute
   '/api/public/telegram/health': typeof ApiPublicTelegramHealthRoute
   '/api/public/telegram/notify-materials': typeof ApiPublicTelegramNotifyMaterialsRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
+  '/api/public/telegram/weekly-summary': typeof ApiPublicTelegramWeeklySummaryRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -508,9 +528,11 @@ export interface FileRouteTypes {
     | '/api/public/push/config'
     | '/api/public/push/dispatch'
     | '/api/public/push/subscribe'
+    | '/api/public/telegram/daily-deadlines'
     | '/api/public/telegram/health'
     | '/api/public/telegram/notify-materials'
     | '/api/public/telegram/webhook'
+    | '/api/public/telegram/weekly-summary'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -557,9 +579,11 @@ export interface FileRouteTypes {
     | '/api/public/push/config'
     | '/api/public/push/dispatch'
     | '/api/public/push/subscribe'
+    | '/api/public/telegram/daily-deadlines'
     | '/api/public/telegram/health'
     | '/api/public/telegram/notify-materials'
     | '/api/public/telegram/webhook'
+    | '/api/public/telegram/weekly-summary'
   id:
     | '__root__'
     | '/'
@@ -608,9 +632,11 @@ export interface FileRouteTypes {
     | '/api/public/push/config'
     | '/api/public/push/dispatch'
     | '/api/public/push/subscribe'
+    | '/api/public/telegram/daily-deadlines'
     | '/api/public/telegram/health'
     | '/api/public/telegram/notify-materials'
     | '/api/public/telegram/webhook'
+    | '/api/public/telegram/weekly-summary'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -632,9 +658,11 @@ export interface RootRouteChildren {
   ApiPublicPushConfigRoute: typeof ApiPublicPushConfigRoute
   ApiPublicPushDispatchRoute: typeof ApiPublicPushDispatchRoute
   ApiPublicPushSubscribeRoute: typeof ApiPublicPushSubscribeRoute
+  ApiPublicTelegramDailyDeadlinesRoute: typeof ApiPublicTelegramDailyDeadlinesRoute
   ApiPublicTelegramHealthRoute: typeof ApiPublicTelegramHealthRoute
   ApiPublicTelegramNotifyMaterialsRoute: typeof ApiPublicTelegramNotifyMaterialsRoute
   ApiPublicTelegramWebhookRoute: typeof ApiPublicTelegramWebhookRoute
+  ApiPublicTelegramWeeklySummaryRoute: typeof ApiPublicTelegramWeeklySummaryRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -940,6 +968,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDeadlinesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/api/public/telegram/weekly-summary': {
+      id: '/api/public/telegram/weekly-summary'
+      path: '/api/public/telegram/weekly-summary'
+      fullPath: '/api/public/telegram/weekly-summary'
+      preLoaderRoute: typeof ApiPublicTelegramWeeklySummaryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/telegram/webhook': {
       id: '/api/public/telegram/webhook'
       path: '/api/public/telegram/webhook'
@@ -959,6 +994,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/telegram/health'
       fullPath: '/api/public/telegram/health'
       preLoaderRoute: typeof ApiPublicTelegramHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/telegram/daily-deadlines': {
+      id: '/api/public/telegram/daily-deadlines'
+      path: '/api/public/telegram/daily-deadlines'
+      fullPath: '/api/public/telegram/daily-deadlines'
+      preLoaderRoute: typeof ApiPublicTelegramDailyDeadlinesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/push/subscribe': {
@@ -1076,9 +1118,11 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicPushConfigRoute: ApiPublicPushConfigRoute,
   ApiPublicPushDispatchRoute: ApiPublicPushDispatchRoute,
   ApiPublicPushSubscribeRoute: ApiPublicPushSubscribeRoute,
+  ApiPublicTelegramDailyDeadlinesRoute: ApiPublicTelegramDailyDeadlinesRoute,
   ApiPublicTelegramHealthRoute: ApiPublicTelegramHealthRoute,
   ApiPublicTelegramNotifyMaterialsRoute: ApiPublicTelegramNotifyMaterialsRoute,
   ApiPublicTelegramWebhookRoute: ApiPublicTelegramWebhookRoute,
+  ApiPublicTelegramWeeklySummaryRoute: ApiPublicTelegramWeeklySummaryRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
