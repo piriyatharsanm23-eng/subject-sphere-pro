@@ -20,6 +20,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SuperIndexRouteImport } from './routes/super.index'
+import { Route as NotesIndexRouteImport } from './routes/notes.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as SuperVisitorsRouteImport } from './routes/super.visitors'
 import { Route as SuperUsersRouteImport } from './routes/super.users'
@@ -115,6 +116,11 @@ const SuperIndexRoute = SuperIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => SuperRoute,
+} as any)
+const NotesIndexRoute = NotesIndexRouteImport.update({
+  id: '/notes/',
+  path: '/notes/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
@@ -364,6 +370,7 @@ export interface FileRoutesByFullPath {
   '/super/users': typeof SuperUsersRoute
   '/super/visitors': typeof SuperVisitorsRoute
   '/admin/': typeof AdminIndexRoute
+  '/notes/': typeof NotesIndexRoute
   '/super/': typeof SuperIndexRoute
   '/api/public/push/config': typeof ApiPublicPushConfigRoute
   '/api/public/push/dispatch': typeof ApiPublicPushDispatchRoute
@@ -415,6 +422,7 @@ export interface FileRoutesByTo {
   '/super/users': typeof SuperUsersRoute
   '/super/visitors': typeof SuperVisitorsRoute
   '/admin': typeof AdminIndexRoute
+  '/notes': typeof NotesIndexRoute
   '/super': typeof SuperIndexRoute
   '/api/public/push/config': typeof ApiPublicPushConfigRoute
   '/api/public/push/dispatch': typeof ApiPublicPushDispatchRoute
@@ -469,6 +477,7 @@ export interface FileRoutesById {
   '/super/users': typeof SuperUsersRoute
   '/super/visitors': typeof SuperVisitorsRoute
   '/admin/': typeof AdminIndexRoute
+  '/notes/': typeof NotesIndexRoute
   '/super/': typeof SuperIndexRoute
   '/api/public/push/config': typeof ApiPublicPushConfigRoute
   '/api/public/push/dispatch': typeof ApiPublicPushDispatchRoute
@@ -524,6 +533,7 @@ export interface FileRouteTypes {
     | '/super/users'
     | '/super/visitors'
     | '/admin/'
+    | '/notes/'
     | '/super/'
     | '/api/public/push/config'
     | '/api/public/push/dispatch'
@@ -575,6 +585,7 @@ export interface FileRouteTypes {
     | '/super/users'
     | '/super/visitors'
     | '/admin'
+    | '/notes'
     | '/super'
     | '/api/public/push/config'
     | '/api/public/push/dispatch'
@@ -628,6 +639,7 @@ export interface FileRouteTypes {
     | '/super/users'
     | '/super/visitors'
     | '/admin/'
+    | '/notes/'
     | '/super/'
     | '/api/public/push/config'
     | '/api/public/push/dispatch'
@@ -655,6 +667,7 @@ export interface RootRouteChildren {
   MaterialIdRoute: typeof MaterialIdRoute
   SemesterIdRoute: typeof SemesterIdRoute
   SubjectIdRoute: typeof SubjectIdRoute
+  NotesIndexRoute: typeof NotesIndexRoute
   ApiPublicPushConfigRoute: typeof ApiPublicPushConfigRoute
   ApiPublicPushDispatchRoute: typeof ApiPublicPushDispatchRoute
   ApiPublicPushSubscribeRoute: typeof ApiPublicPushSubscribeRoute
@@ -743,6 +756,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/super/'
       preLoaderRoute: typeof SuperIndexRouteImport
       parentRoute: typeof SuperRoute
+    }
+    '/notes/': {
+      id: '/notes/'
+      path: '/notes'
+      fullPath: '/notes/'
+      preLoaderRoute: typeof NotesIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/admin/': {
       id: '/admin/'
@@ -1115,6 +1135,7 @@ const rootRouteChildren: RootRouteChildren = {
   MaterialIdRoute: MaterialIdRoute,
   SemesterIdRoute: SemesterIdRoute,
   SubjectIdRoute: SubjectIdRoute,
+  NotesIndexRoute: NotesIndexRoute,
   ApiPublicPushConfigRoute: ApiPublicPushConfigRoute,
   ApiPublicPushDispatchRoute: ApiPublicPushDispatchRoute,
   ApiPublicPushSubscribeRoute: ApiPublicPushSubscribeRoute,
