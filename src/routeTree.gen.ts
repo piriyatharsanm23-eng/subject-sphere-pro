@@ -53,6 +53,7 @@ import { Route as AdminKuppiRouteImport } from './routes/admin.kuppi'
 import { Route as AdminGuideRouteImport } from './routes/admin.guide'
 import { Route as AdminFeedbackRouteImport } from './routes/admin.feedback'
 import { Route as AdminDeadlinesRouteImport } from './routes/admin.deadlines'
+import { Route as NotesSubjectSlugRouteImport } from './routes/notes.$subject.$slug'
 import { Route as ApiPublicTelegramWeeklySummaryRouteImport } from './routes/api/public/telegram/weekly-summary'
 import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram/webhook'
 import { Route as ApiPublicTelegramNotifyMaterialsRouteImport } from './routes/api/public/telegram/notify-materials'
@@ -282,6 +283,11 @@ const AdminDeadlinesRoute = AdminDeadlinesRouteImport.update({
   path: '/deadlines',
   getParentRoute: () => AdminRoute,
 } as any)
+const NotesSubjectSlugRoute = NotesSubjectSlugRouteImport.update({
+  id: '/notes/$subject/$slug',
+  path: '/notes/$subject/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicTelegramWeeklySummaryRoute =
   ApiPublicTelegramWeeklySummaryRouteImport.update({
     id: '/api/public/telegram/weekly-summary',
@@ -372,6 +378,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/notes/': typeof NotesIndexRoute
   '/super/': typeof SuperIndexRoute
+  '/notes/$subject/$slug': typeof NotesSubjectSlugRoute
   '/api/public/push/config': typeof ApiPublicPushConfigRoute
   '/api/public/push/dispatch': typeof ApiPublicPushDispatchRoute
   '/api/public/push/subscribe': typeof ApiPublicPushSubscribeRoute
@@ -424,6 +431,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/notes': typeof NotesIndexRoute
   '/super': typeof SuperIndexRoute
+  '/notes/$subject/$slug': typeof NotesSubjectSlugRoute
   '/api/public/push/config': typeof ApiPublicPushConfigRoute
   '/api/public/push/dispatch': typeof ApiPublicPushDispatchRoute
   '/api/public/push/subscribe': typeof ApiPublicPushSubscribeRoute
@@ -479,6 +487,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/notes/': typeof NotesIndexRoute
   '/super/': typeof SuperIndexRoute
+  '/notes/$subject/$slug': typeof NotesSubjectSlugRoute
   '/api/public/push/config': typeof ApiPublicPushConfigRoute
   '/api/public/push/dispatch': typeof ApiPublicPushDispatchRoute
   '/api/public/push/subscribe': typeof ApiPublicPushSubscribeRoute
@@ -535,6 +544,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/notes/'
     | '/super/'
+    | '/notes/$subject/$slug'
     | '/api/public/push/config'
     | '/api/public/push/dispatch'
     | '/api/public/push/subscribe'
@@ -587,6 +597,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/notes'
     | '/super'
+    | '/notes/$subject/$slug'
     | '/api/public/push/config'
     | '/api/public/push/dispatch'
     | '/api/public/push/subscribe'
@@ -641,6 +652,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/notes/'
     | '/super/'
+    | '/notes/$subject/$slug'
     | '/api/public/push/config'
     | '/api/public/push/dispatch'
     | '/api/public/push/subscribe'
@@ -668,6 +680,7 @@ export interface RootRouteChildren {
   SemesterIdRoute: typeof SemesterIdRoute
   SubjectIdRoute: typeof SubjectIdRoute
   NotesIndexRoute: typeof NotesIndexRoute
+  NotesSubjectSlugRoute: typeof NotesSubjectSlugRoute
   ApiPublicPushConfigRoute: typeof ApiPublicPushConfigRoute
   ApiPublicPushDispatchRoute: typeof ApiPublicPushDispatchRoute
   ApiPublicPushSubscribeRoute: typeof ApiPublicPushSubscribeRoute
@@ -988,6 +1001,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDeadlinesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/notes/$subject/$slug': {
+      id: '/notes/$subject/$slug'
+      path: '/notes/$subject/$slug'
+      fullPath: '/notes/$subject/$slug'
+      preLoaderRoute: typeof NotesSubjectSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/telegram/weekly-summary': {
       id: '/api/public/telegram/weekly-summary'
       path: '/api/public/telegram/weekly-summary'
@@ -1136,6 +1156,7 @@ const rootRouteChildren: RootRouteChildren = {
   SemesterIdRoute: SemesterIdRoute,
   SubjectIdRoute: SubjectIdRoute,
   NotesIndexRoute: NotesIndexRoute,
+  NotesSubjectSlugRoute: NotesSubjectSlugRoute,
   ApiPublicPushConfigRoute: ApiPublicPushConfigRoute,
   ApiPublicPushDispatchRoute: ApiPublicPushDispatchRoute,
   ApiPublicPushSubscribeRoute: ApiPublicPushSubscribeRoute,
