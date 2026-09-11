@@ -30,6 +30,7 @@ import { Route as SuperRequestsRouteImport } from './routes/super.requests'
 import { Route as SuperProfileRouteImport } from './routes/super.profile'
 import { Route as SuperPendingRouteImport } from './routes/super.pending'
 import { Route as SuperNotificationsRouteImport } from './routes/super.notifications'
+import { Route as SuperNotesRouteImport } from './routes/super.notes'
 import { Route as SuperModulesRouteImport } from './routes/super.modules'
 import { Route as SuperMaterialsRouteImport } from './routes/super.materials'
 import { Route as SuperFeedbackRouteImport } from './routes/super.feedback'
@@ -47,6 +48,7 @@ import { Route as KuppiPresenterNameRouteImport } from './routes/kuppi-presenter
 import { Route as ContributorsIdRouteImport } from './routes/contributors_.$id'
 import { Route as AdminRequestsRouteImport } from './routes/admin.requests'
 import { Route as AdminProfileRouteImport } from './routes/admin.profile'
+import { Route as AdminNotesRouteImport } from './routes/admin.notes'
 import { Route as AdminModulesRouteImport } from './routes/admin.modules'
 import { Route as AdminMaterialsRouteImport } from './routes/admin.materials'
 import { Route as AdminKuppiRouteImport } from './routes/admin.kuppi'
@@ -168,6 +170,11 @@ const SuperNotificationsRoute = SuperNotificationsRouteImport.update({
   path: '/notifications',
   getParentRoute: () => SuperRoute,
 } as any)
+const SuperNotesRoute = SuperNotesRouteImport.update({
+  id: '/notes',
+  path: '/notes',
+  getParentRoute: () => SuperRoute,
+} as any)
 const SuperModulesRoute = SuperModulesRouteImport.update({
   id: '/modules',
   path: '/modules',
@@ -251,6 +258,11 @@ const AdminRequestsRoute = AdminRequestsRouteImport.update({
 const AdminProfileRoute = AdminProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminNotesRoute = AdminNotesRouteImport.update({
+  id: '/notes',
+  path: '/notes',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminModulesRoute = AdminModulesRouteImport.update({
@@ -350,6 +362,7 @@ export interface FileRoutesByFullPath {
   '/admin/kuppi': typeof AdminKuppiRoute
   '/admin/materials': typeof AdminMaterialsRoute
   '/admin/modules': typeof AdminModulesRoute
+  '/admin/notes': typeof AdminNotesRoute
   '/admin/profile': typeof AdminProfileRoute
   '/admin/requests': typeof AdminRequestsRoute
   '/contributors/$id': typeof ContributorsIdRoute
@@ -367,6 +380,7 @@ export interface FileRoutesByFullPath {
   '/super/feedback': typeof SuperFeedbackRoute
   '/super/materials': typeof SuperMaterialsRoute
   '/super/modules': typeof SuperModulesRoute
+  '/super/notes': typeof SuperNotesRoute
   '/super/notifications': typeof SuperNotificationsRoute
   '/super/pending': typeof SuperPendingRoute
   '/super/profile': typeof SuperProfileRoute
@@ -403,6 +417,7 @@ export interface FileRoutesByTo {
   '/admin/kuppi': typeof AdminKuppiRoute
   '/admin/materials': typeof AdminMaterialsRoute
   '/admin/modules': typeof AdminModulesRoute
+  '/admin/notes': typeof AdminNotesRoute
   '/admin/profile': typeof AdminProfileRoute
   '/admin/requests': typeof AdminRequestsRoute
   '/contributors/$id': typeof ContributorsIdRoute
@@ -420,6 +435,7 @@ export interface FileRoutesByTo {
   '/super/feedback': typeof SuperFeedbackRoute
   '/super/materials': typeof SuperMaterialsRoute
   '/super/modules': typeof SuperModulesRoute
+  '/super/notes': typeof SuperNotesRoute
   '/super/notifications': typeof SuperNotificationsRoute
   '/super/pending': typeof SuperPendingRoute
   '/super/profile': typeof SuperProfileRoute
@@ -459,6 +475,7 @@ export interface FileRoutesById {
   '/admin/kuppi': typeof AdminKuppiRoute
   '/admin/materials': typeof AdminMaterialsRoute
   '/admin/modules': typeof AdminModulesRoute
+  '/admin/notes': typeof AdminNotesRoute
   '/admin/profile': typeof AdminProfileRoute
   '/admin/requests': typeof AdminRequestsRoute
   '/contributors_/$id': typeof ContributorsIdRoute
@@ -476,6 +493,7 @@ export interface FileRoutesById {
   '/super/feedback': typeof SuperFeedbackRoute
   '/super/materials': typeof SuperMaterialsRoute
   '/super/modules': typeof SuperModulesRoute
+  '/super/notes': typeof SuperNotesRoute
   '/super/notifications': typeof SuperNotificationsRoute
   '/super/pending': typeof SuperPendingRoute
   '/super/profile': typeof SuperProfileRoute
@@ -516,6 +534,7 @@ export interface FileRouteTypes {
     | '/admin/kuppi'
     | '/admin/materials'
     | '/admin/modules'
+    | '/admin/notes'
     | '/admin/profile'
     | '/admin/requests'
     | '/contributors/$id'
@@ -533,6 +552,7 @@ export interface FileRouteTypes {
     | '/super/feedback'
     | '/super/materials'
     | '/super/modules'
+    | '/super/notes'
     | '/super/notifications'
     | '/super/pending'
     | '/super/profile'
@@ -569,6 +589,7 @@ export interface FileRouteTypes {
     | '/admin/kuppi'
     | '/admin/materials'
     | '/admin/modules'
+    | '/admin/notes'
     | '/admin/profile'
     | '/admin/requests'
     | '/contributors/$id'
@@ -586,6 +607,7 @@ export interface FileRouteTypes {
     | '/super/feedback'
     | '/super/materials'
     | '/super/modules'
+    | '/super/notes'
     | '/super/notifications'
     | '/super/pending'
     | '/super/profile'
@@ -624,6 +646,7 @@ export interface FileRouteTypes {
     | '/admin/kuppi'
     | '/admin/materials'
     | '/admin/modules'
+    | '/admin/notes'
     | '/admin/profile'
     | '/admin/requests'
     | '/contributors_/$id'
@@ -641,6 +664,7 @@ export interface FileRouteTypes {
     | '/super/feedback'
     | '/super/materials'
     | '/super/modules'
+    | '/super/notes'
     | '/super/notifications'
     | '/super/pending'
     | '/super/profile'
@@ -840,6 +864,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SuperNotificationsRouteImport
       parentRoute: typeof SuperRoute
     }
+    '/super/notes': {
+      id: '/super/notes'
+      path: '/notes'
+      fullPath: '/super/notes'
+      preLoaderRoute: typeof SuperNotesRouteImport
+      parentRoute: typeof SuperRoute
+    }
     '/super/modules': {
       id: '/super/modules'
       path: '/modules'
@@ -959,6 +990,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProfileRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/notes': {
+      id: '/admin/notes'
+      path: '/notes'
+      fullPath: '/admin/notes'
+      preLoaderRoute: typeof AdminNotesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/modules': {
       id: '/admin/modules'
       path: '/modules'
@@ -1074,6 +1112,7 @@ interface AdminRouteChildren {
   AdminKuppiRoute: typeof AdminKuppiRoute
   AdminMaterialsRoute: typeof AdminMaterialsRoute
   AdminModulesRoute: typeof AdminModulesRoute
+  AdminNotesRoute: typeof AdminNotesRoute
   AdminProfileRoute: typeof AdminProfileRoute
   AdminRequestsRoute: typeof AdminRequestsRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -1086,6 +1125,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminKuppiRoute: AdminKuppiRoute,
   AdminMaterialsRoute: AdminMaterialsRoute,
   AdminModulesRoute: AdminModulesRoute,
+  AdminNotesRoute: AdminNotesRoute,
   AdminProfileRoute: AdminProfileRoute,
   AdminRequestsRoute: AdminRequestsRoute,
   AdminIndexRoute: AdminIndexRoute,
@@ -1104,6 +1144,7 @@ interface SuperRouteChildren {
   SuperFeedbackRoute: typeof SuperFeedbackRoute
   SuperMaterialsRoute: typeof SuperMaterialsRoute
   SuperModulesRoute: typeof SuperModulesRoute
+  SuperNotesRoute: typeof SuperNotesRoute
   SuperNotificationsRoute: typeof SuperNotificationsRoute
   SuperPendingRoute: typeof SuperPendingRoute
   SuperProfileRoute: typeof SuperProfileRoute
@@ -1126,6 +1167,7 @@ const SuperRouteChildren: SuperRouteChildren = {
   SuperFeedbackRoute: SuperFeedbackRoute,
   SuperMaterialsRoute: SuperMaterialsRoute,
   SuperModulesRoute: SuperModulesRoute,
+  SuperNotesRoute: SuperNotesRoute,
   SuperNotificationsRoute: SuperNotificationsRoute,
   SuperPendingRoute: SuperPendingRoute,
   SuperProfileRoute: SuperProfileRoute,

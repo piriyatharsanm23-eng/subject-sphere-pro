@@ -322,7 +322,7 @@ function NoteEditorDialog({
     }
 
     await logActivity({
-      action_type: note.id ? "update" : "create",
+      action_type: note.id ? "edit" : "upload",
       description: `${note.id ? "Updated" : "Created"} study note "${payload.title}"${publish ? " (published)" : " (draft)"}`,
       target_type: "study_note", target_id: res.data?.id ?? note.id ?? null,
       semester_id: semesterId, subject_id: subjectId,
