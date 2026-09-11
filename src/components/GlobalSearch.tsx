@@ -41,7 +41,7 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean; onOpenChan
       // User text is never interpolated raw into a PostgREST filter.
       // See src/lib/search-query.ts + its injection regression tests.
       const { like, subjectsOr, materialsOr } = buildSearchFilters(q);
-      const [sem, sub, mat, dead] = await Promise.all([
+      const [sem, sub, mat, dead, notes] = await Promise.all([
         supabase.from("semesters").select("id,name").ilike("name", like).limit(6),
         supabase.from("subjects").select("id,name,code").or(subjectsOr).limit(8),
         supabase
@@ -59,12 +59,23 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean; onOpenChan
           .ilike("title", like)
           .gte("deadline_at", new Date().toISOString())
           .limit(6),
+        (supabase as any)
+          .from("study_notes")
+          .select("id,title,slug,chapter, subject:subjects(name)")
+          .eq("published", true)
+          .ilike("title", like)
+          .order("order_index", { ascending: true })
+          .limit(8),
       ]);
       return {
         semesters: sem.data ?? [],
         subjects: sub.data ?? [],
         materials: mat.data ?? [],
         deadlines: dead.data ?? [],
+        notes: (notes.data ?? []) as Array<{
+          id: string; title: string; slug: string; chapter: string | null;
+          subject: { name: string } | null;
+        }>,
       };
     },
   });
