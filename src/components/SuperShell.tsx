@@ -3,7 +3,7 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Activity, BarChart3, BookOpen, CalendarClock, ClipboardCheck, FileText,
   LayoutDashboard, Library, Loader2, MessageSquare, ShieldAlert,
-  Star, User, Users, BookPlus, KeyRound, Bell, Eye, Menu, Megaphone,
+  Star, User, Users, BookPlus, KeyRound, Bell, Eye, Menu, Megaphone, NotebookPen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -26,6 +26,7 @@ function useSuperNav(): NavItem[] {
     { to: "/super/admins", label: "Admins", icon: Users },
     { to: "/super/users", label: "All accounts", icon: Users },
     { to: "/super/materials", label: "Materials", icon: FileText },
+    { to: "/super/notes", label: "Study Notes", icon: NotebookPen },
     { to: "/super/deadlines", label: "Deadlines", icon: CalendarClock },
     { to: "/super/requests", label: "Requests", icon: MessageSquare },
     { to: "/super/pending", label: "Pending changes", icon: ClipboardCheck },
