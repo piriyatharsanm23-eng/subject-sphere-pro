@@ -23,6 +23,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AIExplainDialog, type AIProvider } from "@/components/AIExplainDialog";
 import { useAISettings } from "@/hooks/useAISettings";
 import { openExternalAIExplain } from "@/lib/openExternalAI";
+import { slugify } from "@/lib/notes";
 
 export const Route = createFileRoute("/subject/$id")({
   head: () => ({ meta: [{ title: "Subject — StudyHub" }] }),
@@ -77,6 +78,8 @@ function SubjectPage() {
       }>;
     },
   });
+
+  const noteSubjectSlug = slugify((subjectQ.data as any)?.name ?? "subject");
 
   const notesByMaterial = useMemo(() => {
     const map: Record<string, { title: string; slug: string }> = {};
