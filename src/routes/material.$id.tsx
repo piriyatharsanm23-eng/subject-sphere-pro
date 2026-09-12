@@ -16,6 +16,7 @@ import { useMaterialDownload } from "@/hooks/useMaterialDownload";
 import { useUploaders } from "@/lib/uploaders";
 import { UploaderBadge } from "@/components/UploaderBadge";
 import { ReportMaterialButton } from "@/components/ReportMaterialButton";
+import { slugify } from "@/lib/notes";
 
 export const Route = createFileRoute("/material/$id")({
   head: () => ({ meta: [{ title: "Material — StudyHub" }] }),
@@ -83,6 +84,24 @@ function MaterialPage() {
   const related = siblings.filter((s) => s.id !== id).slice(0, 5);
 
   const uploadersQ = useUploaders(m?.uploaded_by ? [m.uploaded_by] : []);
+
+  // Published web study notes linked to this material.
+  const notesQ = useQuery({
+    queryKey: ["material-study-notes", id],
+    enabled: !!m?.id,
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("study_notes")
+        .select("id,title,slug,chapter,description")
+        .eq("material_id", id)
+        .eq("published", true)
+        .order("order_index", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as Array<{ id: string; title: string; slug: string; chapter: string | null; description: string | null }>;
+    },
+  });
+  const notes = notesQ.data ?? [];
+  const noteSubjectSlug = slugify(subjectQ.data?.name ?? "subject");
 
   const [signedUrl, setSignedUrl] = useState<string | null>(null);
   useEffect(() => {
