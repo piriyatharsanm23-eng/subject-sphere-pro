@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, Download, ExternalLink, FileText, Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Download, ExternalLink, FileText, Loader2, NotebookPen } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -16,6 +16,7 @@ import { useMaterialDownload } from "@/hooks/useMaterialDownload";
 import { useUploaders } from "@/lib/uploaders";
 import { UploaderBadge } from "@/components/UploaderBadge";
 import { ReportMaterialButton } from "@/components/ReportMaterialButton";
+import { slugify } from "@/lib/notes";
 
 export const Route = createFileRoute("/material/$id")({
   head: () => ({ meta: [{ title: "Material — StudyHub" }] }),
@@ -83,6 +84,24 @@ function MaterialPage() {
   const related = siblings.filter((s) => s.id !== id).slice(0, 5);
 
   const uploadersQ = useUploaders(m?.uploaded_by ? [m.uploaded_by] : []);
+
+  // Published web study notes linked to this material.
+  const notesQ = useQuery({
+    queryKey: ["material-study-notes", id],
+    enabled: !!m?.id,
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("study_notes")
+        .select("id,title,slug,chapter,description")
+        .eq("material_id", id)
+        .eq("published", true)
+        .order("order_index", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as Array<{ id: string; title: string; slug: string; chapter: string | null; description: string | null }>;
+    },
+  });
+  const notes = notesQ.data ?? [];
+  const noteSubjectSlug = slugify(subjectQ.data?.name ?? "subject");
 
   const [signedUrl, setSignedUrl] = useState<string | null>(null);
   useEffect(() => {
@@ -193,6 +212,22 @@ function MaterialPage() {
                 />
               )}
             </section>
+
+            {notes.length > 0 && (
+              <section className="mt-6 rounded-2xl border border-border bg-card p-4 shadow-soft">
+                <SectionHeading title="Study notes for this material" />
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {notes.map((n) => (
+                    <Button key={n.id} asChild variant="secondary" size="sm" className="justify-start">
+                      <Link to="/notes/$subject/$slug" params={{ subject: noteSubjectSlug, slug: n.slug }}>
+                        <NotebookPen className="mr-2 h-4 w-4 text-amber-500" aria-hidden="true" />
+                        <span className="truncate">Read Study Notes — {n.title}</span>
+                      </Link>
+                    </Button>
+                  ))}
+                </div>
+              </section>
+            )}
 
             <nav aria-label="Material navigation" className="mt-6 flex flex-wrap items-center justify-between gap-3">
               {prev ? (

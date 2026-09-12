@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { BookOpen, CalendarClock, FileText, Layers, Search } from "lucide-react";
+import { BookOpen, CalendarClock, FileText, Layers, NotebookPen, Search } from "lucide-react";
 import {
   CommandDialog,
   CommandEmpty,
@@ -14,6 +14,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { materialTypeLabel } from "@/lib/materials";
 import { buildSearchFilters } from "@/lib/search-query";
+import { slugify } from "@/lib/notes";
 
 export function useGlobalSearch() {
   const [open, setOpen] = useState(false);
@@ -129,6 +130,27 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean; onOpenChan
                   <FileText className="mr-2 h-4 w-4 text-violet-500" />
                   <span className="truncate">{m.title}</span>
                   <span className="ml-2 text-xs text-muted-foreground">{materialTypeLabel(m.material_type)}{m.year ? ` · ${m.year}` : ""}</span>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </>
+        ) : null}
+
+        {r?.notes.length ? (
+          <>
+            <CommandSeparator />
+            <CommandGroup heading="Study Notes">
+              {r.notes.map((n) => (
+                <CommandItem
+                  key={n.id}
+                  value={`note-${n.id}-${n.title}`}
+                  onSelect={() => go(`/notes/${slugify(n.subject?.name ?? "subject")}/${n.slug}`)}
+                >
+                  <NotebookPen className="mr-2 h-4 w-4 text-amber-500" />
+                  <span className="truncate">{n.title}</span>
+                  <span className="ml-2 text-xs text-muted-foreground">
+                    {n.subject?.name ?? ""}{n.chapter ? ` · ${n.chapter}` : ""}
+                  </span>
                 </CommandItem>
               ))}
             </CommandGroup>

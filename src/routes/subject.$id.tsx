@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Bot, Calendar, Download, ExternalLink, Eye, FileText, Loader2, Sparkles, Video, X } from "lucide-react";
+import { ArrowLeft, Bot, Calendar, Download, ExternalLink, Eye, FileText, Loader2, NotebookPen, Sparkles, Video, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -23,6 +23,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AIExplainDialog, type AIProvider } from "@/components/AIExplainDialog";
 import { useAISettings } from "@/hooks/useAISettings";
 import { openExternalAIExplain } from "@/lib/openExternalAI";
+import { slugify } from "@/lib/notes";
 
 export const Route = createFileRoute("/subject/$id")({
   head: () => ({ meta: [{ title: "Subject — StudyHub" }] }),
@@ -59,6 +60,32 @@ function SubjectPage() {
   });
 
   const uploadersQ = useUploaders((materialsQ.data ?? []).map((m) => m.uploaded_by));
+
+  // Web-based study notes published for this subject.
+  const notesQ = useQuery({
+    queryKey: ["subject-study-notes", id],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("study_notes")
+        .select("id,title,slug,chapter,description,material_id,order_index")
+        .eq("subject_id", id)
+        .eq("published", true)
+        .order("order_index", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as Array<{
+        id: string; title: string; slug: string; chapter: string | null;
+        description: string | null; material_id: string | null; order_index: number;
+      }>;
+    },
+  });
+
+  const noteSubjectSlug = slugify((subjectQ.data as any)?.name ?? "subject");
+
+  const notesByMaterial = useMemo(() => {
+    const map: Record<string, { title: string; slug: string }> = {};
+    for (const n of notesQ.data ?? []) if (n.material_id) map[n.material_id] = { title: n.title, slug: n.slug };
+    return map;
+  }, [notesQ.data]);
 
   const deadlinesQ = useQuery({
     queryKey: ["subject-deadlines", id],
@@ -161,6 +188,7 @@ function SubjectPage() {
             <TabsTrigger value="assignment" className="text-xs sm:text-sm">Assign. ({groups.assignment.length})</TabsTrigger>
             <TabsTrigger value="other" className="text-xs sm:text-sm">Tutorials ({groups.other.length})</TabsTrigger>
             <TabsTrigger value="kuppi" className="text-xs sm:text-sm">Kuppi ({(kuppiQ.data ?? []).length})</TabsTrigger>
+            <TabsTrigger value="study_notes" className="text-xs sm:text-sm">Study Notes ({(notesQ.data ?? []).length})</TabsTrigger>
             <TabsTrigger value="deadlines" className="text-xs sm:text-sm">Deadlines ({(deadlinesQ.data ?? []).length})</TabsTrigger>
           </TabsList>
 
@@ -172,6 +200,7 @@ function SubjectPage() {
                   uploaders={uploadersQ.data ?? {}}
                   subjectName={(subjectQ.data as any)?.name ?? null}
                   semesterName={(subjectQ.data as any)?.semester?.name ?? null}
+                  notesByMaterial={notesByMaterial}
                 />
               )}
             </TabsContent>
@@ -179,6 +208,30 @@ function SubjectPage() {
 
           <TabsContent value="kuppi" className="mt-4">
             {kuppiQ.isLoading ? <MaterialSkeleton /> : <KuppiSection items={kuppiQ.data ?? []} />}
+          </TabsContent>
+
+          <TabsContent value="study_notes" className="mt-4">
+            {notesQ.isLoading ? (
+              <CardGridSkeleton count={3} height="h-20" className="space-y-3" />
+            ) : (notesQ.data ?? []).length === 0 ? (
+              <Empty label="No study notes yet" description="Study notes you can read right in the browser will appear here once an admin publishes them." />
+            ) : (
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {notesQ.data!.map((n) => (
+                  <Link
+                    key={n.id}
+                    to="/notes/$subject/$slug"
+                    params={{ subject: noteSubjectSlug, slug: n.slug }}
+                    className="group rounded-2xl border border-border bg-card p-4 shadow-soft transition-shadow hover:shadow-elevated"
+                  >
+                    {n.chapter && <div className="text-xs font-medium text-primary">{n.chapter}</div>}
+                    <div className="mt-1 font-semibold leading-snug group-hover:text-primary">{n.title}</div>
+                    {n.description && <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{n.description}</p>}
+                    <div className="mt-3 inline-flex items-center text-xs font-medium text-primary">Read study note →</div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </TabsContent>
 
 
@@ -244,12 +297,15 @@ function MaterialList({
   uploaders,
   subjectName,
   semesterName,
+  notesByMaterial,
 }: {
   items: MaterialRow[];
   uploaders: Record<string, UploaderInfo>;
   subjectName?: string | null;
   semesterName?: string | null;
+  notesByMaterial?: Record<string, { title: string; slug: string }>;
 }) {
+  const subjectSlug = slugify(subjectName ?? "subject");
   const [previewing, setPreviewing] = useState<MaterialRow | null>(null);
   const dl = useMaterialDownload();
   const aiSettings = useAISettings().data;
@@ -304,6 +360,13 @@ function MaterialList({
                 <Button size="sm" variant="secondary" onClick={() => openAI(m, "gemini")}>
                   <Sparkles className="mr-2 h-4 w-4 text-sky-400" aria-hidden="true" />Gemini
                   <ExternalLink className="ml-1 h-3 w-3 opacity-70" aria-hidden="true" />
+                </Button>
+              )}
+              {notesByMaterial?.[m.id] && (
+                <Button asChild size="sm" variant="secondary" className="col-span-2">
+                  <Link to="/notes/$subject/$slug" params={{ subject: subjectSlug, slug: notesByMaterial[m.id].slug }}>
+                    <NotebookPen className="mr-2 h-4 w-4 text-amber-500" aria-hidden="true" />Read Study Notes
+                  </Link>
                 </Button>
               )}
             </div>
