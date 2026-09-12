@@ -297,12 +297,15 @@ function MaterialList({
   uploaders,
   subjectName,
   semesterName,
+  notesByMaterial,
 }: {
   items: MaterialRow[];
   uploaders: Record<string, UploaderInfo>;
   subjectName?: string | null;
   semesterName?: string | null;
+  notesByMaterial?: Record<string, { title: string; slug: string }>;
 }) {
+  const subjectSlug = slugify(subjectName ?? "subject");
   const [previewing, setPreviewing] = useState<MaterialRow | null>(null);
   const dl = useMaterialDownload();
   const aiSettings = useAISettings().data;
