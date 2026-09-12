@@ -60,6 +60,30 @@ function SubjectPage() {
 
   const uploadersQ = useUploaders((materialsQ.data ?? []).map((m) => m.uploaded_by));
 
+  // Web-based study notes published for this subject.
+  const notesQ = useQuery({
+    queryKey: ["subject-study-notes", id],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("study_notes")
+        .select("id,title,slug,chapter,description,material_id,order_index")
+        .eq("subject_id", id)
+        .eq("published", true)
+        .order("order_index", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as Array<{
+        id: string; title: string; slug: string; chapter: string | null;
+        description: string | null; material_id: string | null; order_index: number;
+      }>;
+    },
+  });
+
+  const notesByMaterial = useMemo(() => {
+    const map: Record<string, { title: string; slug: string }> = {};
+    for (const n of notesQ.data ?? []) if (n.material_id) map[n.material_id] = { title: n.title, slug: n.slug };
+    return map;
+  }, [notesQ.data]);
+
   const deadlinesQ = useQuery({
     queryKey: ["subject-deadlines", id],
     queryFn: async () => {
