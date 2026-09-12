@@ -135,6 +135,27 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean; onOpenChan
           </>
         ) : null}
 
+        {r?.notes.length ? (
+          <>
+            <CommandSeparator />
+            <CommandGroup heading="Study Notes">
+              {r.notes.map((n) => (
+                <CommandItem
+                  key={n.id}
+                  value={`note-${n.id}-${n.title}`}
+                  onSelect={() => go(`/notes/${slugify(n.subject?.name ?? "subject")}/${n.slug}`)}
+                >
+                  <NotebookPen className="mr-2 h-4 w-4 text-amber-500" />
+                  <span className="truncate">{n.title}</span>
+                  <span className="ml-2 text-xs text-muted-foreground">
+                    {n.subject?.name ?? ""}{n.chapter ? ` · ${n.chapter}` : ""}
+                  </span>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </>
+        ) : null}
+
         {r?.deadlines.length ? (
           <>
             <CommandSeparator />
