@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { BookOpen, CalendarClock, FileText, Layers, Search } from "lucide-react";
+import { BookOpen, CalendarClock, FileText, Layers, NotebookPen, Search } from "lucide-react";
 import {
   CommandDialog,
   CommandEmpty,
@@ -14,6 +14,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { materialTypeLabel } from "@/lib/materials";
 import { buildSearchFilters } from "@/lib/search-query";
+import { slugify } from "@/lib/notes";
 
 export function useGlobalSearch() {
   const [open, setOpen] = useState(false);
