@@ -185,6 +185,7 @@ function SubjectPage() {
             <TabsTrigger value="assignment" className="text-xs sm:text-sm">Assign. ({groups.assignment.length})</TabsTrigger>
             <TabsTrigger value="other" className="text-xs sm:text-sm">Tutorials ({groups.other.length})</TabsTrigger>
             <TabsTrigger value="kuppi" className="text-xs sm:text-sm">Kuppi ({(kuppiQ.data ?? []).length})</TabsTrigger>
+            <TabsTrigger value="study_notes" className="text-xs sm:text-sm">Study Notes ({(notesQ.data ?? []).length})</TabsTrigger>
             <TabsTrigger value="deadlines" className="text-xs sm:text-sm">Deadlines ({(deadlinesQ.data ?? []).length})</TabsTrigger>
           </TabsList>
 
@@ -196,6 +197,7 @@ function SubjectPage() {
                   uploaders={uploadersQ.data ?? {}}
                   subjectName={(subjectQ.data as any)?.name ?? null}
                   semesterName={(subjectQ.data as any)?.semester?.name ?? null}
+                  notesByMaterial={notesByMaterial}
                 />
               )}
             </TabsContent>
@@ -203,6 +205,30 @@ function SubjectPage() {
 
           <TabsContent value="kuppi" className="mt-4">
             {kuppiQ.isLoading ? <MaterialSkeleton /> : <KuppiSection items={kuppiQ.data ?? []} />}
+          </TabsContent>
+
+          <TabsContent value="study_notes" className="mt-4">
+            {notesQ.isLoading ? (
+              <CardGridSkeleton count={3} height="h-20" className="space-y-3" />
+            ) : (notesQ.data ?? []).length === 0 ? (
+              <Empty label="No study notes yet" description="Study notes you can read right in the browser will appear here once an admin publishes them." />
+            ) : (
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {notesQ.data!.map((n) => (
+                  <Link
+                    key={n.id}
+                    to="/notes/$subject/$slug"
+                    params={{ subject: noteSubjectSlug, slug: n.slug }}
+                    className="group rounded-2xl border border-border bg-card p-4 shadow-soft transition-shadow hover:shadow-elevated"
+                  >
+                    {n.chapter && <div className="text-xs font-medium text-primary">{n.chapter}</div>}
+                    <div className="mt-1 font-semibold leading-snug group-hover:text-primary">{n.title}</div>
+                    {n.description && <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{n.description}</p>}
+                    <div className="mt-3 inline-flex items-center text-xs font-medium text-primary">Read study note →</div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </TabsContent>
 
 
