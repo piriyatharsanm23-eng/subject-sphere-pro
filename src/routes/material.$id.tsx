@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, Download, ExternalLink, FileText, Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Download, ExternalLink, FileText, Loader2, NotebookPen } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -212,6 +212,22 @@ function MaterialPage() {
                 />
               )}
             </section>
+
+            {notes.length > 0 && (
+              <section className="mt-6 rounded-2xl border border-border bg-card p-4 shadow-soft">
+                <SectionHeading title="Study notes for this material" />
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {notes.map((n) => (
+                    <Button key={n.id} asChild variant="secondary" size="sm" className="justify-start">
+                      <Link to="/notes/$subject/$slug" params={{ subject: noteSubjectSlug, slug: n.slug }}>
+                        <NotebookPen className="mr-2 h-4 w-4 text-amber-500" aria-hidden="true" />
+                        <span className="truncate">Read Study Notes — {n.title}</span>
+                      </Link>
+                    </Button>
+                  ))}
+                </div>
+              </section>
+            )}
 
             <nav aria-label="Material navigation" className="mt-6 flex flex-wrap items-center justify-between gap-3">
               {prev ? (
