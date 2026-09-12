@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Bot, Calendar, Download, ExternalLink, Eye, FileText, Loader2, Sparkles, Video, X } from "lucide-react";
+import { ArrowLeft, Bot, Calendar, Download, ExternalLink, Eye, FileText, Loader2, NotebookPen, Sparkles, Video, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -360,6 +360,13 @@ function MaterialList({
                 <Button size="sm" variant="secondary" onClick={() => openAI(m, "gemini")}>
                   <Sparkles className="mr-2 h-4 w-4 text-sky-400" aria-hidden="true" />Gemini
                   <ExternalLink className="ml-1 h-3 w-3 opacity-70" aria-hidden="true" />
+                </Button>
+              )}
+              {notesByMaterial?.[m.id] && (
+                <Button asChild size="sm" variant="secondary" className="col-span-2">
+                  <Link to="/notes/$subject/$slug" params={{ subject: subjectSlug, slug: notesByMaterial[m.id].slug }}>
+                    <NotebookPen className="mr-2 h-4 w-4 text-amber-500" aria-hidden="true" />Read Study Notes
+                  </Link>
                 </Button>
               )}
             </div>
