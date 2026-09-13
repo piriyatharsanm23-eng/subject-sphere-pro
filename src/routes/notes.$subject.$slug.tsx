@@ -138,7 +138,7 @@ function NoteReaderPage() {
     <div className="min-h-dvh flex flex-col bg-muted/40">
       <SiteHeader />
 
-      <main className="container mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 sm:py-8">
+      <main className="container mx-auto w-full flex-1 px-4 py-6 sm:px-6 sm:py-8">
         {noteQ.isLoading ? (
           <div className="space-y-4">
             <Skeleton className="h-4 w-48" />
@@ -155,7 +155,7 @@ function NoteReaderPage() {
             action={<Button asChild size="sm"><Link to="/notes">Browse study notes</Link></Button>}
           />
         ) : (
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[15rem_minmax(0,1fr)] xl:grid-cols-[15rem_minmax(0,1fr)_14rem]">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-8 xl:grid-cols-[16rem_minmax(0,1fr)_16rem] 2xl:grid-cols-[18rem_minmax(0,1fr)_18rem]">
             {/* LEFT: navigation */}
             <aside className="hidden lg:block">
               <div className="sticky top-24 max-h-[calc(100dvh-8rem)] overflow-y-auto pr-2">
@@ -234,12 +234,13 @@ function NoteReaderPage() {
             {/* RIGHT: on this page */}
             <aside className="hidden xl:block">
               {toc.length > 0 && (
-                <div className="sticky top-24 max-h-[calc(100dvh-8rem)] overflow-y-auto">
-                  <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">On this page</div>
-                  <TocList items={toc} activeId={activeId} className="mt-2" />
+                <div className="sticky top-24 max-h-[calc(100dvh-8rem)] overflow-y-auto [scrollbar-width:thin] pr-1">
+                  <div className="mb-2 px-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">On this page</div>
+                  <TocList items={toc} activeId={activeId} />
                 </div>
               )}
             </aside>
+
           </div>
         )}
       </main>
@@ -253,19 +254,21 @@ function TocList({
   items, activeId, className,
 }: { items: ReturnType<typeof extractToc>; activeId: string | null; className?: string }) {
   return (
-    <ul className={`space-y-1 text-sm ${className ?? ""}`}>
+    <ul className={`toc-rail space-y-0.5 text-sm ${className ?? ""}`}>
       {items.map((t) => (
-        <li key={t.id} style={{ paddingLeft: t.level === 3 ? 12 : 0 }}>
+        <li key={t.id}>
           <a
             href={`#${t.id}`}
+            data-level={t.level}
+            data-active={activeId === t.id ? "true" : undefined}
             onClick={(e) => {
               e.preventDefault();
               document.getElementById(t.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
               history.replaceState(null, "", `#${t.id}`);
             }}
-            className={`block rounded px-2 py-1 transition-colors ${
-              activeId === t.id ? "font-semibold text-primary" : "text-muted-foreground hover:text-foreground"
-            }`}
+            className={`${
+              activeId === t.id ? "" : "text-muted-foreground hover:text-foreground"
+            } ${t.level === 2 ? "font-medium" : ""}`}
           >
             {t.text}
           </a>
@@ -274,6 +277,7 @@ function TocList({
     </ul>
   );
 }
+
 
 function MobileSheet({
   title, icon: Icon, label, children,
