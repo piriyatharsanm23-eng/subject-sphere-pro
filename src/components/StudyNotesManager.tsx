@@ -407,6 +407,25 @@ function NoteEditorDialog({
             <TabsTrigger value="preview"><Eye className="mr-2 h-4 w-4" aria-hidden="true" />Preview</TabsTrigger>
           </TabsList>
           <TabsContent value="write">
+            <div
+              className="mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-dashed border-border p-3"
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => { e.preventDefault(); importFile(e.dataTransfer.files?.[0]); }}
+            >
+              <input
+                ref={fileRef}
+                type="file"
+                accept=".md,.markdown,.txt,text/markdown,text/plain"
+                className="hidden"
+                onChange={(e) => { importFile(e.target.files?.[0]); e.target.value = ""; }}
+              />
+              <Button type="button" variant="outline" size="sm" onClick={() => fileRef.current?.click()}>
+                <Upload className="mr-2 h-4 w-4" aria-hidden="true" />Upload a .md file
+              </Button>
+              <span className="text-xs text-muted-foreground">
+                Or drag a Markdown (.md) or text file here — it replaces what's below.
+              </span>
+            </div>
             <Textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
