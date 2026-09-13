@@ -387,12 +387,46 @@
 
 @utility relative-z { position: relative; z-index: 1; }
 
-/* One shared content width so header, page content and footer line up. */
+/* One shared content width so header, page content and footer line up.
+   Scales up on large screens so wide monitors don't show big empty gutters. */
 @utility container {
   width: 100%;
   margin-inline: auto;
-  max-width: 72rem;
+  max-width: 80rem;
 }
+@media (min-width: 1440px) {
+  .container {
+    max-width: 90rem;
+  }
+}
+@media (min-width: 1750px) {
+  .container {
+    max-width: 100rem;
+  }
+}
+
+/* "On this page" table of contents — nested rail like a docs sidebar. */
+.toc-rail {
+  position: relative;
+  border-left: 1px solid var(--border);
+}
+.toc-rail a {
+  display: block;
+  border-left: 2px solid transparent;
+  margin-left: -1px;
+  padding: 0.25rem 0.5rem;
+  line-height: 1.35;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.toc-rail a[data-level="3"] {
+  padding-left: 1.25rem;
+}
+.toc-rail a[data-active="true"] {
+  border-left-color: var(--primary);
+  color: var(--primary);
+  font-weight: 600;
+}
+
 
 /* ============================================================
    SUBJECT CARD COLOR THEMES
