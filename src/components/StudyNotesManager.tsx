@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  ArrowDown, ArrowUp, Eye, ExternalLink, Loader2, NotebookPen, Pencil, Plus, Save, Search, Send, Trash2,
+  ArrowDown, ArrowUp, Eye, ExternalLink, Loader2, NotebookPen, Pencil, Plus, Save, Search, Send, Trash2, Upload,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -282,6 +282,22 @@ function NoteEditorDialog({
   const [orderIndex, setOrderIndex] = useState(String(note.order_index ?? 1));
   const [content, setContent] = useState(note.content ?? STARTER);
   const [saving, setSaving] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  /** Load a .md / .txt file straight into the editor. */
+  const importFile = async (file: File | undefined | null) => {
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) return toast.error("That file is too big (max 2 MB)");
+    const text = await file.text();
+    if (!text.trim()) return toast.error("That file is empty");
+    setContent(text);
+    if (!title.trim()) {
+      const heading = /^#{1,3}\s+(.+)$/m.exec(text)?.[1]?.trim();
+      const fromName = file.name.replace(/\.(md|markdown|txt)$/i, "").replace(/[-_]+/g, " ").trim();
+      setTitle(heading || fromName);
+    }
+    toast.success(`Loaded "${file.name}"`);
+  };
 
   useEffect(() => {
     if (!slugTouched) setSlug(slugify(title));
@@ -391,6 +407,25 @@ function NoteEditorDialog({
             <TabsTrigger value="preview"><Eye className="mr-2 h-4 w-4" aria-hidden="true" />Preview</TabsTrigger>
           </TabsList>
           <TabsContent value="write">
+            <div
+              className="mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-dashed border-border p-3"
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => { e.preventDefault(); importFile(e.dataTransfer.files?.[0]); }}
+            >
+              <input
+                ref={fileRef}
+                type="file"
+                accept=".md,.markdown,.txt,text/markdown,text/plain"
+                className="hidden"
+                onChange={(e) => { importFile(e.target.files?.[0]); e.target.value = ""; }}
+              />
+              <Button type="button" variant="outline" size="sm" onClick={() => fileRef.current?.click()}>
+                <Upload className="mr-2 h-4 w-4" aria-hidden="true" />Upload a .md file
+              </Button>
+              <span className="text-xs text-muted-foreground">
+                Or drag a Markdown (.md) or text file here — it replaces what's below.
+              </span>
+            </div>
             <Textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
