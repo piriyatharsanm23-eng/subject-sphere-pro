@@ -304,7 +304,7 @@ function MaterialList({
   uploaders: Record<string, UploaderInfo>;
   subjectName?: string | null;
   semesterName?: string | null;
-  notesByMaterial?: Record<string, { title: string; slug: string }>;
+  notesByMaterial?: Record<string, { title: string; slug: string; content?: string | null }>;
 }) {
   const subjectSlug = slugify(subjectName ?? "subject");
   const [previewing, setPreviewing] = useState<MaterialRow | null>(null);
