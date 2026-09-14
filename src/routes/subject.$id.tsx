@@ -356,13 +356,25 @@ function MaterialList({
                 )}
               </Button>
               {showChatGPT && (
-                <Button size="sm" variant="secondary" onClick={() => openAI(m, "chatgpt")}>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  disabled={!notesByMaterial?.[m.id]}
+                  title={notesByMaterial?.[m.id] ? undefined : "Available once study notes are added for this material"}
+                  onClick={() => openAI(m, "chatgpt")}
+                >
                   <Bot className="mr-2 h-4 w-4 text-emerald-400" aria-hidden="true" />ChatGPT
                   <ExternalLink className="ml-1 h-3 w-3 opacity-70" aria-hidden="true" />
                 </Button>
               )}
               {showGemini && (
-                <Button size="sm" variant="secondary" onClick={() => openAI(m, "gemini")}>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  disabled={!notesByMaterial?.[m.id]}
+                  title={notesByMaterial?.[m.id] ? undefined : "Available once study notes are added for this material"}
+                  onClick={() => openAI(m, "gemini")}
+                >
                   <Sparkles className="mr-2 h-4 w-4 text-sky-400" aria-hidden="true" />Gemini
                   <ExternalLink className="ml-1 h-3 w-3 opacity-70" aria-hidden="true" />
                 </Button>
