@@ -86,6 +86,19 @@ function SemesterPage() {
     },
   });
 
+  const studyNotesQ = useQuery({
+    queryKey: ["semester-study-note-counts", id],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("study_notes")
+        .select("id,subject_id")
+        .eq("semester_id", id)
+        .eq("published", true);
+      if (error) throw error;
+      return (data ?? []) as { id: string; subject_id: string }[];
+    },
+  });
+
   const contributorsQ = useQuery({
     queryKey: ["semester-contributors", id],
     queryFn: async () => {
