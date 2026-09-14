@@ -127,6 +127,7 @@ function SemesterPage() {
       papers: mine.filter((m) => m.material_type === "past_paper").length,
       deadlines: deadlines.filter((d) => d.subject_id === s.id).length,
       kuppis: kuppis.filter((k) => k.subject_id === s.id).length,
+      studyNotes: studyNotes.filter((n) => n.subject_id === s.id).length,
       latest,
     };
   }).sort((a, b) => {
