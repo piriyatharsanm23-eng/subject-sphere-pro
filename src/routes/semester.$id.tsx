@@ -248,6 +248,7 @@ function SemesterPage() {
                     <MiniStat icon={Layers} label="Papers" value={s.papers} tone="text-[var(--subject-accent)]" />
                     <MiniStat icon={CalendarClock} label="Deadlines" value={s.deadlines} tone="text-[var(--subject-accent)]" />
                     <MiniStat icon={Video} label="Kuppi" value={s.kuppis} tone="text-[var(--subject-accent)]" />
+                    <MiniStat icon={BookOpen} label="Study Notes" value={s.studyNotes} tone="text-[var(--subject-accent)]" />
                   </div>
                   <div className="mt-auto flex items-center justify-between gap-2 border-t border-border/40 pt-3 text-xs text-muted-foreground">
                     <span className="truncate">{s.latest ? `Updated ${formatRelative(s.latest)}` : "No uploads yet"}</span>
