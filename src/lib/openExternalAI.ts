@@ -42,6 +42,8 @@ Semester: ${semester ?? "Unknown"}
 Material type: ${materialType}
 File name: ${fileName ?? "Unknown"}
 PDF/file link: ${link}
+${noteBlock}
+
 
 Please explain the whole material without missing important content.
 I need the explanation in simple student-friendly English.
