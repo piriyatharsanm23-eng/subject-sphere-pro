@@ -412,6 +412,7 @@ function PreviewDialog({
   aiOn,
   showChatGPT,
   showGemini,
+  hasNote,
 }: {
   material: MaterialRow | null;
   onClose: () => void;
@@ -419,6 +420,7 @@ function PreviewDialog({
   aiOn?: boolean;
   showChatGPT?: boolean;
   showGemini?: boolean;
+  hasNote?: boolean;
 }) {
   const [signedUrl, setSignedUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
