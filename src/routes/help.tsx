@@ -208,6 +208,48 @@ function HelpPage() {
             </div>
           </Card>
 
+          {/* Study Notes */}
+          <Card
+            icon={<BookOpen className="h-5 w-5" />}
+            eyebrow="Read online"
+            title="Study Notes — read without downloading"
+          >
+            <p className="text-sm text-muted-foreground">
+              Besides PDFs, many topics now have web Study Notes you can read straight in the
+              browser — with headings, tables, formulas and an “On this page” list so you can jump
+              to any section.
+            </p>
+            <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <Tip
+                icon={<BookOpen className="h-4 w-4" />}
+                title="Find them on a subject"
+                desc="Open a subject and switch to the Study Notes tab. The count on each subject card tells you how many notes are ready."
+              />
+              <Tip
+                icon={<Layers className="h-4 w-4" />}
+                title="Linked to the PDF"
+                desc="A material with notes shows a Read Study Notes button, so you can read and download the same topic."
+              />
+              <Tip
+                icon={<Search className="h-4 w-4" />}
+                title="Searchable"
+                desc="Press ⌘K / Ctrl+K — study notes appear in their own group in the search results."
+              />
+              <Tip
+                icon={<Sparkles className="h-4 w-4" />}
+                title="Ask ChatGPT or Gemini"
+                desc="When a material has study notes, the ChatGPT and Gemini buttons send the note text along so the answer is about your actual content."
+              />
+            </div>
+            <div className="mt-6">
+              <Button asChild size="sm">
+                <Link to="/notes">
+                  Browse study notes <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </Card>
+
           {/* Efficiency tips */}
           <Card
             icon={<Sparkles className="h-5 w-5" />}
