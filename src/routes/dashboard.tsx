@@ -102,6 +102,26 @@ function DashboardContent({ sel }: { sel: Selection }) {
     },
   });
 
+  const studyNotesQ = useQuery({
+    queryKey: ["dashboard-study-note-counts", sel.subjectIds.join(",")],
+    enabled: sel.subjectIds.length > 0,
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("study_notes")
+        .select("id,subject_id")
+        .in("subject_id", sel.subjectIds)
+        .eq("published", true);
+      if (error) throw error;
+      return (data ?? []) as { id: string; subject_id: string }[];
+    },
+  });
+
+  const studyNoteCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const n of studyNotesQ.data ?? []) counts[n.subject_id] = (counts[n.subject_id] ?? 0) + 1;
+    return counts;
+  }, [studyNotesQ.data]);
+
   const subjectsById = useMemo(() => Object.fromEntries((subjectsQ.data ?? []).map((s) => [s.id, s])), [subjectsQ.data]);
 
   const filtered = useMemo(() => {
