@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Search, Download, Eye, ArrowRight, Settings2, Inbox, FileText, MessageSquarePlus, Star, Loader2 } from "lucide-react";
+import { Search, Download, Eye, ArrowRight, Settings2, Inbox, FileText, MessageSquarePlus, Star, Loader2, BookOpen } from "lucide-react";
 import { MaterialPreviewDialog, type PreviewableMaterial } from "@/components/MaterialPreview";
 import { DeadlineBanner, AllDeadlinesList } from "@/components/DeadlineBanner";
 import { Button } from "@/components/ui/button";
