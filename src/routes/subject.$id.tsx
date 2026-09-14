@@ -67,7 +67,7 @@ function SubjectPage() {
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from("study_notes")
-        .select("id,title,slug,chapter,description,material_id,order_index")
+        .select("id,title,slug,chapter,description,material_id,order_index,content")
         .eq("subject_id", id)
         .eq("published", true)
         .order("order_index", { ascending: true });
@@ -75,6 +75,7 @@ function SubjectPage() {
       return (data ?? []) as Array<{
         id: string; title: string; slug: string; chapter: string | null;
         description: string | null; material_id: string | null; order_index: number;
+        content: string | null;
       }>;
     },
   });
@@ -82,8 +83,8 @@ function SubjectPage() {
   const noteSubjectSlug = slugify((subjectQ.data as any)?.name ?? "subject");
 
   const notesByMaterial = useMemo(() => {
-    const map: Record<string, { title: string; slug: string }> = {};
-    for (const n of notesQ.data ?? []) if (n.material_id) map[n.material_id] = { title: n.title, slug: n.slug };
+    const map: Record<string, { title: string; slug: string; content: string | null }> = {};
+    for (const n of notesQ.data ?? []) if (n.material_id) map[n.material_id] = { title: n.title, slug: n.slug, content: n.content };
     return map;
   }, [notesQ.data]);
 
