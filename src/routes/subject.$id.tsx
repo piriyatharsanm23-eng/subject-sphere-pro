@@ -399,6 +399,7 @@ function MaterialList({
         aiOn={aiOn}
         showChatGPT={!!showChatGPT}
         showGemini={!!showGemini}
+        hasNote={!!(previewing && notesByMaterial?.[previewing.id])}
       />
     </>
   );
