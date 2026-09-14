@@ -88,6 +88,8 @@ export async function openExternalAIExplain(
     semester?: string | null;
     file_name?: string | null;
     file_url?: string | null;
+    note_title?: string | null;
+    note_content?: string | null;
   },
 ) {
   const prompt = buildPrompt({
@@ -97,6 +99,8 @@ export async function openExternalAIExplain(
     semester: material.semester,
     fileName: material.file_name,
     fileUrl: material.file_url,
+    noteTitle: material.note_title,
+    noteContent: material.note_content,
   });
 
   const encoded = encodeURIComponent(prompt);
