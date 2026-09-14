@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Search, Download, Eye, ArrowRight, Settings2, Inbox, FileText, MessageSquarePlus, Star, Loader2 } from "lucide-react";
+import { Search, Download, Eye, ArrowRight, Settings2, Inbox, FileText, MessageSquarePlus, Star, Loader2, BookOpen } from "lucide-react";
 import { MaterialPreviewDialog, type PreviewableMaterial } from "@/components/MaterialPreview";
 import { DeadlineBanner, AllDeadlinesList } from "@/components/DeadlineBanner";
 import { Button } from "@/components/ui/button";
@@ -101,6 +101,26 @@ function DashboardContent({ sel }: { sel: Selection }) {
       return data ?? [];
     },
   });
+
+  const studyNotesQ = useQuery({
+    queryKey: ["dashboard-study-note-counts", sel.subjectIds.join(",")],
+    enabled: sel.subjectIds.length > 0,
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("study_notes")
+        .select("id,subject_id")
+        .in("subject_id", sel.subjectIds)
+        .eq("published", true);
+      if (error) throw error;
+      return (data ?? []) as { id: string; subject_id: string }[];
+    },
+  });
+
+  const studyNoteCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const n of studyNotesQ.data ?? []) counts[n.subject_id] = (counts[n.subject_id] ?? 0) + 1;
+    return counts;
+  }, [studyNotesQ.data]);
 
   const subjectsById = useMemo(() => Object.fromEntries((subjectsQ.data ?? []).map((s) => [s.id, s])), [subjectsQ.data]);
 
@@ -293,6 +313,7 @@ function DashboardContent({ sel }: { sel: Selection }) {
                     </div>
                     <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 pt-4 text-xs text-muted-foreground">
                       <span className="inline-flex items-center gap-1"><FileText className="h-4 w-4" aria-hidden="true" /> {meta?.count ?? 0} materials</span>
+                      <span className="inline-flex items-center gap-1"><BookOpen className="h-4 w-4" aria-hidden="true" /> {studyNoteCounts[s.id] ?? 0} study notes</span>
                       {meta?.latest && <span>Updated {formatRelative(meta.latest)}</span>}
                     </div>
                   </Link>

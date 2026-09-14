@@ -67,7 +67,7 @@ function SubjectPage() {
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from("study_notes")
-        .select("id,title,slug,chapter,description,material_id,order_index")
+        .select("id,title,slug,chapter,description,material_id,order_index,content")
         .eq("subject_id", id)
         .eq("published", true)
         .order("order_index", { ascending: true });
@@ -75,6 +75,7 @@ function SubjectPage() {
       return (data ?? []) as Array<{
         id: string; title: string; slug: string; chapter: string | null;
         description: string | null; material_id: string | null; order_index: number;
+        content: string | null;
       }>;
     },
   });
@@ -82,8 +83,8 @@ function SubjectPage() {
   const noteSubjectSlug = slugify((subjectQ.data as any)?.name ?? "subject");
 
   const notesByMaterial = useMemo(() => {
-    const map: Record<string, { title: string; slug: string }> = {};
-    for (const n of notesQ.data ?? []) if (n.material_id) map[n.material_id] = { title: n.title, slug: n.slug };
+    const map: Record<string, { title: string; slug: string; content: string | null }> = {};
+    for (const n of notesQ.data ?? []) if (n.material_id) map[n.material_id] = { title: n.title, slug: n.slug, content: n.content };
     return map;
   }, [notesQ.data]);
 
@@ -303,7 +304,7 @@ function MaterialList({
   uploaders: Record<string, UploaderInfo>;
   subjectName?: string | null;
   semesterName?: string | null;
-  notesByMaterial?: Record<string, { title: string; slug: string }>;
+  notesByMaterial?: Record<string, { title: string; slug: string; content?: string | null }>;
 }) {
   const subjectSlug = slugify(subjectName ?? "subject");
   const [previewing, setPreviewing] = useState<MaterialRow | null>(null);
@@ -312,8 +313,9 @@ function MaterialList({
   const aiOn = !!aiSettings?.enabled;
   const showChatGPT = aiOn && aiSettings?.chatgpt_enabled;
   const showGemini = aiOn && aiSettings?.gemini_enabled;
-  const openAI = (m: MaterialRow, provider: AIProvider) =>
-    openExternalAIExplain(provider, {
+  const openAI = (m: MaterialRow, provider: AIProvider) => {
+    const note = notesByMaterial?.[m.id];
+    return openExternalAIExplain(provider, {
       id: m.id,
       title: m.title,
       material_type: materialTypeLabel(m.material_type),
@@ -321,7 +323,10 @@ function MaterialList({
       semester: semesterName ?? null,
       file_name: m.file_name,
       file_url: m.file_url,
+      note_title: note?.title ?? null,
+      note_content: note?.content ?? null,
     });
+  };
   if (items.length === 0) return <Empty label="Nothing here yet" />;
   return (
     <>
@@ -351,13 +356,25 @@ function MaterialList({
                 )}
               </Button>
               {showChatGPT && (
-                <Button size="sm" variant="secondary" onClick={() => openAI(m, "chatgpt")}>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  disabled={!notesByMaterial?.[m.id]}
+                  title={notesByMaterial?.[m.id] ? undefined : "Available once study notes are added for this material"}
+                  onClick={() => openAI(m, "chatgpt")}
+                >
                   <Bot className="mr-2 h-4 w-4 text-emerald-400" aria-hidden="true" />ChatGPT
                   <ExternalLink className="ml-1 h-3 w-3 opacity-70" aria-hidden="true" />
                 </Button>
               )}
               {showGemini && (
-                <Button size="sm" variant="secondary" onClick={() => openAI(m, "gemini")}>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  disabled={!notesByMaterial?.[m.id]}
+                  title={notesByMaterial?.[m.id] ? undefined : "Available once study notes are added for this material"}
+                  onClick={() => openAI(m, "gemini")}
+                >
                   <Sparkles className="mr-2 h-4 w-4 text-sky-400" aria-hidden="true" />Gemini
                   <ExternalLink className="ml-1 h-3 w-3 opacity-70" aria-hidden="true" />
                 </Button>
@@ -382,6 +399,7 @@ function MaterialList({
         aiOn={aiOn}
         showChatGPT={!!showChatGPT}
         showGemini={!!showGemini}
+        hasNote={!!(previewing && notesByMaterial?.[previewing.id])}
       />
     </>
   );
@@ -394,6 +412,7 @@ function PreviewDialog({
   aiOn,
   showChatGPT,
   showGemini,
+  hasNote,
 }: {
   material: MaterialRow | null;
   onClose: () => void;
@@ -401,6 +420,7 @@ function PreviewDialog({
   aiOn?: boolean;
   showChatGPT?: boolean;
   showGemini?: boolean;
+  hasNote?: boolean;
 }) {
   const [signedUrl, setSignedUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -487,16 +507,18 @@ function PreviewDialog({
               <Sparkles className="h-3.5 w-3.5 text-primary" /> AI Study Helper
             </div>
             <p className="mt-1 text-sm text-muted-foreground">
-              Get a complete explanation, formulas, examples, viva questions, and exam revision from this material.
+              {hasNote
+                ? "Get a complete explanation, formulas, examples, viva questions, and exam revision from this material's study notes."
+                : "Available once study notes are added for this material."}
             </p>
             <div className="mt-2 flex flex-wrap gap-2">
               {showChatGPT && (
-                <Button size="sm" variant="secondary" onClick={() => onExplain("chatgpt")}>
+                <Button size="sm" variant="secondary" disabled={!hasNote} onClick={() => onExplain("chatgpt")}>
                   <Bot className="mr-2 h-4 w-4 text-emerald-400" /> Explain with ChatGPT
                 </Button>
               )}
               {showGemini && (
-                <Button size="sm" variant="secondary" onClick={() => onExplain("gemini")}>
+                <Button size="sm" variant="secondary" disabled={!hasNote} onClick={() => onExplain("gemini")}>
                   <Sparkles className="mr-2 h-4 w-4 text-sky-400" /> Explain with Gemini
                 </Button>
               )}
