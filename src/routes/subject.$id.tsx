@@ -313,8 +313,9 @@ function MaterialList({
   const aiOn = !!aiSettings?.enabled;
   const showChatGPT = aiOn && aiSettings?.chatgpt_enabled;
   const showGemini = aiOn && aiSettings?.gemini_enabled;
-  const openAI = (m: MaterialRow, provider: AIProvider) =>
-    openExternalAIExplain(provider, {
+  const openAI = (m: MaterialRow, provider: AIProvider) => {
+    const note = notesByMaterial?.[m.id];
+    return openExternalAIExplain(provider, {
       id: m.id,
       title: m.title,
       material_type: materialTypeLabel(m.material_type),
@@ -322,7 +323,10 @@ function MaterialList({
       semester: semesterName ?? null,
       file_name: m.file_name,
       file_url: m.file_url,
+      note_title: note?.title ?? null,
+      note_content: note?.content ?? null,
     });
+  };
   if (items.length === 0) return <Empty label="Nothing here yet" />;
   return (
     <>
