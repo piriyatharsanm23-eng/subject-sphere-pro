@@ -313,6 +313,7 @@ function DashboardContent({ sel }: { sel: Selection }) {
                     </div>
                     <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 pt-4 text-xs text-muted-foreground">
                       <span className="inline-flex items-center gap-1"><FileText className="h-4 w-4" aria-hidden="true" /> {meta?.count ?? 0} materials</span>
+                      <span className="inline-flex items-center gap-1"><BookOpen className="h-4 w-4" aria-hidden="true" /> {studyNoteCounts[s.id] ?? 0} study notes</span>
                       {meta?.latest && <span>Updated {formatRelative(meta.latest)}</span>}
                     </div>
                   </Link>
