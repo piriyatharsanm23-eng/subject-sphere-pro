@@ -7,6 +7,9 @@ const PROVIDER_LABEL: Record<AIProvider, string> = {
   gemini: "Gemini",
 };
 
+/** Keeps the prompt inside the URL length limits browsers/providers accept. */
+const MAX_NOTE_CHARS = 6000;
+
 function buildPrompt(input: {
   materialTitle: string;
   materialType: string;
@@ -14,9 +17,22 @@ function buildPrompt(input: {
   semester?: string | null;
   fileName?: string | null;
   fileUrl?: string | null;
+  noteTitle?: string | null;
+  noteContent?: string | null;
 }) {
-  const { materialTitle, materialType, subject, semester, fileName, fileUrl } = input;
+  const { materialTitle, materialType, subject, semester, fileName, fileUrl, noteTitle, noteContent } = input;
   const link = fileUrl && fileUrl.length > 0 ? fileUrl : "PDF/file link not available";
+  const note = (noteContent ?? "").trim();
+  const noteBlock = note
+    ? `
+
+Here are the study notes for this material${noteTitle ? ` ("${noteTitle}")` : ""}. Base your teaching on this content:
+
+--- STUDY NOTES START ---
+${note.length > MAX_NOTE_CHARS ? `${note.slice(0, MAX_NOTE_CHARS)}\n…(notes truncated)` : note}
+--- STUDY NOTES END ---`
+    : "";
+
   return `I am a university student. I want you to teach me this PDF/lecture material completely and clearly.
 
 Material details:
