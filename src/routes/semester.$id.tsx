@@ -115,6 +115,7 @@ function SemesterPage() {
   const materials = materialsQ.data ?? [];
   const deadlines = deadlinesQ.data ?? [];
   const kuppis = kuppiQ.data ?? [];
+  const studyNotes = studyNotesQ.data ?? [];
 
   const perSubject = subjects.map((s) => {
     const mine = materials.filter((m) => m.subject_id === s.id);
