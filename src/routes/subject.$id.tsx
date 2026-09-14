@@ -507,16 +507,18 @@ function PreviewDialog({
               <Sparkles className="h-3.5 w-3.5 text-primary" /> AI Study Helper
             </div>
             <p className="mt-1 text-sm text-muted-foreground">
-              Get a complete explanation, formulas, examples, viva questions, and exam revision from this material.
+              {hasNote
+                ? "Get a complete explanation, formulas, examples, viva questions, and exam revision from this material's study notes."
+                : "Available once study notes are added for this material."}
             </p>
             <div className="mt-2 flex flex-wrap gap-2">
               {showChatGPT && (
-                <Button size="sm" variant="secondary" onClick={() => onExplain("chatgpt")}>
+                <Button size="sm" variant="secondary" disabled={!hasNote} onClick={() => onExplain("chatgpt")}>
                   <Bot className="mr-2 h-4 w-4 text-emerald-400" /> Explain with ChatGPT
                 </Button>
               )}
               {showGemini && (
-                <Button size="sm" variant="secondary" onClick={() => onExplain("gemini")}>
+                <Button size="sm" variant="secondary" disabled={!hasNote} onClick={() => onExplain("gemini")}>
                   <Sparkles className="mr-2 h-4 w-4 text-sky-400" /> Explain with Gemini
                 </Button>
               )}
