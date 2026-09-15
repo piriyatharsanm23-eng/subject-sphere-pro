@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { Download, FileText, Loader2 } from "lucide-react";
+import { Download, ExternalLink, FileText, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useMaterialDownload } from "@/hooks/useMaterialDownload";
-import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export type PreviewableMaterial = {
   id: string;
