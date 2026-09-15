@@ -411,20 +411,89 @@
   border-left: 1px solid var(--border);
 }
 .toc-rail a {
+  position: relative;
   display: block;
   border-left: 2px solid transparent;
   margin-left: -1px;
   padding: 0.25rem 0.5rem;
   line-height: 1.35;
-  transition: color 0.15s ease, border-color 0.15s ease;
+  border-radius: 0 0.5rem 0.5rem 0;
+  transition:
+    color 0.22s ease,
+    border-color 0.22s ease,
+    background-color 0.22s ease,
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    padding-left 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: toc-item-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .toc-rail a[data-level="3"] {
   padding-left: 1.25rem;
+}
+.toc-rail a:hover {
+  background-color: color-mix(in oklab, var(--primary) 8%, transparent);
+  transform: translateX(2px);
 }
 .toc-rail a[data-active="true"] {
   border-left-color: var(--primary);
   color: var(--primary);
   font-weight: 600;
+  background-color: color-mix(in oklab, var(--primary) 10%, transparent);
+  transform: translateX(3px);
+}
+.toc-rail a[data-active="true"]::before {
+  content: "";
+  position: absolute;
+  left: -3px;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 9999px;
+  background: var(--primary);
+  transform: translateY(-50%);
+  animation: toc-dot-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes toc-item-in {
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes toc-dot-in {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) scale(0.2);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+}
+
+/* Left "all notes" navigation links */
+.notes-nav a {
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: toc-item-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.notes-nav a:hover {
+  transform: translateX(3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toc-rail a,
+  .notes-nav a,
+  .toc-rail a[data-active="true"]::before {
+    animation: none;
+    transition: none;
+    transform: none;
+  }
 }
 
 
