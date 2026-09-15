@@ -102,7 +102,7 @@ function NoteReaderPage() {
   }, [note?.title]);
 
   const sidebar = (onNavigate?: () => void) => (
-    <nav aria-label="Study notes" className="space-y-5 text-sm">
+    <nav aria-label="Study notes" className="notes-nav space-y-5 text-sm">
       {bySubject.map((g) => (
         <div key={g.name}>
           <div className="px-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{g.name}</div>
