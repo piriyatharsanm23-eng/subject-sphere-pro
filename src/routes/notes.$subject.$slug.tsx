@@ -255,8 +255,8 @@ function TocList({
 }: { items: ReturnType<typeof extractToc>; activeId: string | null; className?: string }) {
   return (
     <ul className={`toc-rail space-y-0.5 text-sm ${className ?? ""}`}>
-      {items.map((t) => (
-        <li key={t.id}>
+      {items.map((t, i) => (
+        <li key={t.id} style={{ animationDelay: `${Math.min(i, 12) * 25}ms` }}>
           <a
             href={`#${t.id}`}
             data-level={t.level}
