@@ -256,9 +256,10 @@ function TocList({
   return (
     <ul className={`toc-rail space-y-0.5 text-sm ${className ?? ""}`}>
       {items.map((t, i) => (
-        <li key={t.id} style={{ animationDelay: `${Math.min(i, 12) * 25}ms` }}>
+        <li key={t.id}>
           <a
             href={`#${t.id}`}
+            style={{ animationDelay: `${Math.min(i, 12) * 25}ms` }}
             data-level={t.level}
             data-active={activeId === t.id ? "true" : undefined}
             onClick={(e) => {
