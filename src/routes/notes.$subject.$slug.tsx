@@ -102,7 +102,7 @@ function NoteReaderPage() {
   }, [note?.title]);
 
   const sidebar = (onNavigate?: () => void) => (
-    <nav aria-label="Study notes" className="space-y-5 text-sm">
+    <nav aria-label="Study notes" className="notes-nav space-y-5 text-sm">
       {bySubject.map((g) => (
         <div key={g.name}>
           <div className="px-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{g.name}</div>
@@ -255,10 +255,11 @@ function TocList({
 }: { items: ReturnType<typeof extractToc>; activeId: string | null; className?: string }) {
   return (
     <ul className={`toc-rail space-y-0.5 text-sm ${className ?? ""}`}>
-      {items.map((t) => (
+      {items.map((t, i) => (
         <li key={t.id}>
           <a
             href={`#${t.id}`}
+            style={{ animationDelay: `${Math.min(i, 12) * 25}ms` }}
             data-level={t.level}
             data-active={activeId === t.id ? "true" : undefined}
             onClick={(e) => {
