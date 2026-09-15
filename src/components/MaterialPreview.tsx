@@ -24,6 +24,7 @@ export function MaterialPreviewDialog({
   const [signedUrl, setSignedUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const dl = useMaterialDownload();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     let cancelled = false;
@@ -48,7 +49,8 @@ export function MaterialPreviewDialog({
     ((material.file_type ?? "").includes("pdf") ||
       (material.file_name ?? "").toLowerCase().endsWith(".pdf"));
   const isImage = !!material && (material.file_type ?? "").startsWith("image/");
-  const canPreview = !!signedUrl && (isPdf || isImage);
+  // Mobile browsers can't render a PDF inside an iframe — offer a viewer tab instead.
+  const canPreview = !!signedUrl && (isImage || (isPdf && !isMobile));
 
   return (
     <Dialog open={!!material} onOpenChange={(o) => !o && onClose()}>
