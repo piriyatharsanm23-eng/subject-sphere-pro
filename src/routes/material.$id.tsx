@@ -17,6 +17,7 @@ import { useUploaders } from "@/lib/uploaders";
 import { UploaderBadge } from "@/components/UploaderBadge";
 import { ReportMaterialButton } from "@/components/ReportMaterialButton";
 import { slugify } from "@/lib/notes";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export const Route = createFileRoute("/material/$id")({
   head: () => ({ meta: [{ title: "Material — StudyHub" }] }),
@@ -116,7 +117,8 @@ function MaterialPage() {
 
   const isPdf = (m?.file_type ?? "").includes("pdf") || (m?.file_name ?? "").toLowerCase().endsWith(".pdf");
   const isImage = (m?.file_type ?? "").startsWith("image/");
-  const canPreview = !!signedUrl && (isPdf || isImage);
+  // Mobile browsers can't render a PDF inside an iframe — offer a viewer tab instead.
+  const canPreview = !!signedUrl && (isImage || (isPdf && !isMobile));
 
   return (
     <div className="min-h-dvh flex flex-col bg-muted/40">
