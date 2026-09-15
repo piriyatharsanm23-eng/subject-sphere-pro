@@ -447,13 +447,15 @@ function PreviewDialog({
   }, [material?.file_url]);
 
   const dlg = useMaterialDownload();
+  const isMobile = useIsMobile();
 
   const isPdf =
     !!material &&
     ((material.file_type ?? "").includes("pdf") ||
       (material.file_name ?? "").toLowerCase().endsWith(".pdf"));
   const isImage = !!material && (material.file_type ?? "").startsWith("image/");
-  const canPreview = !!signedUrl && (isPdf || isImage);
+  // Mobile browsers can't render a PDF inside an iframe — offer a viewer tab instead.
+  const canPreview = !!signedUrl && (isImage || (isPdf && !isMobile));
 
   return (
     <Dialog open={!!material} onOpenChange={(o) => !o && onClose()}>
@@ -464,9 +466,9 @@ function PreviewDialog({
             {material?.title ?? "Preview"}
           </DialogTitle>
         </DialogHeader>
-        <div className="bg-muted/40 min-h-[70vh]">
+        <div className="bg-muted/40 min-h-[40vh] sm:min-h-[70vh]">
           {loading || !signedUrl ? (
-            <div className="h-[70vh] grid place-items-center text-sm text-muted-foreground">
+            <div className="h-[40vh] sm:h-[70vh] grid place-items-center text-sm text-muted-foreground">
               Loading preview…
             </div>
           ) : canPreview ? (
@@ -476,22 +478,38 @@ function PreviewDialog({
               <img src={signedUrl} alt={material?.title ?? "Preview"} className="w-full max-h-[75vh] object-contain bg-background" />
             )
           ) : (
-            <div className="h-[70vh] grid place-items-center text-center px-6">
+            <div className="h-[40vh] sm:h-[70vh] grid place-items-center text-center px-6">
               <div>
                 <FileText className="mx-auto h-8 w-8 text-muted-foreground" />
-                <p className="mt-3 font-semibold">Preview not supported</p>
+                <p className="mt-3 font-semibold">{isPdf ? "Open this PDF" : "Preview not supported"}</p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {material?.file_name ?? "This file"} can't be shown here. Use Download to open it.
+                  {isPdf
+                    ? "Tap below to read it in your phone's PDF viewer, or download a copy."
+                    : `${material?.file_name ?? "This file"} can't be shown here. Use Download to open it.`}
                 </p>
+                {isPdf && signedUrl && (
+                  <Button asChild size="sm" className="mt-4">
+                    <a href={signedUrl} target="_blank" rel="noopener">
+                      <ExternalLink className="mr-2 h-4 w-4" /> Open PDF
+                    </a>
+                  </Button>
+                )}
               </div>
             </div>
           )}
         </div>
-        <div className="flex items-center justify-between gap-2 px-5 py-3 border-t border-border">
-          <div className="text-xs text-muted-foreground truncate">
+        <div className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 border-t border-border">
+          <div className="text-xs text-muted-foreground truncate max-w-full">
             {material?.file_name}
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            {signedUrl && (
+              <Button asChild size="sm" variant="outline">
+                <a href={signedUrl} target="_blank" rel="noopener">
+                  <ExternalLink className="mr-2 h-4 w-4" /> Open
+                </a>
+              </Button>
+            )}
             {material && (
               <Button size="sm" disabled={dlg.busy} aria-busy={dlg.busy} onClick={() => dlg.download(material)}>
                 {dlg.busy ? (
