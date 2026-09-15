@@ -24,6 +24,7 @@ import { AIExplainDialog, type AIProvider } from "@/components/AIExplainDialog";
 import { useAISettings } from "@/hooks/useAISettings";
 import { openExternalAIExplain } from "@/lib/openExternalAI";
 import { slugify } from "@/lib/notes";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export const Route = createFileRoute("/subject/$id")({
   head: () => ({ meta: [{ title: "Subject — StudyHub" }] }),
