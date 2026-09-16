@@ -115,6 +115,7 @@ function MaterialPage() {
     return () => { cancelled = true; };
   }, [m?.file_url]);
 
+  const isMobile = useIsMobile();
   const isPdf = (m?.file_type ?? "").includes("pdf") || (m?.file_name ?? "").toLowerCase().endsWith(".pdf");
   const isImage = (m?.file_type ?? "").startsWith("image/");
   // Mobile browsers can't render a PDF inside an iframe — offer a viewer tab instead.
