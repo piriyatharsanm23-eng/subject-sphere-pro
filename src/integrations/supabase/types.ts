@@ -928,6 +928,7 @@ export type Database = {
       user_roles: {
         Row: {
           assigned_semester_id: string | null
+          assigned_subject_id: string | null
           created_at: string
           id: string
           role: Database["public"]["Enums"]["app_role"]
@@ -935,6 +936,7 @@ export type Database = {
         }
         Insert: {
           assigned_semester_id?: string | null
+          assigned_subject_id?: string | null
           created_at?: string
           id?: string
           role: Database["public"]["Enums"]["app_role"]
@@ -942,6 +944,7 @@ export type Database = {
         }
         Update: {
           assigned_semester_id?: string | null
+          assigned_subject_id?: string | null
           created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
