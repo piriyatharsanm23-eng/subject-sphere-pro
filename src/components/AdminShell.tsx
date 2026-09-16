@@ -116,12 +116,22 @@ export function AdminShell({
       const { data: isSuper } = await supabase.rpc("is_super_admin", { _user_id: uid });
       const { data: roles } = await supabase
         .from("user_roles")
-        .select("role, assigned_semester_id")
+        .select("role, assigned_semester_id, assigned_subject_id")
         .eq("user_id", uid);
 
       if (!mounted) return;
-      const adminRows = (roles ?? []).filter((r) => r.role === "admin" && r.assigned_semester_id);
+      const adminRows = (roles ?? []).filter((r) => r.role === "admin" && r.assigned_semester_id) as
+        { role: string; assigned_semester_id: string; assigned_subject_id: string | null }[];
       const superRow = (roles ?? []).find((r) => r.role === "super_admin");
+
+      // semesterId -> allowed subject ids, or null when the admin owns the whole semester
+      const scope: Record<string, string[] | null> = {};
+      for (const r of adminRows) {
+        if (r.assigned_subject_id === null) { scope[r.assigned_semester_id] = null; continue; }
+        if (scope[r.assigned_semester_id] === null) continue;
+        scope[r.assigned_semester_id] = [...(scope[r.assigned_semester_id] ?? []), r.assigned_subject_id];
+      }
+      setSubjectScope(scope);
 
       if (adminRows.length === 0 && !superRow && !isSuper) {
         setState("denied");
