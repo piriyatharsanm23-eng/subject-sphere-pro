@@ -25,6 +25,8 @@ export type AdminContext = {
   isSuper: boolean;
   semesters: AdminSemester[];
   setSemesterId: (id: string) => void;
+  /** Subject ids this admin may manage in the current semester; null = every subject. */
+  allowedSubjectIds: string[] | null;
 };
 
 type NavItem = { to: string; label: string; icon: typeof FileText; exact?: boolean };
@@ -62,6 +64,7 @@ export function AdminShell({
   const [meta, setMeta] = useState<{ userId: string; isSuper: boolean } | null>(null);
   const [unread, setUnread] = useState<Record<string, number>>({});
   const [menuOpen, setMenuOpen] = useState(false);
+  const [subjectScope, setSubjectScope] = useState<Record<string, string[] | null>>({});
 
 
   // Poll unread notifications (grouped by kind) every 60s.
