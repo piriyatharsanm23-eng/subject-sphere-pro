@@ -179,6 +179,7 @@ export function AdminShell({
         isSuper: meta.isSuper,
         semesters,
         setSemesterId,
+        allowedSubjectIds: meta.isSuper ? null : (subjectScope[semesterId] ?? null),
       }
     : null;
 
