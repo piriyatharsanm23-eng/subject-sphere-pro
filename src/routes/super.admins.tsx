@@ -404,24 +404,51 @@ function AssignDialog({
         </div>
         {role === "admin" && (
           <div>
-            <label className="text-sm font-medium">Semesters</label>
-            <div className="mt-1 max-h-56 overflow-auto rounded-lg border border-border divide-y divide-border">
+            <label className="text-sm font-medium">Semesters &amp; subjects</label>
+            <div className="mt-1 max-h-72 overflow-auto rounded-lg border border-border divide-y divide-border">
               {semesters.length === 0 ? (
                 <div className="p-3 text-sm text-muted-foreground">No semesters available.</div>
-              ) : semesters.map((s) => (
-                <label key={s.id} className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted/40 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4 accent-primary"
-                    checked={semesterIds.includes(s.id)}
-                    onChange={() => toggle(s.id)}
-                  />
-                  <span>{s.name}</span>
-                </label>
-              ))}
+              ) : semesters.map((s) => {
+                const semSubjects = subjects.filter((x) => x.semester_id === s.id);
+                const picked = subjectIds[s.id] ?? [];
+                return (
+                  <div key={s.id}>
+                    <label className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted/40 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        className="h-4 w-4 accent-primary"
+                        checked={semesterIds.includes(s.id)}
+                        onChange={() => toggle(s.id)}
+                      />
+                      <span>{s.name}</span>
+                      {semesterIds.includes(s.id) && (
+                        <span className="ml-auto text-xs text-muted-foreground">
+                          {picked.length === 0 ? "All subjects" : `${picked.length} subject${picked.length > 1 ? "s" : ""}`}
+                        </span>
+                      )}
+                    </label>
+                    {semesterIds.includes(s.id) && semSubjects.length > 0 && (
+                      <div className="pl-8 pr-3 pb-2 space-y-1">
+                        {semSubjects.map((sub) => (
+                          <label key={sub.id} className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
+                            <input
+                              type="checkbox"
+                              className="h-3.5 w-3.5 accent-primary"
+                              checked={picked.includes(sub.id)}
+                              onChange={() => toggleSubject(s.id, sub.id)}
+                            />
+                            <span>{sub.name}</span>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              This admin will be able to manage every selected semester.
+              Leave the subjects unticked to give full control of the semester. Tick subjects to limit
+              this admin to only those subjects.
             </p>
           </div>
         )}
