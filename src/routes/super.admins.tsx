@@ -20,10 +20,12 @@ export const Route = createFileRoute("/super/admins")({
 
 type Role = "admin" | "super_admin";
 type RoleRow = {
-  id: string; user_id: string; role: Role; assigned_semester_id: string | null;
+  id: string; user_id: string; role: Role;
+  assigned_semester_id: string | null; assigned_subject_id: string | null;
 };
 type Profile = { id: string; full_name: string | null; email: string | null };
 type Semester = { id: string; name: string };
+type Subject = { id: string; name: string; semester_id: string };
 
 function AdminsPage() {
   const qc = useQueryClient();
@@ -35,7 +37,7 @@ function AdminsPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("user_roles")
-        .select("id,user_id,role,assigned_semester_id");
+        .select("id,user_id,role,assigned_semester_id,assigned_subject_id");
       if (error) throw error;
       return (data ?? []) as RoleRow[];
     },
@@ -56,6 +58,16 @@ function AdminsPage() {
       const { data, error } = await supabase.from("semesters").select("id,name").order("name");
       if (error) throw error;
       return (data ?? []) as Semester[];
+    },
+  });
+
+  const subjectsQ = useQuery({
+    queryKey: ["super-all-subjects"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("subjects").select("id,name,semester_id").order("name");
+      if (error) throw error;
+      return (data ?? []) as Subject[];
     },
   });
 
