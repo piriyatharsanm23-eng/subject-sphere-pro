@@ -79,6 +79,10 @@ function AdminsPage() {
     () => Object.fromEntries((semestersQ.data ?? []).map((s) => [s.id, s])),
     [semestersQ.data],
   );
+  const subjById = useMemo(
+    () => Object.fromEntries((subjectsQ.data ?? []).map((s) => [s.id, s])),
+    [subjectsQ.data],
+  );
 
   const rows = useMemo(() => {
     const all = rolesQ.data ?? [];
