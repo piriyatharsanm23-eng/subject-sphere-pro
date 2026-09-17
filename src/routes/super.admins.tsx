@@ -237,14 +237,17 @@ function AdminsPage() {
 }
 
 function AssignDialog({
-  profiles, semesters, existing, onSaved,
+  profiles, semesters, subjects, existing, onSaved,
 }: {
-  profiles: Profile[]; semesters: Semester[]; existing: RoleRow[]; onSaved: () => void;
+  profiles: Profile[]; semesters: Semester[]; subjects: Subject[];
+  existing: RoleRow[]; onSaved: () => void;
 }) {
   const [userId, setUserId] = useState("");
   const [userSearch, setUserSearch] = useState("");
   const [role, setRole] = useState<Role>("admin");
   const [semesterIds, setSemesterIds] = useState<string[]>([]);
+  // semesterId -> chosen subject ids; empty means the whole semester
+  const [subjectIds, setSubjectIds] = useState<Record<string, string[]>>({});
   const [saving, setSaving] = useState(false);
 
   const filteredProfiles = useMemo(() => {
@@ -263,6 +266,15 @@ function AssignDialog({
   const toggle = (id: string) =>
     setSemesterIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
 
+  const toggleSubject = (semId: string, subjectId: string) =>
+    setSubjectIds((prev) => {
+      const cur = prev[semId] ?? [];
+      return {
+        ...prev,
+        [semId]: cur.includes(subjectId) ? cur.filter((x) => x !== subjectId) : [...cur, subjectId],
+      };
+    });
+
   const save = async () => {
     const target = profiles.find((p) => p.id === userId);
     if (!target) return toast.error("Select a user account first.");
@@ -279,23 +291,49 @@ function AssignDialog({
       });
       if (error) { setSaving(false); return toast.error(error.message); }
     } else {
-      // only insert semesters that aren't already assigned
-      const alreadyAssigned = new Set(
-        existing.filter((r) => r.user_id === target.id && r.role === "admin").map((r) => r.assigned_semester_id),
+      // skip rows that already exist with the exact same semester + subject scope
+      const already = new Set(
+        existing
+          .filter((r) => r.user_id === target.id && r.role === "admin")
+          .map((r) => `${r.assigned_semester_id}|${r.assigned_subject_id ?? ""}`),
       );
-      const toInsert = semesterIds
-        .filter((id) => !alreadyAssigned.has(id))
-        .map((id) => ({ user_id: target.id, role: "admin" as const, assigned_semester_id: id }));
+      const toInsert: {
+        user_id: string; role: "admin"; assigned_semester_id: string; assigned_subject_id: string | null;
+      }[] = [];
+      for (const semId of semesterIds) {
+        const chosen = subjectIds[semId] ?? [];
+        const scopes: (string | null)[] = chosen.length > 0 ? chosen : [null];
+        for (const subjectId of scopes) {
+          if (already.has(`${semId}|${subjectId ?? ""}`)) continue;
+          toInsert.push({
+            user_id: target.id, role: "admin",
+            assigned_semester_id: semId, assigned_subject_id: subjectId,
+          });
+        }
+      }
       if (toInsert.length === 0) {
         setSaving(false);
-        return toast.error("This user is already admin of the selected semesters");
+        return toast.error("This user already has the selected access");
       }
       const { error } = await supabase.from("user_roles").insert(toInsert);
       if (error) { setSaving(false); return toast.error(error.message); }
     }
     setSaving(false);
 
-    const semNames = semesterIds.map((id) => semesters.find((s) => s.id === id)?.name).filter(Boolean).join(", ");
+    const semNames = semesterIds
+      .map((id) => {
+        const name = semesters.find((s) => s.id === id)?.name;
+        if (!name) return null;
+        const chosen = subjectIds[id] ?? [];
+        if (chosen.length === 0) return name;
+        const subjNames = chosen
+          .map((sid) => subjects.find((s) => s.id === sid)?.name)
+          .filter(Boolean)
+          .join(", ");
+        return `${name} (${subjNames})`;
+      })
+      .filter(Boolean)
+      .join(", ");
     await supabase.from("notifications").insert({
       user_id: target.id,
       kind: "role_assigned",
