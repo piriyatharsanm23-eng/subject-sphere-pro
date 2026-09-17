@@ -208,6 +208,17 @@ function AdminsPage() {
                           </Select>
                         ) : <span className="text-muted-foreground whitespace-nowrap">All semesters</span>}
                       </td>
+                      <td className="px-4 py-3">
+                        {r.role === "admin" ? (
+                          r.assigned_subject_id ? (
+                            <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium border bg-sky-500/15 text-sky-300 border-sky-500/30">
+                              {subjById[r.assigned_subject_id]?.name ?? "Subject"}
+                            </span>
+                          ) : (
+                            <span className="text-muted-foreground whitespace-nowrap">All subjects</span>
+                          )
+                        ) : <span className="text-muted-foreground whitespace-nowrap">Everything</span>}
+                      </td>
                       <td className="px-4 py-3 text-right whitespace-nowrap">
                         <Button size="sm" variant="ghost" className="text-rose-400 hover:text-rose-300" onClick={() => removeRole(r)}>
                           <ShieldOff className="h-4 w-4 mr-1" />Remove
