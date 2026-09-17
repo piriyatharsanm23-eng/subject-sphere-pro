@@ -54,9 +54,13 @@ function DeadlinesPage({ ctx }: { ctx: AdminContext }) {
   const [open, setOpen] = useState(false);
 
   const subjectsQ = useQuery({
-    queryKey: ["admin-subjects", ctx.semesterId],
-    queryFn: async () => (await supabase
-      .from("subjects").select("id,name,code").eq("semester_id", ctx.semesterId).order("name")).data ?? [],
+    queryKey: ["admin-subjects", ctx.semesterId, ctx.allowedSubjectIds],
+    queryFn: async () => {
+      let qb = supabase
+        .from("subjects").select("id,name,code").eq("semester_id", ctx.semesterId).order("name");
+      if (ctx.allowedSubjectIds) qb = qb.in("id", ctx.allowedSubjectIds);
+      return (await qb).data ?? [];
+    },
   });
 
   const listQ = useQuery({

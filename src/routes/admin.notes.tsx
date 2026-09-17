@@ -13,7 +13,7 @@ function AdminNotesRoute() {
       title="Study Notes"
       description="Write web-based notes students can read online — with headings, examples and equations."
     >
-      {(ctx) => <StudyNotesManager semesterId={ctx.semesterId} />}
+      {(ctx) => <StudyNotesManager semesterId={ctx.semesterId} allowedSubjectIds={ctx.allowedSubjectIds} />}
     </AdminShell>
   );
 }

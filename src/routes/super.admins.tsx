@@ -20,10 +20,12 @@ export const Route = createFileRoute("/super/admins")({
 
 type Role = "admin" | "super_admin";
 type RoleRow = {
-  id: string; user_id: string; role: Role; assigned_semester_id: string | null;
+  id: string; user_id: string; role: Role;
+  assigned_semester_id: string | null; assigned_subject_id: string | null;
 };
 type Profile = { id: string; full_name: string | null; email: string | null };
 type Semester = { id: string; name: string };
+type Subject = { id: string; name: string; semester_id: string };
 
 function AdminsPage() {
   const qc = useQueryClient();
@@ -35,7 +37,7 @@ function AdminsPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("user_roles")
-        .select("id,user_id,role,assigned_semester_id");
+        .select("id,user_id,role,assigned_semester_id,assigned_subject_id");
       if (error) throw error;
       return (data ?? []) as RoleRow[];
     },
@@ -59,6 +61,16 @@ function AdminsPage() {
     },
   });
 
+  const subjectsQ = useQuery({
+    queryKey: ["super-all-subjects"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("subjects").select("id,name,semester_id").order("name");
+      if (error) throw error;
+      return (data ?? []) as Subject[];
+    },
+  });
+
   const profileById = useMemo(
     () => Object.fromEntries((profilesQ.data ?? []).map((p) => [p.id, p])),
     [profilesQ.data],
@@ -66,6 +78,10 @@ function AdminsPage() {
   const semById = useMemo(
     () => Object.fromEntries((semestersQ.data ?? []).map((s) => [s.id, s])),
     [semestersQ.data],
+  );
+  const subjById = useMemo(
+    () => Object.fromEntries((subjectsQ.data ?? []).map((s) => [s.id, s])),
+    [subjectsQ.data],
   );
 
   const rows = useMemo(() => {
@@ -134,6 +150,7 @@ function AdminsPage() {
           <AssignDialog
             profiles={profilesQ.data ?? []}
             semesters={semestersQ.data ?? []}
+            subjects={subjectsQ.data ?? []}
             existing={rolesQ.data ?? []}
             onSaved={() => { setOpen(false); refresh(); }}
           />
@@ -153,6 +170,7 @@ function AdminsPage() {
                   <th className="text-left font-medium px-4 py-3">User</th>
                   <th className="text-left font-medium px-4 py-3">Role</th>
                   <th className="text-left font-medium px-4 py-3">Semester</th>
+                  <th className="text-left font-medium px-4 py-3">Subject scope</th>
                   <th className="text-right font-medium px-4 py-3">Actions</th>
                 </tr>
               </thead>
@@ -190,6 +208,17 @@ function AdminsPage() {
                           </Select>
                         ) : <span className="text-muted-foreground whitespace-nowrap">All semesters</span>}
                       </td>
+                      <td className="px-4 py-3">
+                        {r.role === "admin" ? (
+                          r.assigned_subject_id ? (
+                            <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium border bg-sky-500/15 text-sky-300 border-sky-500/30">
+                              {subjById[r.assigned_subject_id]?.name ?? "Subject"}
+                            </span>
+                          ) : (
+                            <span className="text-muted-foreground whitespace-nowrap">All subjects</span>
+                          )
+                        ) : <span className="text-muted-foreground whitespace-nowrap">Everything</span>}
+                      </td>
                       <td className="px-4 py-3 text-right whitespace-nowrap">
                         <Button size="sm" variant="ghost" className="text-rose-400 hover:text-rose-300" onClick={() => removeRole(r)}>
                           <ShieldOff className="h-4 w-4 mr-1" />Remove
@@ -208,14 +237,17 @@ function AdminsPage() {
 }
 
 function AssignDialog({
-  profiles, semesters, existing, onSaved,
+  profiles, semesters, subjects, existing, onSaved,
 }: {
-  profiles: Profile[]; semesters: Semester[]; existing: RoleRow[]; onSaved: () => void;
+  profiles: Profile[]; semesters: Semester[]; subjects: Subject[];
+  existing: RoleRow[]; onSaved: () => void;
 }) {
   const [userId, setUserId] = useState("");
   const [userSearch, setUserSearch] = useState("");
   const [role, setRole] = useState<Role>("admin");
   const [semesterIds, setSemesterIds] = useState<string[]>([]);
+  // semesterId -> chosen subject ids; empty means the whole semester
+  const [subjectIds, setSubjectIds] = useState<Record<string, string[]>>({});
   const [saving, setSaving] = useState(false);
 
   const filteredProfiles = useMemo(() => {
@@ -234,6 +266,15 @@ function AssignDialog({
   const toggle = (id: string) =>
     setSemesterIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
 
+  const toggleSubject = (semId: string, subjectId: string) =>
+    setSubjectIds((prev) => {
+      const cur = prev[semId] ?? [];
+      return {
+        ...prev,
+        [semId]: cur.includes(subjectId) ? cur.filter((x) => x !== subjectId) : [...cur, subjectId],
+      };
+    });
+
   const save = async () => {
     const target = profiles.find((p) => p.id === userId);
     if (!target) return toast.error("Select a user account first.");
@@ -250,23 +291,49 @@ function AssignDialog({
       });
       if (error) { setSaving(false); return toast.error(error.message); }
     } else {
-      // only insert semesters that aren't already assigned
-      const alreadyAssigned = new Set(
-        existing.filter((r) => r.user_id === target.id && r.role === "admin").map((r) => r.assigned_semester_id),
+      // skip rows that already exist with the exact same semester + subject scope
+      const already = new Set(
+        existing
+          .filter((r) => r.user_id === target.id && r.role === "admin")
+          .map((r) => `${r.assigned_semester_id}|${r.assigned_subject_id ?? ""}`),
       );
-      const toInsert = semesterIds
-        .filter((id) => !alreadyAssigned.has(id))
-        .map((id) => ({ user_id: target.id, role: "admin" as const, assigned_semester_id: id }));
+      const toInsert: {
+        user_id: string; role: "admin"; assigned_semester_id: string; assigned_subject_id: string | null;
+      }[] = [];
+      for (const semId of semesterIds) {
+        const chosen = subjectIds[semId] ?? [];
+        const scopes: (string | null)[] = chosen.length > 0 ? chosen : [null];
+        for (const subjectId of scopes) {
+          if (already.has(`${semId}|${subjectId ?? ""}`)) continue;
+          toInsert.push({
+            user_id: target.id, role: "admin",
+            assigned_semester_id: semId, assigned_subject_id: subjectId,
+          });
+        }
+      }
       if (toInsert.length === 0) {
         setSaving(false);
-        return toast.error("This user is already admin of the selected semesters");
+        return toast.error("This user already has the selected access");
       }
       const { error } = await supabase.from("user_roles").insert(toInsert);
       if (error) { setSaving(false); return toast.error(error.message); }
     }
     setSaving(false);
 
-    const semNames = semesterIds.map((id) => semesters.find((s) => s.id === id)?.name).filter(Boolean).join(", ");
+    const semNames = semesterIds
+      .map((id) => {
+        const name = semesters.find((s) => s.id === id)?.name;
+        if (!name) return null;
+        const chosen = subjectIds[id] ?? [];
+        if (chosen.length === 0) return name;
+        const subjNames = chosen
+          .map((sid) => subjects.find((s) => s.id === sid)?.name)
+          .filter(Boolean)
+          .join(", ");
+        return `${name} (${subjNames})`;
+      })
+      .filter(Boolean)
+      .join(", ");
     await supabase.from("notifications").insert({
       user_id: target.id,
       kind: "role_assigned",
@@ -337,24 +404,51 @@ function AssignDialog({
         </div>
         {role === "admin" && (
           <div>
-            <label className="text-sm font-medium">Semesters</label>
-            <div className="mt-1 max-h-56 overflow-auto rounded-lg border border-border divide-y divide-border">
+            <label className="text-sm font-medium">Semesters &amp; subjects</label>
+            <div className="mt-1 max-h-72 overflow-auto rounded-lg border border-border divide-y divide-border">
               {semesters.length === 0 ? (
                 <div className="p-3 text-sm text-muted-foreground">No semesters available.</div>
-              ) : semesters.map((s) => (
-                <label key={s.id} className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted/40 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4 accent-primary"
-                    checked={semesterIds.includes(s.id)}
-                    onChange={() => toggle(s.id)}
-                  />
-                  <span>{s.name}</span>
-                </label>
-              ))}
+              ) : semesters.map((s) => {
+                const semSubjects = subjects.filter((x) => x.semester_id === s.id);
+                const picked = subjectIds[s.id] ?? [];
+                return (
+                  <div key={s.id}>
+                    <label className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted/40 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        className="h-4 w-4 accent-primary"
+                        checked={semesterIds.includes(s.id)}
+                        onChange={() => toggle(s.id)}
+                      />
+                      <span>{s.name}</span>
+                      {semesterIds.includes(s.id) && (
+                        <span className="ml-auto text-xs text-muted-foreground">
+                          {picked.length === 0 ? "All subjects" : `${picked.length} subject${picked.length > 1 ? "s" : ""}`}
+                        </span>
+                      )}
+                    </label>
+                    {semesterIds.includes(s.id) && semSubjects.length > 0 && (
+                      <div className="pl-8 pr-3 pb-2 space-y-1">
+                        {semSubjects.map((sub) => (
+                          <label key={sub.id} className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
+                            <input
+                              type="checkbox"
+                              className="h-3.5 w-3.5 accent-primary"
+                              checked={picked.includes(sub.id)}
+                              onChange={() => toggleSubject(s.id, sub.id)}
+                            />
+                            <span>{sub.name}</span>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              This admin will be able to manage every selected semester.
+              Leave the subjects unticked to give full control of the semester. Tick subjects to limit
+              this admin to only those subjects.
             </p>
           </div>
         )}

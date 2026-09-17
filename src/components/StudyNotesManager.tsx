@@ -45,10 +45,13 @@ export function StudyNotesManager({
   semesterId,
   semesters,
   onSemesterChange,
+  allowedSubjectIds = null,
 }: {
   semesterId: string;
   semesters?: Array<{ id: string; name: string }>;
   onSemesterChange?: (id: string) => void;
+  /** Subject ids this admin may manage; null = every subject in the semester. */
+  allowedSubjectIds?: string[] | null;
 }) {
   const qc = useQueryClient();
   const [q, setQ] = useState("");
@@ -56,11 +59,13 @@ export function StudyNotesManager({
   const [editing, setEditing] = useState<Partial<StudyNote> | null>(null);
 
   const subjectsQ = useQuery({
-    queryKey: ["notes-subjects", semesterId],
+    queryKey: ["notes-subjects", semesterId, allowedSubjectIds],
     enabled: !!semesterId,
     queryFn: async () => {
-      const { data, error } = await supabase
+      let qb = supabase
         .from("subjects").select("id,name,code").eq("semester_id", semesterId).order("name");
+      if (allowedSubjectIds) qb = qb.in("id", allowedSubjectIds);
+      const { data, error } = await qb;
       if (error) throw error;
       return (data ?? []) as Subject[];
     },
