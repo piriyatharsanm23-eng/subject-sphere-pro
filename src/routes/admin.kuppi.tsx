@@ -56,10 +56,12 @@ function Body({ ctx }: { ctx: AdminContext }) {
   const [open, setOpen] = useState(false);
 
   const subjectsQ = useQuery({
-    queryKey: ["admin-kuppi-subjects", ctx.semesterId],
+    queryKey: ["admin-kuppi-subjects", ctx.semesterId, ctx.allowedSubjectIds],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let qb = supabase
         .from("subjects").select("id,name,code").eq("semester_id", ctx.semesterId).order("name");
+      if (ctx.allowedSubjectIds) qb = qb.in("id", ctx.allowedSubjectIds);
+      const { data, error } = await qb;
       if (error) throw error;
       return data ?? [];
     },
