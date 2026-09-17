@@ -150,6 +150,7 @@ function AdminsPage() {
           <AssignDialog
             profiles={profilesQ.data ?? []}
             semesters={semestersQ.data ?? []}
+            subjects={subjectsQ.data ?? []}
             existing={rolesQ.data ?? []}
             onSaved={() => { setOpen(false); refresh(); }}
           />
@@ -169,6 +170,7 @@ function AdminsPage() {
                   <th className="text-left font-medium px-4 py-3">User</th>
                   <th className="text-left font-medium px-4 py-3">Role</th>
                   <th className="text-left font-medium px-4 py-3">Semester</th>
+                  <th className="text-left font-medium px-4 py-3">Subject scope</th>
                   <th className="text-right font-medium px-4 py-3">Actions</th>
                 </tr>
               </thead>
