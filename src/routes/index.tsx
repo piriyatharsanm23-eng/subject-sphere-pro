@@ -13,6 +13,8 @@ import {
   GraduationCap,
   Clock,
   Layers,
+  NotebookPen,
+  CalendarClock,
   ShieldCheck,
   HelpCircle,
   Send,
@@ -23,6 +25,9 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { supabase } from "@/integrations/supabase/client";
 import { getSelection } from "@/lib/selection";
+import { cn } from "@/lib/utils";
+import { subjectThemeClass } from "@/lib/subject-theme";
+import { CardGridSkeleton, EmptyState } from "@/components/ui/states";
 import { useRealtimeInvalidate } from "@/hooks/useRealtimeInvalidate";
 
 export const Route = createFileRoute("/")({
@@ -271,20 +276,24 @@ function Landing() {
       <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
 
       {/* AVAILABLE SEMESTERS */}
-      <section className="container mx-auto px-4 sm:px-6 mt-8 sm:mt-10">
-        <div className="flex items-end justify-between gap-4 mb-4 flex-wrap">
+      <section className="container mx-auto px-4 sm:px-6 mt-8 sm:mt-10" aria-labelledby="semester-heading">
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
           <div className="min-w-0">
-            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 text-primary px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider">
+            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-primary">
               <Layers className="h-3 w-3" /> Catalog
             </div>
-            <h2 className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight">Choose your semester</h2>
-            <p className="mt-1 text-muted-foreground text-sm">Pick a semester to view its subjects and materials.</p>
+            <h2 id="semester-heading" className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">Choose your semester</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {(semesters?.length ?? 0) > 0
+                ? `${semesters?.length} ${semesters?.length === 1 ? "semester" : "semesters"} available — tap a card to see its subjects and materials.`
+                : "Pick a semester to view its subjects and materials."}
+            </p>
           </div>
           <Button asChild variant="ghost" className="shrink-0">
-            <Link to="/select">View all <ArrowRight className="ml-1 h-4 w-4" /></Link>
+            <Link to="/select">Set my semester & subjects <ArrowRight className="ml-1 h-4 w-4" /></Link>
           </Button>
         </div>
-        <SemesterCards semesters={semesters ?? []} />
+        <SemesterCards semesters={semesters ?? []} loading={semesters === undefined} />
       </section>
 
       <RecentUploads />
@@ -348,7 +357,25 @@ function Landing() {
   );
 }
 
-function SemesterCards({ semesters }: { semesters: { id: string; name: string; description: string | null }[] }) {
+type SemesterRow = { id: string; name: string; description: string | null };
+
+/** Reads the number to feature and the label to show from a semester name. */
+function readSemester(name: string) {
+  const title = name.trim();
+  const kindMatch = title.match(/\b(semester|sem|year|term|module|topic)\b/i);
+  const kind = kindMatch
+    ? kindMatch[1].charAt(0).toUpperCase() + kindMatch[1].slice(1).toLowerCase()
+    : "Semester";
+  let number: string | null = null;
+  if (kindMatch && kindMatch.index !== undefined) {
+    const after = title.slice(kindMatch.index + kindMatch[0].length).match(/^[\s\-–—:#]*(\d+)/);
+    if (after) number = after[1];
+  }
+  if (!number) number = title.match(/(\d+)/)?.[1] ?? null;
+  return { title, kind, number };
+}
+
+function SemesterCards({ semesters, loading }: { semesters: SemesterRow[]; loading?: boolean }) {
   const ids = semesters.map((s) => s.id);
   const statsQ = useQuery({
     queryKey: ["home-sem-stats", ids.join(",")],
@@ -375,57 +402,104 @@ function SemesterCards({ semesters }: { semesters: { id: string; name: string; d
     },
   });
 
+  if (loading) {
+    return (
+      <CardGridSkeleton
+        count={3}
+        height="h-44"
+        className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+      />
+    );
+  }
+
   if (semesters.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-border bg-card p-12 text-center">
-        <GraduationCap className="mx-auto h-8 w-8 text-muted-foreground" />
-        <p className="mt-3 font-semibold">No semesters yet</p>
-        <p className="mt-1 text-sm text-muted-foreground">Admins can add semesters from the admin dashboard.</p>
-      </div>
+      <EmptyState
+        icon={GraduationCap}
+        title="No semesters yet"
+        description="Admins can add semesters from the admin dashboard."
+      />
     );
   }
 
   return (
-    <div className="stagger-children grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="stagger-children grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {semesters.map((s) => {
         const st = statsQ.data?.[s.id];
+        const badge = readSemester(s.name);
         const empty = st && st.subjects === 0 && st.tutorials === 0 && st.notes === 0 && st.papers === 0 && st.deadlines === 0;
         return (
           <Link
             key={s.id}
             to="/semester/$id"
             params={{ id: s.id }}
-            className="group relative overflow-hidden rounded-2xl border border-border bg-card-soft p-5 sm:p-6 shadow-soft hover:shadow-elevated hover:-translate-y-0.5 transition-all"
+            className={cn(
+              "subject-card semester-card group flex h-full min-w-0 flex-col overflow-hidden rounded-2xl p-5 shadow-soft hover:shadow-elevated sm:p-6",
+              subjectThemeClass(s.id),
+            )}
           >
-            <div className="absolute -top-12 -right-12 h-32 w-32 rounded-full bg-primary/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="relative flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary-gradient text-primary-foreground shadow-glow">
-                  <GraduationCap className="h-5 w-5" />
-                </div>
-                <h3 className="text-base sm:text-lg font-semibold truncate group-hover:text-primary transition-colors">{s.name}</h3>
-              </div>
-              <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all shrink-0" />
+            <span
+              aria-hidden="true"
+              className="semester-glow pointer-events-none absolute -top-10 -right-10 h-28 w-28 rounded-full opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100"
+            />
+
+            <div className="relative flex items-center gap-3.5">
+              <span className="semester-tile grid h-14 w-14 shrink-0 place-items-center rounded-2xl">
+                {badge.number ? (
+                  <span className="text-2xl font-extrabold leading-none tabular-nums">{badge.number}</span>
+                ) : (
+                  <GraduationCap className="h-6 w-6" aria-hidden="true" />
+                )}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  {badge.kind}
+                </span>
+                <span className="mt-0.5 block truncate text-lg font-bold leading-tight sm:text-xl">
+                  {badge.title}
+                </span>
+              </span>
             </div>
-            {s.description && <p className="relative mt-3 text-sm text-muted-foreground line-clamp-2">{s.description}</p>}
+
+            {s.description && (
+              <p className="relative mt-3 line-clamp-2 text-sm text-muted-foreground">{s.description}</p>
+            )}
+
             {empty ? (
-              <p className="relative mt-4 text-xs text-muted-foreground italic">No materials uploaded yet.</p>
+              <p className="relative mb-4 mt-4 text-xs italic text-muted-foreground">No materials uploaded yet.</p>
+            ) : statsQ.isLoading ? (
+              <div className="relative mb-4 mt-4 flex flex-wrap gap-1.5" aria-hidden="true">
+                {[0, 1, 2, 3, 4].map((i) => (
+                  <span key={i} className="h-6 w-16 animate-pulse rounded-lg bg-muted/70" />
+                ))}
+              </div>
             ) : (
-              <div className="relative mt-4 grid grid-cols-5 gap-1.5 text-center">
+              <div className="relative mb-4 mt-4 flex flex-wrap gap-1.5">
                 {[
-                  { k: "Subj", v: st?.subjects },
-                  { k: "Tutorials", v: st?.tutorials },
-                  { k: "Notes", v: st?.notes },
-                  { k: "Papers", v: st?.papers },
-                  { k: "Due", v: st?.deadlines },
+                  { icon: Layers, k: "Subjects", v: st?.subjects },
+                  { icon: FileText, k: "Tutorials", v: st?.tutorials },
+                  { icon: NotebookPen, k: "Notes", v: st?.notes },
+                  { icon: BookOpen, k: "Papers", v: st?.papers },
+                  { icon: CalendarClock, k: "Deadlines", v: st?.deadlines },
                 ].map((x) => (
-                  <div key={x.k} className="rounded-lg bg-muted/60 py-1.5">
-                    <div className="text-sm font-bold tabular-nums">{x.v ?? "—"}</div>
-                    <div className="text-[9px] uppercase tracking-wider text-muted-foreground">{x.k}</div>
-                  </div>
+                  <span
+                    key={x.k}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-border/70 bg-card/70 px-2 py-1 text-xs"
+                  >
+                    <x.icon className="h-3.5 w-3.5 text-muted-foreground" aria-hidden="true" />
+                    <span className="font-bold tabular-nums">{x.v ?? "—"}</span>
+                    <span className="text-muted-foreground">{x.k}</span>
+                  </span>
                 ))}
               </div>
             )}
+
+            <span className="relative mt-auto flex items-center justify-between gap-2 border-t border-border/60 pt-3">
+              <span className="semester-cta text-sm font-semibold">Open semester</span>
+              <span className="semester-cta-arrow grid h-7 w-7 shrink-0 place-items-center rounded-full">
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </span>
+            </span>
           </Link>
         );
       })}
