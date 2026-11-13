@@ -9,100 +9,65 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SuperRouteImport } from './routes/super'
-import { Route as SelectRouteImport } from './routes/select'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as PendingRouteImport } from './routes/pending'
-import { Route as HelpRouteImport } from './routes/help'
-import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as ContributorsRouteImport } from './routes/contributors'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as SuperIndexRouteImport } from './routes/super.index'
-import { Route as NotesIndexRouteImport } from './routes/notes.index'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ContributorsRouteImport } from './routes/contributors'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as HelpRouteImport } from './routes/help'
+import { Route as PendingRouteImport } from './routes/pending'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as SelectRouteImport } from './routes/select'
+import { Route as SuperRouteImport } from './routes/super'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as SuperVisitorsRouteImport } from './routes/super.visitors'
-import { Route as SuperUsersRouteImport } from './routes/super.users'
-import { Route as SuperSubjectsRouteImport } from './routes/super.subjects'
-import { Route as SuperSemestersRouteImport } from './routes/super.semesters'
-import { Route as SuperRequestsRouteImport } from './routes/super.requests'
-import { Route as SuperProfileRouteImport } from './routes/super.profile'
-import { Route as SuperPendingRouteImport } from './routes/super.pending'
-import { Route as SuperNotificationsRouteImport } from './routes/super.notifications'
-import { Route as SuperNotesRouteImport } from './routes/super.notes'
-import { Route as SuperModulesRouteImport } from './routes/super.modules'
-import { Route as SuperMaterialsRouteImport } from './routes/super.materials'
-import { Route as SuperFeedbackRouteImport } from './routes/super.feedback'
-import { Route as SuperDeadlinesRouteImport } from './routes/super.deadlines'
-import { Route as SuperBroadcastRouteImport } from './routes/super.broadcast'
-import { Route as SuperAuthSettingsRouteImport } from './routes/super.auth-settings'
-import { Route as SuperAnalyticsRouteImport } from './routes/super.analytics'
-import { Route as SuperAiSettingsRouteImport } from './routes/super.ai-settings'
-import { Route as SuperAdminsRouteImport } from './routes/super.admins'
-import { Route as SuperActivityRouteImport } from './routes/super.activity'
-import { Route as SubjectIdRouteImport } from './routes/subject.$id'
-import { Route as SemesterIdRouteImport } from './routes/semester.$id'
-import { Route as MaterialIdRouteImport } from './routes/material.$id'
-import { Route as KuppiPresenterNameRouteImport } from './routes/kuppi-presenter.$name'
-import { Route as ContributorsIdRouteImport } from './routes/contributors_.$id'
-import { Route as AdminRequestsRouteImport } from './routes/admin.requests'
-import { Route as AdminProfileRouteImport } from './routes/admin.profile'
-import { Route as AdminNotesRouteImport } from './routes/admin.notes'
-import { Route as AdminModulesRouteImport } from './routes/admin.modules'
-import { Route as AdminMaterialsRouteImport } from './routes/admin.materials'
-import { Route as AdminKuppiRouteImport } from './routes/admin.kuppi'
-import { Route as AdminGuideRouteImport } from './routes/admin.guide'
-import { Route as AdminFeedbackRouteImport } from './routes/admin.feedback'
 import { Route as AdminDeadlinesRouteImport } from './routes/admin.deadlines'
+import { Route as AdminFeedbackRouteImport } from './routes/admin.feedback'
+import { Route as AdminGuideRouteImport } from './routes/admin.guide'
+import { Route as AdminKuppiRouteImport } from './routes/admin.kuppi'
+import { Route as AdminMaterialsRouteImport } from './routes/admin.materials'
+import { Route as AdminModulesRouteImport } from './routes/admin.modules'
+import { Route as AdminNotesRouteImport } from './routes/admin.notes'
+import { Route as AdminProfileRouteImport } from './routes/admin.profile'
+import { Route as AdminRequestsRouteImport } from './routes/admin.requests'
+import { Route as ContributorsIdRouteImport } from './routes/contributors_.$id'
+import { Route as KuppiPresenterNameRouteImport } from './routes/kuppi-presenter.$name'
+import { Route as MaterialIdRouteImport } from './routes/material.$id'
+import { Route as NotesIndexRouteImport } from './routes/notes.index'
+import { Route as SemesterIdRouteImport } from './routes/semester.$id'
+import { Route as SubjectIdRouteImport } from './routes/subject.$id'
+import { Route as SuperIndexRouteImport } from './routes/super.index'
+import { Route as SuperActivityRouteImport } from './routes/super.activity'
+import { Route as SuperAdminsRouteImport } from './routes/super.admins'
+import { Route as SuperAiSettingsRouteImport } from './routes/super.ai-settings'
+import { Route as SuperAnalyticsRouteImport } from './routes/super.analytics'
+import { Route as SuperAuthSettingsRouteImport } from './routes/super.auth-settings'
+import { Route as SuperBroadcastRouteImport } from './routes/super.broadcast'
+import { Route as SuperDeadlinesRouteImport } from './routes/super.deadlines'
+import { Route as SuperFeedbackRouteImport } from './routes/super.feedback'
+import { Route as SuperMaterialsRouteImport } from './routes/super.materials'
+import { Route as SuperModulesRouteImport } from './routes/super.modules'
+import { Route as SuperNotesRouteImport } from './routes/super.notes'
+import { Route as SuperNotificationsRouteImport } from './routes/super.notifications'
+import { Route as SuperPendingRouteImport } from './routes/super.pending'
+import { Route as SuperProfileRouteImport } from './routes/super.profile'
+import { Route as SuperRequestsRouteImport } from './routes/super.requests'
+import { Route as SuperSemestersRouteImport } from './routes/super.semesters'
+import { Route as SuperSubjectsRouteImport } from './routes/super.subjects'
+import { Route as SuperUsersRouteImport } from './routes/super.users'
+import { Route as SuperVisitorsRouteImport } from './routes/super.visitors'
 import { Route as NotesSubjectSlugRouteImport } from './routes/notes.$subject.$slug'
-import { Route as ApiPublicTelegramWeeklySummaryRouteImport } from './routes/api/public/telegram/weekly-summary'
-import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram/webhook'
-import { Route as ApiPublicTelegramNotifyMaterialsRouteImport } from './routes/api/public/telegram/notify-materials'
-import { Route as ApiPublicTelegramHealthRouteImport } from './routes/api/public/telegram/health'
-import { Route as ApiPublicTelegramDailyDeadlinesRouteImport } from './routes/api/public/telegram/daily-deadlines'
-import { Route as ApiPublicPushSubscribeRouteImport } from './routes/api/public/push/subscribe'
-import { Route as ApiPublicPushDispatchRouteImport } from './routes/api/public/push/dispatch'
 import { Route as ApiPublicPushConfigRouteImport } from './routes/api/public/push/config'
+import { Route as ApiPublicPushDispatchRouteImport } from './routes/api/public/push/dispatch'
+import { Route as ApiPublicPushSubscribeRouteImport } from './routes/api/public/push/subscribe'
+import { Route as ApiPublicTelegramDailyDeadlinesRouteImport } from './routes/api/public/telegram/daily-deadlines'
+import { Route as ApiPublicTelegramHealthRouteImport } from './routes/api/public/telegram/health'
+import { Route as ApiPublicTelegramNotifyMaterialsRouteImport } from './routes/api/public/telegram/notify-materials'
+import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram/webhook'
+import { Route as ApiPublicTelegramWeeklySummaryRouteImport } from './routes/api/public/telegram/weekly-summary'
 
-const SuperRoute = SuperRouteImport.update({
-  id: '/super',
-  path: '/super',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SelectRoute = SelectRouteImport.update({
-  id: '/select',
-  path: '/select',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PendingRoute = PendingRouteImport.update({
-  id: '/pending',
-  path: '/pending',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HelpRoute = HelpRouteImport.update({
-  id: '/help',
-  path: '/help',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContributorsRoute = ContributorsRouteImport.update({
-  id: '/contributors',
-  path: '/contributors',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -110,19 +75,44 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SuperIndexRoute = SuperIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => SuperRoute,
+const ContributorsRoute = ContributorsRouteImport.update({
+  id: '/contributors',
+  path: '/contributors',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const NotesIndexRoute = NotesIndexRouteImport.update({
-  id: '/notes/',
-  path: '/notes/',
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HelpRoute = HelpRouteImport.update({
+  id: '/help',
+  path: '/help',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PendingRoute = PendingRouteImport.update({
+  id: '/pending',
+  path: '/pending',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SelectRoute = SelectRouteImport.update({
+  id: '/select',
+  path: '/select',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SuperRoute = SuperRouteImport.update({
+  id: '/super',
+  path: '/super',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -130,159 +120,9 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
-const SuperVisitorsRoute = SuperVisitorsRouteImport.update({
-  id: '/visitors',
-  path: '/visitors',
-  getParentRoute: () => SuperRoute,
-} as any)
-const SuperUsersRoute = SuperUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => SuperRoute,
-} as any)
-const SuperSubjectsRoute = SuperSubjectsRouteImport.update({
-  id: '/subjects',
-  path: '/subjects',
-  getParentRoute: () => SuperRoute,
-} as any)
-const SuperSemestersRoute = SuperSemestersRouteImport.update({
-  id: '/semesters',
-  path: '/semesters',
-  getParentRoute: () => SuperRoute,
-} as any)
-const SuperRequestsRoute = SuperRequestsRouteImport.update({
-  id: '/requests',
-  path: '/requests',
-  getParentRoute: () => SuperRoute,
-} as any)
-const SuperProfileRoute = SuperProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => SuperRoute,
-} as any)
-const SuperPendingRoute = SuperPendingRouteImport.update({
-  id: '/pending',
-  path: '/pending',
-  getParentRoute: () => SuperRoute,
-} as any)
-const SuperNotificationsRoute = SuperNotificationsRouteImport.update({
-  id: '/notifications',
-  path: '/notifications',
-  getParentRoute: () => SuperRoute,
-} as any)
-const SuperNotesRoute = SuperNotesRouteImport.update({
-  id: '/notes',
-  path: '/notes',
-  getParentRoute: () => SuperRoute,
-} as any)
-const SuperModulesRoute = SuperModulesRouteImport.update({
-  id: '/modules',
-  path: '/modules',
-  getParentRoute: () => SuperRoute,
-} as any)
-const SuperMaterialsRoute = SuperMaterialsRouteImport.update({
-  id: '/materials',
-  path: '/materials',
-  getParentRoute: () => SuperRoute,
-} as any)
-const SuperFeedbackRoute = SuperFeedbackRouteImport.update({
-  id: '/feedback',
-  path: '/feedback',
-  getParentRoute: () => SuperRoute,
-} as any)
-const SuperDeadlinesRoute = SuperDeadlinesRouteImport.update({
+const AdminDeadlinesRoute = AdminDeadlinesRouteImport.update({
   id: '/deadlines',
   path: '/deadlines',
-  getParentRoute: () => SuperRoute,
-} as any)
-const SuperBroadcastRoute = SuperBroadcastRouteImport.update({
-  id: '/broadcast',
-  path: '/broadcast',
-  getParentRoute: () => SuperRoute,
-} as any)
-const SuperAuthSettingsRoute = SuperAuthSettingsRouteImport.update({
-  id: '/auth-settings',
-  path: '/auth-settings',
-  getParentRoute: () => SuperRoute,
-} as any)
-const SuperAnalyticsRoute = SuperAnalyticsRouteImport.update({
-  id: '/analytics',
-  path: '/analytics',
-  getParentRoute: () => SuperRoute,
-} as any)
-const SuperAiSettingsRoute = SuperAiSettingsRouteImport.update({
-  id: '/ai-settings',
-  path: '/ai-settings',
-  getParentRoute: () => SuperRoute,
-} as any)
-const SuperAdminsRoute = SuperAdminsRouteImport.update({
-  id: '/admins',
-  path: '/admins',
-  getParentRoute: () => SuperRoute,
-} as any)
-const SuperActivityRoute = SuperActivityRouteImport.update({
-  id: '/activity',
-  path: '/activity',
-  getParentRoute: () => SuperRoute,
-} as any)
-const SubjectIdRoute = SubjectIdRouteImport.update({
-  id: '/subject/$id',
-  path: '/subject/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SemesterIdRoute = SemesterIdRouteImport.update({
-  id: '/semester/$id',
-  path: '/semester/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MaterialIdRoute = MaterialIdRouteImport.update({
-  id: '/material/$id',
-  path: '/material/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const KuppiPresenterNameRoute = KuppiPresenterNameRouteImport.update({
-  id: '/kuppi-presenter/$name',
-  path: '/kuppi-presenter/$name',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContributorsIdRoute = ContributorsIdRouteImport.update({
-  id: '/contributors_/$id',
-  path: '/contributors/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRequestsRoute = AdminRequestsRouteImport.update({
-  id: '/requests',
-  path: '/requests',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminProfileRoute = AdminProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminNotesRoute = AdminNotesRouteImport.update({
-  id: '/notes',
-  path: '/notes',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminModulesRoute = AdminModulesRouteImport.update({
-  id: '/modules',
-  path: '/modules',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminMaterialsRoute = AdminMaterialsRouteImport.update({
-  id: '/materials',
-  path: '/materials',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminKuppiRoute = AdminKuppiRouteImport.update({
-  id: '/kuppi',
-  path: '/kuppi',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminGuideRoute = AdminGuideRouteImport.update({
-  id: '/guide',
-  path: '/guide',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminFeedbackRoute = AdminFeedbackRouteImport.update({
@@ -290,37 +130,189 @@ const AdminFeedbackRoute = AdminFeedbackRouteImport.update({
   path: '/feedback',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminDeadlinesRoute = AdminDeadlinesRouteImport.update({
+const AdminGuideRoute = AdminGuideRouteImport.update({
+  id: '/guide',
+  path: '/guide',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminKuppiRoute = AdminKuppiRouteImport.update({
+  id: '/kuppi',
+  path: '/kuppi',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMaterialsRoute = AdminMaterialsRouteImport.update({
+  id: '/materials',
+  path: '/materials',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminModulesRoute = AdminModulesRouteImport.update({
+  id: '/modules',
+  path: '/modules',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminNotesRoute = AdminNotesRouteImport.update({
+  id: '/notes',
+  path: '/notes',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminProfileRoute = AdminProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRequestsRoute = AdminRequestsRouteImport.update({
+  id: '/requests',
+  path: '/requests',
+  getParentRoute: () => AdminRoute,
+} as any)
+const ContributorsIdRoute = ContributorsIdRouteImport.update({
+  id: '/contributors_/$id',
+  path: '/contributors/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KuppiPresenterNameRoute = KuppiPresenterNameRouteImport.update({
+  id: '/kuppi-presenter/$name',
+  path: '/kuppi-presenter/$name',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MaterialIdRoute = MaterialIdRouteImport.update({
+  id: '/material/$id',
+  path: '/material/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotesIndexRoute = NotesIndexRouteImport.update({
+  id: '/notes/',
+  path: '/notes/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SemesterIdRoute = SemesterIdRouteImport.update({
+  id: '/semester/$id',
+  path: '/semester/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SubjectIdRoute = SubjectIdRouteImport.update({
+  id: '/subject/$id',
+  path: '/subject/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SuperIndexRoute = SuperIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SuperRoute,
+} as any)
+const SuperActivityRoute = SuperActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => SuperRoute,
+} as any)
+const SuperAdminsRoute = SuperAdminsRouteImport.update({
+  id: '/admins',
+  path: '/admins',
+  getParentRoute: () => SuperRoute,
+} as any)
+const SuperAiSettingsRoute = SuperAiSettingsRouteImport.update({
+  id: '/ai-settings',
+  path: '/ai-settings',
+  getParentRoute: () => SuperRoute,
+} as any)
+const SuperAnalyticsRoute = SuperAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => SuperRoute,
+} as any)
+const SuperAuthSettingsRoute = SuperAuthSettingsRouteImport.update({
+  id: '/auth-settings',
+  path: '/auth-settings',
+  getParentRoute: () => SuperRoute,
+} as any)
+const SuperBroadcastRoute = SuperBroadcastRouteImport.update({
+  id: '/broadcast',
+  path: '/broadcast',
+  getParentRoute: () => SuperRoute,
+} as any)
+const SuperDeadlinesRoute = SuperDeadlinesRouteImport.update({
   id: '/deadlines',
   path: '/deadlines',
-  getParentRoute: () => AdminRoute,
+  getParentRoute: () => SuperRoute,
+} as any)
+const SuperFeedbackRoute = SuperFeedbackRouteImport.update({
+  id: '/feedback',
+  path: '/feedback',
+  getParentRoute: () => SuperRoute,
+} as any)
+const SuperMaterialsRoute = SuperMaterialsRouteImport.update({
+  id: '/materials',
+  path: '/materials',
+  getParentRoute: () => SuperRoute,
+} as any)
+const SuperModulesRoute = SuperModulesRouteImport.update({
+  id: '/modules',
+  path: '/modules',
+  getParentRoute: () => SuperRoute,
+} as any)
+const SuperNotesRoute = SuperNotesRouteImport.update({
+  id: '/notes',
+  path: '/notes',
+  getParentRoute: () => SuperRoute,
+} as any)
+const SuperNotificationsRoute = SuperNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => SuperRoute,
+} as any)
+const SuperPendingRoute = SuperPendingRouteImport.update({
+  id: '/pending',
+  path: '/pending',
+  getParentRoute: () => SuperRoute,
+} as any)
+const SuperProfileRoute = SuperProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => SuperRoute,
+} as any)
+const SuperRequestsRoute = SuperRequestsRouteImport.update({
+  id: '/requests',
+  path: '/requests',
+  getParentRoute: () => SuperRoute,
+} as any)
+const SuperSemestersRoute = SuperSemestersRouteImport.update({
+  id: '/semesters',
+  path: '/semesters',
+  getParentRoute: () => SuperRoute,
+} as any)
+const SuperSubjectsRoute = SuperSubjectsRouteImport.update({
+  id: '/subjects',
+  path: '/subjects',
+  getParentRoute: () => SuperRoute,
+} as any)
+const SuperUsersRoute = SuperUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => SuperRoute,
+} as any)
+const SuperVisitorsRoute = SuperVisitorsRouteImport.update({
+  id: '/visitors',
+  path: '/visitors',
+  getParentRoute: () => SuperRoute,
 } as any)
 const NotesSubjectSlugRoute = NotesSubjectSlugRouteImport.update({
   id: '/notes/$subject/$slug',
   path: '/notes/$subject/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicTelegramWeeklySummaryRoute =
-  ApiPublicTelegramWeeklySummaryRouteImport.update({
-    id: '/api/public/telegram/weekly-summary',
-    path: '/api/public/telegram/weekly-summary',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicTelegramWebhookRoute =
-  ApiPublicTelegramWebhookRouteImport.update({
-    id: '/api/public/telegram/webhook',
-    path: '/api/public/telegram/webhook',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicTelegramNotifyMaterialsRoute =
-  ApiPublicTelegramNotifyMaterialsRouteImport.update({
-    id: '/api/public/telegram/notify-materials',
-    path: '/api/public/telegram/notify-materials',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicTelegramHealthRoute = ApiPublicTelegramHealthRouteImport.update({
-  id: '/api/public/telegram/health',
-  path: '/api/public/telegram/health',
+const ApiPublicPushConfigRoute = ApiPublicPushConfigRouteImport.update({
+  id: '/api/public/push/config',
+  path: '/api/public/push/config',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicPushDispatchRoute = ApiPublicPushDispatchRouteImport.update({
+  id: '/api/public/push/dispatch',
+  path: '/api/public/push/dispatch',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicPushSubscribeRoute = ApiPublicPushSubscribeRouteImport.update({
+  id: '/api/public/push/subscribe',
+  path: '/api/public/push/subscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicTelegramDailyDeadlinesRoute =
@@ -329,21 +321,29 @@ const ApiPublicTelegramDailyDeadlinesRoute =
     path: '/api/public/telegram/daily-deadlines',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicPushSubscribeRoute = ApiPublicPushSubscribeRouteImport.update({
-  id: '/api/public/push/subscribe',
-  path: '/api/public/push/subscribe',
+const ApiPublicTelegramHealthRoute = ApiPublicTelegramHealthRouteImport.update({
+  id: '/api/public/telegram/health',
+  path: '/api/public/telegram/health',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicPushDispatchRoute = ApiPublicPushDispatchRouteImport.update({
-  id: '/api/public/push/dispatch',
-  path: '/api/public/push/dispatch',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicPushConfigRoute = ApiPublicPushConfigRouteImport.update({
-  id: '/api/public/push/config',
-  path: '/api/public/push/config',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const ApiPublicTelegramNotifyMaterialsRoute =
+  ApiPublicTelegramNotifyMaterialsRouteImport.update({
+    id: '/api/public/telegram/notify-materials',
+    path: '/api/public/telegram/notify-materials',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicTelegramWebhookRoute =
+  ApiPublicTelegramWebhookRouteImport.update({
+    id: '/api/public/telegram/webhook',
+    path: '/api/public/telegram/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicTelegramWeeklySummaryRoute =
+  ApiPublicTelegramWeeklySummaryRouteImport.update({
+    id: '/api/public/telegram/weekly-summary',
+    path: '/api/public/telegram/weekly-summary',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -717,60 +717,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/super': {
-      id: '/super'
-      path: '/super'
-      fullPath: '/super'
-      preLoaderRoute: typeof SuperRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/select': {
-      id: '/select'
-      path: '/select'
-      fullPath: '/select'
-      preLoaderRoute: typeof SelectRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reset-password': {
-      id: '/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pending': {
-      id: '/pending'
-      path: '/pending'
-      fullPath: '/pending'
-      preLoaderRoute: typeof PendingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/help': {
-      id: '/help'
-      path: '/help'
-      fullPath: '/help'
-      preLoaderRoute: typeof HelpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contributors': {
-      id: '/contributors'
-      path: '/contributors'
-      fullPath: '/contributors'
-      preLoaderRoute: typeof ContributorsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -780,25 +731,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/super/': {
-      id: '/super/'
-      path: '/'
-      fullPath: '/super/'
-      preLoaderRoute: typeof SuperIndexRouteImport
-      parentRoute: typeof SuperRoute
+    '/contributors': {
+      id: '/contributors'
+      path: '/contributors'
+      fullPath: '/contributors'
+      preLoaderRoute: typeof ContributorsRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/notes/': {
-      id: '/notes/'
-      path: '/notes'
-      fullPath: '/notes/'
-      preLoaderRoute: typeof NotesIndexRouteImport
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/help': {
+      id: '/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof HelpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pending': {
+      id: '/pending'
+      path: '/pending'
+      fullPath: '/pending'
+      preLoaderRoute: typeof PendingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/select': {
+      id: '/select'
+      path: '/select'
+      fullPath: '/select'
+      preLoaderRoute: typeof SelectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/super': {
+      id: '/super'
+      path: '/super'
+      fullPath: '/super'
+      preLoaderRoute: typeof SuperRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -808,221 +794,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/super/visitors': {
-      id: '/super/visitors'
-      path: '/visitors'
-      fullPath: '/super/visitors'
-      preLoaderRoute: typeof SuperVisitorsRouteImport
-      parentRoute: typeof SuperRoute
-    }
-    '/super/users': {
-      id: '/super/users'
-      path: '/users'
-      fullPath: '/super/users'
-      preLoaderRoute: typeof SuperUsersRouteImport
-      parentRoute: typeof SuperRoute
-    }
-    '/super/subjects': {
-      id: '/super/subjects'
-      path: '/subjects'
-      fullPath: '/super/subjects'
-      preLoaderRoute: typeof SuperSubjectsRouteImport
-      parentRoute: typeof SuperRoute
-    }
-    '/super/semesters': {
-      id: '/super/semesters'
-      path: '/semesters'
-      fullPath: '/super/semesters'
-      preLoaderRoute: typeof SuperSemestersRouteImport
-      parentRoute: typeof SuperRoute
-    }
-    '/super/requests': {
-      id: '/super/requests'
-      path: '/requests'
-      fullPath: '/super/requests'
-      preLoaderRoute: typeof SuperRequestsRouteImport
-      parentRoute: typeof SuperRoute
-    }
-    '/super/profile': {
-      id: '/super/profile'
-      path: '/profile'
-      fullPath: '/super/profile'
-      preLoaderRoute: typeof SuperProfileRouteImport
-      parentRoute: typeof SuperRoute
-    }
-    '/super/pending': {
-      id: '/super/pending'
-      path: '/pending'
-      fullPath: '/super/pending'
-      preLoaderRoute: typeof SuperPendingRouteImport
-      parentRoute: typeof SuperRoute
-    }
-    '/super/notifications': {
-      id: '/super/notifications'
-      path: '/notifications'
-      fullPath: '/super/notifications'
-      preLoaderRoute: typeof SuperNotificationsRouteImport
-      parentRoute: typeof SuperRoute
-    }
-    '/super/notes': {
-      id: '/super/notes'
-      path: '/notes'
-      fullPath: '/super/notes'
-      preLoaderRoute: typeof SuperNotesRouteImport
-      parentRoute: typeof SuperRoute
-    }
-    '/super/modules': {
-      id: '/super/modules'
-      path: '/modules'
-      fullPath: '/super/modules'
-      preLoaderRoute: typeof SuperModulesRouteImport
-      parentRoute: typeof SuperRoute
-    }
-    '/super/materials': {
-      id: '/super/materials'
-      path: '/materials'
-      fullPath: '/super/materials'
-      preLoaderRoute: typeof SuperMaterialsRouteImport
-      parentRoute: typeof SuperRoute
-    }
-    '/super/feedback': {
-      id: '/super/feedback'
-      path: '/feedback'
-      fullPath: '/super/feedback'
-      preLoaderRoute: typeof SuperFeedbackRouteImport
-      parentRoute: typeof SuperRoute
-    }
-    '/super/deadlines': {
-      id: '/super/deadlines'
+    '/admin/deadlines': {
+      id: '/admin/deadlines'
       path: '/deadlines'
-      fullPath: '/super/deadlines'
-      preLoaderRoute: typeof SuperDeadlinesRouteImport
-      parentRoute: typeof SuperRoute
-    }
-    '/super/broadcast': {
-      id: '/super/broadcast'
-      path: '/broadcast'
-      fullPath: '/super/broadcast'
-      preLoaderRoute: typeof SuperBroadcastRouteImport
-      parentRoute: typeof SuperRoute
-    }
-    '/super/auth-settings': {
-      id: '/super/auth-settings'
-      path: '/auth-settings'
-      fullPath: '/super/auth-settings'
-      preLoaderRoute: typeof SuperAuthSettingsRouteImport
-      parentRoute: typeof SuperRoute
-    }
-    '/super/analytics': {
-      id: '/super/analytics'
-      path: '/analytics'
-      fullPath: '/super/analytics'
-      preLoaderRoute: typeof SuperAnalyticsRouteImport
-      parentRoute: typeof SuperRoute
-    }
-    '/super/ai-settings': {
-      id: '/super/ai-settings'
-      path: '/ai-settings'
-      fullPath: '/super/ai-settings'
-      preLoaderRoute: typeof SuperAiSettingsRouteImport
-      parentRoute: typeof SuperRoute
-    }
-    '/super/admins': {
-      id: '/super/admins'
-      path: '/admins'
-      fullPath: '/super/admins'
-      preLoaderRoute: typeof SuperAdminsRouteImport
-      parentRoute: typeof SuperRoute
-    }
-    '/super/activity': {
-      id: '/super/activity'
-      path: '/activity'
-      fullPath: '/super/activity'
-      preLoaderRoute: typeof SuperActivityRouteImport
-      parentRoute: typeof SuperRoute
-    }
-    '/subject/$id': {
-      id: '/subject/$id'
-      path: '/subject/$id'
-      fullPath: '/subject/$id'
-      preLoaderRoute: typeof SubjectIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/semester/$id': {
-      id: '/semester/$id'
-      path: '/semester/$id'
-      fullPath: '/semester/$id'
-      preLoaderRoute: typeof SemesterIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/material/$id': {
-      id: '/material/$id'
-      path: '/material/$id'
-      fullPath: '/material/$id'
-      preLoaderRoute: typeof MaterialIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/kuppi-presenter/$name': {
-      id: '/kuppi-presenter/$name'
-      path: '/kuppi-presenter/$name'
-      fullPath: '/kuppi-presenter/$name'
-      preLoaderRoute: typeof KuppiPresenterNameRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contributors_/$id': {
-      id: '/contributors_/$id'
-      path: '/contributors/$id'
-      fullPath: '/contributors/$id'
-      preLoaderRoute: typeof ContributorsIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/requests': {
-      id: '/admin/requests'
-      path: '/requests'
-      fullPath: '/admin/requests'
-      preLoaderRoute: typeof AdminRequestsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/profile': {
-      id: '/admin/profile'
-      path: '/profile'
-      fullPath: '/admin/profile'
-      preLoaderRoute: typeof AdminProfileRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/notes': {
-      id: '/admin/notes'
-      path: '/notes'
-      fullPath: '/admin/notes'
-      preLoaderRoute: typeof AdminNotesRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/modules': {
-      id: '/admin/modules'
-      path: '/modules'
-      fullPath: '/admin/modules'
-      preLoaderRoute: typeof AdminModulesRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/materials': {
-      id: '/admin/materials'
-      path: '/materials'
-      fullPath: '/admin/materials'
-      preLoaderRoute: typeof AdminMaterialsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/kuppi': {
-      id: '/admin/kuppi'
-      path: '/kuppi'
-      fullPath: '/admin/kuppi'
-      preLoaderRoute: typeof AdminKuppiRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/guide': {
-      id: '/admin/guide'
-      path: '/guide'
-      fullPath: '/admin/guide'
-      preLoaderRoute: typeof AdminGuideRouteImport
+      fullPath: '/admin/deadlines'
+      preLoaderRoute: typeof AdminDeadlinesRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/feedback': {
@@ -1032,12 +808,236 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminFeedbackRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/deadlines': {
-      id: '/admin/deadlines'
-      path: '/deadlines'
-      fullPath: '/admin/deadlines'
-      preLoaderRoute: typeof AdminDeadlinesRouteImport
+    '/admin/guide': {
+      id: '/admin/guide'
+      path: '/guide'
+      fullPath: '/admin/guide'
+      preLoaderRoute: typeof AdminGuideRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/admin/kuppi': {
+      id: '/admin/kuppi'
+      path: '/kuppi'
+      fullPath: '/admin/kuppi'
+      preLoaderRoute: typeof AdminKuppiRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/materials': {
+      id: '/admin/materials'
+      path: '/materials'
+      fullPath: '/admin/materials'
+      preLoaderRoute: typeof AdminMaterialsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/modules': {
+      id: '/admin/modules'
+      path: '/modules'
+      fullPath: '/admin/modules'
+      preLoaderRoute: typeof AdminModulesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/notes': {
+      id: '/admin/notes'
+      path: '/notes'
+      fullPath: '/admin/notes'
+      preLoaderRoute: typeof AdminNotesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/profile': {
+      id: '/admin/profile'
+      path: '/profile'
+      fullPath: '/admin/profile'
+      preLoaderRoute: typeof AdminProfileRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/requests': {
+      id: '/admin/requests'
+      path: '/requests'
+      fullPath: '/admin/requests'
+      preLoaderRoute: typeof AdminRequestsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/contributors_/$id': {
+      id: '/contributors_/$id'
+      path: '/contributors/$id'
+      fullPath: '/contributors/$id'
+      preLoaderRoute: typeof ContributorsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kuppi-presenter/$name': {
+      id: '/kuppi-presenter/$name'
+      path: '/kuppi-presenter/$name'
+      fullPath: '/kuppi-presenter/$name'
+      preLoaderRoute: typeof KuppiPresenterNameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/material/$id': {
+      id: '/material/$id'
+      path: '/material/$id'
+      fullPath: '/material/$id'
+      preLoaderRoute: typeof MaterialIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notes/': {
+      id: '/notes/'
+      path: '/notes'
+      fullPath: '/notes/'
+      preLoaderRoute: typeof NotesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/semester/$id': {
+      id: '/semester/$id'
+      path: '/semester/$id'
+      fullPath: '/semester/$id'
+      preLoaderRoute: typeof SemesterIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/subject/$id': {
+      id: '/subject/$id'
+      path: '/subject/$id'
+      fullPath: '/subject/$id'
+      preLoaderRoute: typeof SubjectIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/super/': {
+      id: '/super/'
+      path: '/'
+      fullPath: '/super/'
+      preLoaderRoute: typeof SuperIndexRouteImport
+      parentRoute: typeof SuperRoute
+    }
+    '/super/activity': {
+      id: '/super/activity'
+      path: '/activity'
+      fullPath: '/super/activity'
+      preLoaderRoute: typeof SuperActivityRouteImport
+      parentRoute: typeof SuperRoute
+    }
+    '/super/admins': {
+      id: '/super/admins'
+      path: '/admins'
+      fullPath: '/super/admins'
+      preLoaderRoute: typeof SuperAdminsRouteImport
+      parentRoute: typeof SuperRoute
+    }
+    '/super/ai-settings': {
+      id: '/super/ai-settings'
+      path: '/ai-settings'
+      fullPath: '/super/ai-settings'
+      preLoaderRoute: typeof SuperAiSettingsRouteImport
+      parentRoute: typeof SuperRoute
+    }
+    '/super/analytics': {
+      id: '/super/analytics'
+      path: '/analytics'
+      fullPath: '/super/analytics'
+      preLoaderRoute: typeof SuperAnalyticsRouteImport
+      parentRoute: typeof SuperRoute
+    }
+    '/super/auth-settings': {
+      id: '/super/auth-settings'
+      path: '/auth-settings'
+      fullPath: '/super/auth-settings'
+      preLoaderRoute: typeof SuperAuthSettingsRouteImport
+      parentRoute: typeof SuperRoute
+    }
+    '/super/broadcast': {
+      id: '/super/broadcast'
+      path: '/broadcast'
+      fullPath: '/super/broadcast'
+      preLoaderRoute: typeof SuperBroadcastRouteImport
+      parentRoute: typeof SuperRoute
+    }
+    '/super/deadlines': {
+      id: '/super/deadlines'
+      path: '/deadlines'
+      fullPath: '/super/deadlines'
+      preLoaderRoute: typeof SuperDeadlinesRouteImport
+      parentRoute: typeof SuperRoute
+    }
+    '/super/feedback': {
+      id: '/super/feedback'
+      path: '/feedback'
+      fullPath: '/super/feedback'
+      preLoaderRoute: typeof SuperFeedbackRouteImport
+      parentRoute: typeof SuperRoute
+    }
+    '/super/materials': {
+      id: '/super/materials'
+      path: '/materials'
+      fullPath: '/super/materials'
+      preLoaderRoute: typeof SuperMaterialsRouteImport
+      parentRoute: typeof SuperRoute
+    }
+    '/super/modules': {
+      id: '/super/modules'
+      path: '/modules'
+      fullPath: '/super/modules'
+      preLoaderRoute: typeof SuperModulesRouteImport
+      parentRoute: typeof SuperRoute
+    }
+    '/super/notes': {
+      id: '/super/notes'
+      path: '/notes'
+      fullPath: '/super/notes'
+      preLoaderRoute: typeof SuperNotesRouteImport
+      parentRoute: typeof SuperRoute
+    }
+    '/super/notifications': {
+      id: '/super/notifications'
+      path: '/notifications'
+      fullPath: '/super/notifications'
+      preLoaderRoute: typeof SuperNotificationsRouteImport
+      parentRoute: typeof SuperRoute
+    }
+    '/super/pending': {
+      id: '/super/pending'
+      path: '/pending'
+      fullPath: '/super/pending'
+      preLoaderRoute: typeof SuperPendingRouteImport
+      parentRoute: typeof SuperRoute
+    }
+    '/super/profile': {
+      id: '/super/profile'
+      path: '/profile'
+      fullPath: '/super/profile'
+      preLoaderRoute: typeof SuperProfileRouteImport
+      parentRoute: typeof SuperRoute
+    }
+    '/super/requests': {
+      id: '/super/requests'
+      path: '/requests'
+      fullPath: '/super/requests'
+      preLoaderRoute: typeof SuperRequestsRouteImport
+      parentRoute: typeof SuperRoute
+    }
+    '/super/semesters': {
+      id: '/super/semesters'
+      path: '/semesters'
+      fullPath: '/super/semesters'
+      preLoaderRoute: typeof SuperSemestersRouteImport
+      parentRoute: typeof SuperRoute
+    }
+    '/super/subjects': {
+      id: '/super/subjects'
+      path: '/subjects'
+      fullPath: '/super/subjects'
+      preLoaderRoute: typeof SuperSubjectsRouteImport
+      parentRoute: typeof SuperRoute
+    }
+    '/super/users': {
+      id: '/super/users'
+      path: '/users'
+      fullPath: '/super/users'
+      preLoaderRoute: typeof SuperUsersRouteImport
+      parentRoute: typeof SuperRoute
+    }
+    '/super/visitors': {
+      id: '/super/visitors'
+      path: '/visitors'
+      fullPath: '/super/visitors'
+      preLoaderRoute: typeof SuperVisitorsRouteImport
+      parentRoute: typeof SuperRoute
     }
     '/notes/$subject/$slug': {
       id: '/notes/$subject/$slug'
@@ -1046,46 +1046,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NotesSubjectSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/telegram/weekly-summary': {
-      id: '/api/public/telegram/weekly-summary'
-      path: '/api/public/telegram/weekly-summary'
-      fullPath: '/api/public/telegram/weekly-summary'
-      preLoaderRoute: typeof ApiPublicTelegramWeeklySummaryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/telegram/webhook': {
-      id: '/api/public/telegram/webhook'
-      path: '/api/public/telegram/webhook'
-      fullPath: '/api/public/telegram/webhook'
-      preLoaderRoute: typeof ApiPublicTelegramWebhookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/telegram/notify-materials': {
-      id: '/api/public/telegram/notify-materials'
-      path: '/api/public/telegram/notify-materials'
-      fullPath: '/api/public/telegram/notify-materials'
-      preLoaderRoute: typeof ApiPublicTelegramNotifyMaterialsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/telegram/health': {
-      id: '/api/public/telegram/health'
-      path: '/api/public/telegram/health'
-      fullPath: '/api/public/telegram/health'
-      preLoaderRoute: typeof ApiPublicTelegramHealthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/telegram/daily-deadlines': {
-      id: '/api/public/telegram/daily-deadlines'
-      path: '/api/public/telegram/daily-deadlines'
-      fullPath: '/api/public/telegram/daily-deadlines'
-      preLoaderRoute: typeof ApiPublicTelegramDailyDeadlinesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/push/subscribe': {
-      id: '/api/public/push/subscribe'
-      path: '/api/public/push/subscribe'
-      fullPath: '/api/public/push/subscribe'
-      preLoaderRoute: typeof ApiPublicPushSubscribeRouteImport
+    '/api/public/push/config': {
+      id: '/api/public/push/config'
+      path: '/api/public/push/config'
+      fullPath: '/api/public/push/config'
+      preLoaderRoute: typeof ApiPublicPushConfigRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/push/dispatch': {
@@ -1095,11 +1060,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPushDispatchRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/push/config': {
-      id: '/api/public/push/config'
-      path: '/api/public/push/config'
-      fullPath: '/api/public/push/config'
-      preLoaderRoute: typeof ApiPublicPushConfigRouteImport
+    '/api/public/push/subscribe': {
+      id: '/api/public/push/subscribe'
+      path: '/api/public/push/subscribe'
+      fullPath: '/api/public/push/subscribe'
+      preLoaderRoute: typeof ApiPublicPushSubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/telegram/daily-deadlines': {
+      id: '/api/public/telegram/daily-deadlines'
+      path: '/api/public/telegram/daily-deadlines'
+      fullPath: '/api/public/telegram/daily-deadlines'
+      preLoaderRoute: typeof ApiPublicTelegramDailyDeadlinesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/telegram/health': {
+      id: '/api/public/telegram/health'
+      path: '/api/public/telegram/health'
+      fullPath: '/api/public/telegram/health'
+      preLoaderRoute: typeof ApiPublicTelegramHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/telegram/notify-materials': {
+      id: '/api/public/telegram/notify-materials'
+      path: '/api/public/telegram/notify-materials'
+      fullPath: '/api/public/telegram/notify-materials'
+      preLoaderRoute: typeof ApiPublicTelegramNotifyMaterialsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/telegram/webhook': {
+      id: '/api/public/telegram/webhook'
+      path: '/api/public/telegram/webhook'
+      fullPath: '/api/public/telegram/webhook'
+      preLoaderRoute: typeof ApiPublicTelegramWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/telegram/weekly-summary': {
+      id: '/api/public/telegram/weekly-summary'
+      path: '/api/public/telegram/weekly-summary'
+      fullPath: '/api/public/telegram/weekly-summary'
+      preLoaderRoute: typeof ApiPublicTelegramWeeklySummaryRouteImport
       parentRoute: typeof rootRouteImport
     }
   }

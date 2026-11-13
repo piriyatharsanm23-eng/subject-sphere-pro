@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { GlobalSearch } from "@/components/GlobalSearch";
 import { useQuery } from "@tanstack/react-query";
 import {
   ArrowRight,
@@ -16,7 +17,6 @@ import {
   HelpCircle,
   Send,
   Search,
-  CheckCircle2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -30,6 +30,10 @@ export const Route = createFileRoute("/")({
     meta: [
       { title: "StudyHub — Your study materials, organised" },
       { name: "description", content: "Pick your semester and subjects, then access every lecture slide, note, past paper and deadline in one beautiful place." },
+      { property: "og:title", content: "StudyHub — Your study materials, organised" },
+      { property: "og:description", content: "Search materials, pick your semester and see the latest uploads in one place." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Landing,
@@ -38,6 +42,7 @@ export const Route = createFileRoute("/")({
 function Landing() {
   const navigate = useNavigate();
   const [hasSelection, setHasSelection] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   useEffect(() => {
     setHasSelection(!!getSelection());
@@ -144,8 +149,8 @@ function Landing() {
         {/* grid texture */}
         <div className="pointer-events-none absolute inset-0 opacity-[0.07] [background-image:linear-gradient(to_right,white_1px,transparent_1px),linear-gradient(to_bottom,white_1px,transparent_1px)] [background-size:48px_48px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_75%)]" />
 
-        <div className="relative container mx-auto px-4 sm:px-6 pt-14 pb-20 sm:pt-20 sm:pb-28 lg:pt-28 lg:pb-36">
-          <div className="grid items-center gap-12 lg:grid-cols-[1.15fr_1fr]">
+        <div className="relative container mx-auto px-4 sm:px-6 pt-10 pb-16 sm:pt-14 sm:pb-20 lg:pt-16 lg:pb-24">
+          <div className="grid items-center gap-10 lg:grid-cols-[1.15fr_1fr]">
             {/* COPY */}
             <div className="max-w-2xl">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-medium text-white/90 backdrop-blur animate-fade-up">
@@ -162,10 +167,10 @@ function Landing() {
               </h1>
 
               <p className="animate-fade-up [animation-delay:0.2s] mt-5 text-base sm:text-lg text-white/75 max-w-xl leading-relaxed">
-                Instant, no-login access to lecture materials, notes, past papers and upcoming deadlines — sorted by your semester and subjects.
+                Instant access to lecture materials, notes, past papers and upcoming deadlines — sorted by your semester and subjects.
               </p>
 
-              <div className="animate-fade-up [animation-delay:0.3s] mt-8 flex flex-col sm:flex-row gap-3">
+              <div className="animate-fade-up [animation-delay:0.3s] mt-6 flex flex-col sm:flex-row gap-3">
                 <Button
                   size="lg"
                   onClick={() => navigate({ to: hasSelection ? "/dashboard" : "/select" })}
@@ -185,7 +190,7 @@ function Landing() {
               </div>
 
               {/* trust row */}
-              <div className="animate-fade-up [animation-delay:0.4s] mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 text-xs text-white/70">
+              <div className="animate-fade-up [animation-delay:0.4s] mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 text-xs text-white/70">
                 <div className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-emerald-300" /> No sign-up required</div>
                 <div className="flex items-center gap-2"><Clock className="h-4 w-4 text-emerald-300" /> Live deadline alerts</div>
                 <div className="flex items-center gap-2"><Layers className="h-4 w-4 text-emerald-300" /> Organised by subject</div>
@@ -249,8 +254,43 @@ function Landing() {
         <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-background" />
       </section>
 
+      {/* SEARCH */}
+      <section className="container mx-auto px-4 sm:px-6 -mt-10 sm:-mt-12 relative z-10">
+        <button
+          type="button"
+          onClick={() => setSearchOpen(true)}
+          className="group flex w-full items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 sm:px-5 sm:py-4 text-left shadow-elevated hover:border-primary/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <Search className="h-5 w-5 shrink-0 text-primary" />
+          <span className="flex-1 min-w-0 truncate text-sm sm:text-base text-muted-foreground group-hover:text-foreground transition-colors">
+            Search materials, subjects, study notes and past papers…
+          </span>
+          <kbd className="hidden sm:inline rounded-md bg-muted px-2 py-1 text-[11px] font-mono text-muted-foreground">⌘K</kbd>
+        </button>
+      </section>
+      <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
+
+      {/* AVAILABLE SEMESTERS */}
+      <section className="container mx-auto px-4 sm:px-6 mt-8 sm:mt-10">
+        <div className="flex items-end justify-between gap-4 mb-4 flex-wrap">
+          <div className="min-w-0">
+            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 text-primary px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider">
+              <Layers className="h-3 w-3" /> Catalog
+            </div>
+            <h2 className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight">Choose your semester</h2>
+            <p className="mt-1 text-muted-foreground text-sm">Pick a semester to view its subjects and materials.</p>
+          </div>
+          <Button asChild variant="ghost" className="shrink-0">
+            <Link to="/select">View all <ArrowRight className="ml-1 h-4 w-4" /></Link>
+          </Button>
+        </div>
+        <SemesterCards semesters={semesters ?? []} />
+      </section>
+
+      <RecentUploads />
+
       {/* FEATURES */}
-      <section className="container mx-auto px-4 sm:px-6 -mt-10 sm:-mt-14 relative z-10">
+      <section className="container mx-auto px-4 sm:px-6 mt-10 sm:mt-14">
         <div className="stagger-children grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
           {[
             { icon: FileText, title: "Lecture slides & notes", desc: "Download up-to-date material from every subject.", tint: "from-sky-500/15 to-transparent", iconBg: "bg-sky-500/10 text-sky-600 dark:text-sky-300" },
@@ -275,32 +315,13 @@ function Landing() {
         </div>
       </section>
 
-      {/* AVAILABLE SEMESTERS */}
-      <section className="container mx-auto px-4 sm:px-6 mt-16 sm:mt-24">
-        <div className="flex items-end justify-between gap-4 mb-6 flex-wrap">
-          <div className="min-w-0">
-            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 text-primary px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider">
-              <Layers className="h-3 w-3" /> Catalog
-            </div>
-            <h2 className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight">Available semesters</h2>
-            <p className="mt-1 text-muted-foreground text-sm">Pick a semester to view its subjects and materials.</p>
-          </div>
-          <Button asChild variant="ghost" className="shrink-0">
-            <Link to="/select">View all <ArrowRight className="ml-1 h-4 w-4" /></Link>
-          </Button>
-        </div>
-        <SemesterCards semesters={semesters ?? []} />
-      </section>
-
-      <RecentUploads />
-
       <HelpBar />
 
 
 
 
       {/* CTA */}
-      <section className="container mx-auto px-4 sm:px-6 mt-16 sm:mt-24 mb-16 sm:mb-24">
+      <section className="container mx-auto px-4 sm:px-6 mt-10 sm:mt-14 mb-10 sm:mb-14">
         <div className="relative overflow-hidden rounded-3xl border border-border bg-hero p-8 sm:p-12 text-center">
           <div className="pointer-events-none absolute -top-24 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-indigo-400/30 blur-3xl" />
           <div className="relative">
@@ -308,7 +329,7 @@ function Landing() {
               Ready to organise your study life?
             </h2>
             <p className="mt-3 text-sm sm:text-base text-white/75 max-w-xl mx-auto">
-              No login. No clutter. Just everything you need to ace this semester.
+              No clutter. Just everything you need to ace this semester.
             </p>
             <Button
               size="lg"
@@ -428,8 +449,8 @@ function RecentUploads() {
   });
 
   return (
-    <section className="container mx-auto px-4 sm:px-6 mt-16 sm:mt-24">
-      <div className="flex items-end justify-between gap-4 mb-6 flex-wrap">
+    <section className="container mx-auto px-4 sm:px-6 mt-10 sm:mt-14">
+      <div className="flex items-end justify-between gap-4 mb-4 flex-wrap">
         <div>
           <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider">
             <Sparkles className="h-3 w-3" /> Fresh
@@ -479,8 +500,8 @@ function RecentUploads() {
 
 function HelpBar() {
   return (
-    <section className="container mx-auto px-4 sm:px-6 mt-16 sm:mt-24">
-      <div className="relative overflow-hidden rounded-3xl border border-border bg-card-soft p-6 sm:p-10 shadow-soft">
+    <section className="container mx-auto px-4 sm:px-6 mt-10 sm:mt-14">
+      <div className="relative overflow-hidden rounded-3xl border border-border bg-card-soft p-5 sm:p-8 shadow-soft">
         <div className="pointer-events-none absolute -top-16 -right-16 h-56 w-56 rounded-full bg-primary/10 blur-3xl" />
         <div className="relative grid gap-8 lg:grid-cols-[1.1fr_1fr] items-start">
           <div>
@@ -492,10 +513,15 @@ function HelpBar() {
             </h2>
             <p className="mt-1 text-muted-foreground text-sm max-w-lg">
               Set your semester and subjects once — your dashboard then shows only what matters
-              to you. No account, no sign-up.
+              to you.
             </p>
 
-            <ol className="mt-6 space-y-3">
+            <details className="group/guide mt-4" open>
+              <summary className="inline-flex cursor-pointer list-none items-center gap-1.5 text-sm font-medium text-primary [&::-webkit-details-marker]:hidden">
+                <span className="group-open/guide:hidden">Show the 4 steps</span>
+                <span className="hidden group-open/guide:inline">Hide steps</span>
+              </summary>
+            <ol className="mt-3 space-y-3">
               {[
                 { t: "Open the Dashboard", d: "Tap Dashboard in the top menu." },
                 { t: "Choose your semester", d: "Pick the semester you're studying now." },
@@ -513,8 +539,9 @@ function HelpBar() {
                 </li>
               ))}
             </ol>
+            </details>
 
-            <div className="mt-6 flex flex-wrap gap-3">
+            <div className="mt-5 flex flex-wrap gap-3">
               <Button asChild size="sm">
                 <Link to="/select">
                   Set preferences <ArrowRight className="ml-2 h-4 w-4" />
@@ -555,7 +582,6 @@ function HelpBar() {
               <QuickTip icon={<Search className="h-4 w-4" />} title="Press ⌘K" desc="Search anything, anywhere." />
               <QuickTip icon={<Clock className="h-4 w-4" />} title="Urgent deadlines" desc="Red badges = due in 24h." />
               <QuickTip icon={<Download className="h-4 w-4" />} title="Save offline" desc="Grab PDFs before class." />
-              <QuickTip icon={<CheckCircle2 className="h-4 w-4" />} title="No login" desc="Browse anonymously." />
             </div>
           </div>
         </div>
